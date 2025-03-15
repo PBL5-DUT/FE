@@ -5,6 +5,7 @@ import Home from './components/Home';
 import ProjectDetail from './components/ProjectDetail'; 
 import Joined from './components/Joined'; 
 import PjManager from './components/PjManager';
+import PMDetail from './components/PMDetail';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
           </Route>
           <Route path="/joined" element={<Joined />} />
           <Route path="/project-manager" element={<PjManager />} /> 
+          <Route path="/PMproject/:id" element={<PMDetail />} /> 
           {/* Thêm các route khác nếu cần */}
         </Routes>
       </main>

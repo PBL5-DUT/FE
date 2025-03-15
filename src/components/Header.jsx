@@ -9,21 +9,16 @@ const Header = () => {
 
   return (
     <div className="p-4 bg-white flex items-center justify-between relative">
-      {/* Logo + Tên */}
       <div className="flex flex-col items-center">
         <img src={logo} alt="Volunteer Logo" className="h-12 mb-1" />
         <h1 className="text-xs font-bold text-gray-800">Volunteers</h1>
       </div>
-
-      {/* Navigation Menu */}
       <nav className="flex space-x-8">
         <NavLink to="/" className={({ isActive }) => isActive ? "text-blue-500 font-bold" : "text-gray-500 hover:text-blue-500 font-medium"}>Home</NavLink>
         <NavLink to="/joined" className={({ isActive }) => isActive ? "text-blue-500 font-bold" : "text-gray-500 hover:text-blue-500 font-medium"}>Joined Project</NavLink>
         <NavLink to="/information" className={({ isActive }) => isActive ? "text-blue-500 font-bold" : "text-gray-500 hover:text-blue-500 font-medium"}>Information</NavLink>
         <NavLink to="/about" className={({ isActive }) => isActive ? "text-blue-500 font-bold" : "text-gray-500 hover:text-blue-500 font-medium"}>About us</NavLink>
       </nav>
-
-      {/* User Profile */}
       <div className="relative">
         <button onClick={() => setMenuOpen(!menuOpen)} className="flex flex-col items-center">
           <img src={userAvatar} alt="User Avatar" className="h-10 w-10 rounded-full border cursor-pointer" />
