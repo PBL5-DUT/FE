@@ -1,0 +1,120 @@
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
+import NewPj from "./NewPj"; 
+import axios from "axios";
+
+const PjManager = () => {
+  const [projects, setProjects] = useState([]);
+  const [activeTab, setActiveTab] = useState("Active");
+  const [showNewPj, setShowNewPj] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(null);
+  const navigate = useNavigate();
+
+  const loadProjects = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/projects");
+      setProjects(response.data);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách dự án:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  const handleMenuClick = (projectId, action) => {
+    if (action === "forum") {
+      navigate(`/forum/${projectId}`);
+    } else if (action === "lock") {
+      axios.put(`http://localhost:8080/api/projects/${projectId}`, { status: "Locked" })
+        .then(() => loadProjects())
+        .catch((error) => console.error("Lỗi khi khóa dự án:", error));
+    } else if (action === "edit") {
+      navigate(`/edit-project/${projectId}`);
+    } else if (action === "copy") {
+      axios.post(`http://localhost:8080/api/projects/${projectId}/copy`)
+        .then(() => loadProjects())
+        .catch((error) => console.error("Lỗi khi sao chép dự án:", error));
+    }
+    setMenuOpen(null);
+  };
+
+  return (
+    <div className="p-6">
+      {showNewPj ? (
+        <NewPj onClose={() => setShowNewPj(false)} />
+      ) : (
+        <>
+          <div className="flex space-x-6 border-b">
+            {["Active", "Finished", "Locked", "Waiting for approval", "Draft"].map((tab) => (
+              <button
+                key={tab}
+                className={`pb-2 text-lg font-medium ${
+                  activeTab === tab ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500"
+                }`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-6 space-y-6">
+            {projects.length === 0 ? (
+              <p className="text-gray-500">Không có dự án nào.</p>
+            ) : (
+              projects
+                .filter((project) => project.status === activeTab)
+                .map((project) => (
+                  <div 
+                    key={project.id}  
+                    className="flex items-center border-b pb-4 cursor-pointer hover:bg-gray-100 relative"
+                    onClick={() => navigate(`/PMproject/${project.id}`)} 
+                  >
+                    <img 
+                      src={project.avatar_filepath || "https://via.placeholder.com/150"} 
+                      alt={project.name} 
+                      className="w-40 h-24 rounded-lg object-cover"
+                    />
+                    <div className="ml-4 flex-1">
+                      <h2 className="text-lg font-semibold">{project.name}</h2>
+                      <p className="text-gray-600 font-medium">{project.location}</p>
+                      <p className="text-gray-500 text-sm line-clamp-2">{project.description}</p>
+                      <p className="text-gray-500 text-sm">📅 {new Date(project.start_time).toLocaleDateString()} - {new Date(project.end_time).toLocaleDateString()}</p>
+                      <p className="text-gray-500 text-sm">🕒 Cập nhật: {new Date(project.updated_at).toLocaleDateString()}</p>
+                    </div>
+                    <button 
+                      className="text-gray-500 text-2xl relative" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMenuOpen(menuOpen === project.id ? null : project.id);
+                      }}
+                    >
+                    
+                    </button>
+                    {menuOpen === project.id && (
+                      <div className="absolute right-0 top-8 bg-white shadow-md border rounded-md w-40">
+                        <button className="w-full text-left px-4 py-2 hover:bg-gray-200" onClick={() => handleMenuClick(project.id, "forum")}>Go to forum</button>
+                        <button className="w-full text-left px-4 py-2 hover:bg-gray-200" onClick={() => handleMenuClick(project.id, "lock")}>Lock this project</button>
+                        <button className="w-full text-left px-4 py-2 hover:bg-gray-200" onClick={() => handleMenuClick(project.id, "edit")}>Edit information</button>
+                        <button className="w-full text-left px-4 py-2 hover:bg-gray-200" onClick={() => handleMenuClick(project.id, "copy")}>Copy project</button>
+                      </div>
+                    )}
+                  </div>
+                ))
+            )}
+          </div>
+          <button 
+            className="fixed bottom-6 right-6 bg-blue-500 text-white px-4 py-2 rounded-full flex items-center shadow-lg"
+            onClick={() => setShowNewPj(true)} 
+          >
+            <span className="text-xl mr-2">➕</span> Add Project
+          </button>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default PjManager;

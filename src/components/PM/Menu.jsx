@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import userAvatar from "../assets/avatar-icon.avif";
+import userAvatar from "../../assets/avatar-icon.avif";
 
 
 const Menu = ({ isOpen }) => {

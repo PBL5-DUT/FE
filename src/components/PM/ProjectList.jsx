@@ -1,7 +1,7 @@
 import ProjectCard from "./ProjectCard";
-import p1 from "../assets/p1_img.jpg";
-import p2 from "../assets/p2_img.png";
-import p3 from "../assets/p3_img.png";
+import p1 from "../../assets/p1_img.jpg";
+import p2 from "../../assets/p2_img.png";
+import p3 from "../../assets/p3_img.png";
 
 
 const projects = [
