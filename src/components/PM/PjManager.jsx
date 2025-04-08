@@ -10,9 +10,24 @@ const PjManager = () => {
   const [menuOpen, setMenuOpen] = useState(null);
   const navigate = useNavigate();
 
+  const tabMap = {
+    Active: "approved",
+    Pending: "pending",
+    Finished: "finished",
+    Locked: "locked",
+    Draft: "draft",
+    Rejected: "rejected"
+  };
+
+  const reverseTabMap = Object.entries(tabMap).reduce((acc, [label, value]) => {
+    acc[value] = label;
+    return acc;
+  }, {});
+
   const loadProjects = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/projects");
+      console.log("API data:", response.data);
       setProjects(response.data);
     } catch (error) {
       console.error("Lỗi khi tải danh sách dự án:", error);
@@ -27,7 +42,7 @@ const PjManager = () => {
     if (action === "forum") {
       navigate(`/forum/${projectId}`);
     } else if (action === "lock") {
-      axios.put(`http://localhost:8080/api/projects/${projectId}`, { status: "Locked" })
+      axios.put(`http://localhost:8080/api/projects/${projectId}`, { status: "locked" })
         .then(() => loadProjects())
         .catch((error) => console.error("Lỗi khi khóa dự án:", error));
     } else if (action === "edit") {
@@ -47,7 +62,7 @@ const PjManager = () => {
       ) : (
         <>
           <div className="flex space-x-6 border-b">
-            {["Active", "Finished", "Locked", "Waiting for approval", "Draft"].map((tab) => (
+            {Object.keys(tabMap).map((tab) => (
               <button
                 key={tab}
                 className={`pb-2 text-lg font-medium ${
@@ -65,12 +80,12 @@ const PjManager = () => {
               <p className="text-gray-500">Không có dự án nào.</p>
             ) : (
               projects
-                .filter((project) => project.status === activeTab)
+                .filter((project) => project.status === tabMap[activeTab])
                 .map((project) => (
                   <div 
-                    key={project.id}  
+                    key={project.project_id}  
                     className="flex items-center border-b pb-4 cursor-pointer hover:bg-gray-100 relative"
-                    onClick={() => navigate(`/PMproject/${project.id}`)} 
+                    onClick={() => navigate(`/PmDetail/${project.project_id}`)} 
                   >
                     <img 
                       src={project.avatar_filepath || "https://via.placeholder.com/150"} 
@@ -83,24 +98,8 @@ const PjManager = () => {
                       <p className="text-gray-500 text-sm line-clamp-2">{project.description}</p>
                       <p className="text-gray-500 text-sm">📅 {new Date(project.start_time).toLocaleDateString()} - {new Date(project.end_time).toLocaleDateString()}</p>
                       <p className="text-gray-500 text-sm">🕒 Cập nhật: {new Date(project.updated_at).toLocaleDateString()}</p>
+                      <p className="text-sm text-gray-400">Trạng thái: {reverseTabMap[project.status] || project.status}</p>
                     </div>
-                    <button 
-                      className="text-gray-500 text-2xl relative" 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMenuOpen(menuOpen === project.id ? null : project.id);
-                      }}
-                    >
-                    
-                    </button>
-                    {menuOpen === project.id && (
-                      <div className="absolute right-0 top-8 bg-white shadow-md border rounded-md w-40">
-                        <button className="w-full text-left px-4 py-2 hover:bg-gray-200" onClick={() => handleMenuClick(project.id, "forum")}>Go to forum</button>
-                        <button className="w-full text-left px-4 py-2 hover:bg-gray-200" onClick={() => handleMenuClick(project.id, "lock")}>Lock this project</button>
-                        <button className="w-full text-left px-4 py-2 hover:bg-gray-200" onClick={() => handleMenuClick(project.id, "edit")}>Edit information</button>
-                        <button className="w-full text-left px-4 py-2 hover:bg-gray-200" onClick={() => handleMenuClick(project.id, "copy")}>Copy project</button>
-                      </div>
-                    )}
                   </div>
                 ))
             )}
