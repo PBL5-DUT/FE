@@ -8,7 +8,7 @@ const PmManager = () => {
       <Header />
       
       <div className="flex flex-1">
-        <div className="w-full lg:w-3/4 p-6">
+        <div className="w-full p-6">
           <PjManager />
         </div>
       </div>

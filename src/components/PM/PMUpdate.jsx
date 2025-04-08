@@ -1,47 +1,50 @@
-import React, { useState } from "react";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom"; 
 
-const NewPj = ({ onClose }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [avatar, setAvatar] = useState("");
-  const [showImageForm, setShowImageForm] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+const PMUpdate = ({ project, onClose, onUpdated }) => {
+
+const { id } = useParams();
+
+const [title, setTitle] = useState(project?.name || "");
+const [description, setDescription] = useState(project?.description || "");
+const [location, setLocation] = useState(project?.location || "");
+const [startDate, setStartDate] = useState(project?.start_time?.slice(0, 10) || "");
+const [endDate, setEndDate] = useState(project?.end_time?.slice(0, 10) || "");
+const [avatar, setAvatar] = useState(project?.avatar_filepath || "");
+const [showImageForm, setShowImageForm] = useState(false);
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState("");
+
+
+
 
   const handleSubmit = async (status) => {
-    if (!title || !description || !location || !startDate || !endDate) {
-      setError("Vui lòng nhập đầy đủ thông tin.");
-      return;
-    }
-
     setError("");
     setLoading(true);
 
     try {
       const currentTime = new Date().toISOString();
-      
-      const response = await axios.post("http://localhost:8080/api/projects", {
+
+      const response = await axios.put(`http://localhost:8080/api/projects/${id}`, {
         name: title,
         description,
         location,
         start_time: startDate,
         end_time: endDate,
-        avatar_filepath: avatar, // Lưu URL ảnh
-        pm_id: "1",
+        avatar_filepath: avatar,
+        pm_id: "1", 
         status,
-        created_at: currentTime,
+        created_at: project.created_at,
         updated_at: currentTime,
       });
 
-      console.log("Dự án đã được lưu:", response.data);
+      console.log("Dự án đã được cập nhật:", response.data);
+      if (onUpdated) onUpdated();
       onClose();
     } catch (error) {
       if (error.response) {
-        setError(`Lỗi: ${error.response.data.message || "Không thể lưu dự án"}`);
+        setError(`Lỗi: ${error.response.data.message || "Không thể cập nhật dự án"}`);
       } else {
         setError("Lỗi: Không nhận được phản hồi từ server.");
       }
@@ -55,7 +58,7 @@ const NewPj = ({ onClose }) => {
       <div className="bg-white p-6 rounded-lg shadow-lg w-1/2 relative">
         <button className="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-xl" onClick={onClose}>❌</button>
 
-        <h2 className="text-2xl font-bold mb-4">New Project</h2>
+        <h2 className="text-2xl font-bold mb-4">Update Project</h2>
         {error && <p className="text-red-500 mb-3">{error}</p>}
 
         <label className="block font-semibold">Project Name</label>
@@ -87,16 +90,13 @@ const NewPj = ({ onClose }) => {
             <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={() => setShowImageForm(false)}>OK</button>
           </div>
         ) : (
-          <button className="bg-blue-500 text-white px-4 py-2 rounded mb-3" onClick={() => setShowImageForm(true)}>Add Image</button>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded mb-3" onClick={() => setShowImageForm(true)}>Update Image</button>
         )}
 
         <div className="flex justify-between mt-4">
           <div>
-            <button className="bg-gray-300 px-4 py-2 rounded mr-2" onClick={() => handleSubmit("draft")} disabled={loading}>
-              {loading ? "Saving..." : "Save as draft"}
-            </button>
             <button className={`px-4 py-2 rounded ${loading ? "bg-gray-400" : "bg-orange-400 text-white"}`} onClick={() => handleSubmit("pending")} disabled={loading}>
-              {loading ? "Sending..." : "Send"}
+              {loading ? "Updating..." : "Update"}
             </button>
           </div>
         </div>
@@ -105,4 +105,4 @@ const NewPj = ({ onClose }) => {
   );
 };
 
-export default NewPj;
+export default PMUpdate;
