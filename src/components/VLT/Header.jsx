@@ -16,7 +16,7 @@ const Header = () => {
         <NavLink to="/" className={({ isActive }) => isActive ? "text-blue-500 font-bold" : "text-gray-500 hover:text-blue-500 font-medium"}>Home</NavLink>
         <NavLink to="/joined" className={({ isActive }) => isActive ? "text-blue-500 font-bold" : "text-gray-500 hover:text-blue-500 font-medium"}>Joined Project</NavLink>
         <NavLink to="/information" className={({ isActive }) => isActive ? "text-blue-500 font-bold" : "text-gray-500 hover:text-blue-500 font-medium"}>Information</NavLink>
-        <NavLink to="/about" className={({ isActive }) => isActive ? "text-blue-500 font-bold" : "text-gray-500 hover:text-blue-500 font-medium"}>About us</NavLink>
+        <NavLink to="/aboutus" className={({ isActive }) => isActive ? "text-blue-500 font-bold" : "text-gray-500 hover:text-blue-500 font-medium"}>About us</NavLink>
       </nav>
       <div className="relative">
         <button onClick={() => setMenuOpen(!menuOpen)} className="flex flex-col items-center">

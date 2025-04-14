@@ -1,82 +1,77 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Search from '../../components/VLT/Find';
-import Filter from '../../components/VLT/Filter';
+import Header from '../../components/VLT/Header';
 import ProjectList from '../../components/VLT/ProjectList';
-import anh from '../../assets/project.jpg';
-
-const projects = [
-  { 
-    id: 1,
-    name: 'Trung thu cho em',
-    description: 'Ban Tổ chức Ngày hội hiến máu “Trung Thu Cho Em 2024” đã tổ chức chương trình “Đêm hội trăng rằm” nhằm mang đến một mùa Trung thu ý nghĩa, trọn vẹn cho các em. Trò chơi giao lưu, tạo sự kết nối giữa các em và Tình nguyện viên. Ngoài ra còn có các hoạt động khác như: Phá cỗ Trung thu, biểu diễn kỳ lân,... Để hoàn thành sứ mệnh cao cả đó, chúng tôi rất mong nhận được sự quan tâm và hỗ trợ từ phía Quý ông, Quý bà và Quý đơn vị với tư cách là Nhà tài trợ cho chương trình “Đêm hội trăng rằm”, đồng thời hướng đến sự hợp tác lâu dài và tích cực giữa hai bên.\n Thời gian dự kiến: 18h30 ngày 13/09/2024 (Thứ 6) \nMọi thông tin chi tiết xin vui lòng liên hệ: Trưởng Ban Đối ngoại: Vũ Thị Thu Trang \nSố điện thoại: 0393 211 004',
-    location: 'Quảng Ngãi',
-    avatar_filepath: anh, // Sử dụng đường dẫn ảnh dưới dạng chuỗi
-    start_time: '10/09/2025',
-    end_time: '11/09/2025',
-    status: 'approved'
-  },
-
-  {
-    id: 2,
-    name: 'Trung thu cho em',
-    description: 'Ban Tổ chức Ngày hội hiến máu “Trung Thu Cho Em 2024” đã tổ chức chương trình “Đêm hội trăng rằm” nhằm mang đến một mùa Trung thu ý nghĩa, trọn vẹn cho các em. Trò chơi giao lưu, tạo sự kết nối giữa các em và Tình nguyện viên. Ngoài ra còn có các hoạt động khác như: Phá cỗ Trung thu, biểu diễn kỳ lân,... Để hoàn thành sứ mệnh cao cả đó, chúng tôi rất mong nhận được sự quan tâm và hỗ trợ từ phía Quý ông, Quý bà và Quý đơn vị với tư cách là Nhà tài trợ cho chương trình “Đêm hội trăng rằm”, đồng thời hướng đến sự hợp tác lâu dài và tích cực giữa hai bên. Thời gian dự kiến: 18h30 ngày 13/09/2024 (Thứ 6) Mọi thông tin chi tiết xin vui lòng liên hệ: Trưởng Ban Đối ngoại: Vũ Thị Thu Trang Số điện thoại: 0393 211 004',
-    location: 'Quảng Ngãi',
-    avatar_filepath: anh, // Sử dụng đường dẫn ảnh dưới dạng chuỗi
-    start_time: '10/09/2025',
-    end_time: '11/09/2025',
-    status: 'approved'
-  },  {
-    id: 3,
-    name: 'Trung thu cho em',
-    description: 'Ban Tổ chức Ngày hội hiến máu “Trung Thu Cho Em 2024” đã tổ chức chương trình “Đêm hội trăng rằm” nhằm mang đến một mùa Trung thu ý nghĩa, trọn vẹn cho các em. Trò chơi giao lưu, tạo sự kết nối giữa các em và Tình nguyện viên. Ngoài ra còn có các hoạt động khác như: Phá cỗ Trung thu, biểu diễn kỳ lân,... Để hoàn thành sứ mệnh cao cả đó, chúng tôi rất mong nhận được sự quan tâm và hỗ trợ từ phía Quý ông, Quý bà và Quý đơn vị với tư cách là Nhà tài trợ cho chương trình “Đêm hội trăng rằm”, đồng thời hướng đến sự hợp tác lâu dài và tích cực giữa hai bên. Thời gian dự kiến: 18h30 ngày 13/09/2024 (Thứ 6) Mọi thông tin chi tiết xin vui lòng liên hệ: Trưởng Ban Đối ngoại: Vũ Thị Thu Trang Số điện thoại: 0393 211 004',
-    location: 'Quảng Ngãi',
-    avatar_filepath: anh, // Sử dụng đường dẫn ảnh dưới dạng chuỗi
-    start_time: '10/09/2025',
-    end_time: '11/09/2025',
-    status: 'approved'
-  },  {
-    id: 4,
-    name: 'Trung thu cho em',
-    description: 'Ban Tổ chức Ngày hội hiến máu “Trung Thu Cho Em 2024” đã tổ chức chương trình “Đêm hội trăng rằm” nhằm mang đến một mùa Trung thu ý nghĩa, trọn vẹn cho các em. Trò chơi giao lưu, tạo sự kết nối giữa các em và Tình nguyện viên. Ngoài ra còn có các hoạt động khác như: Phá cỗ Trung thu, biểu diễn kỳ lân,... Để hoàn thành sứ mệnh cao cả đó, chúng tôi rất mong nhận được sự quan tâm và hỗ trợ từ phía Quý ông, Quý bà và Quý đơn vị với tư cách là Nhà tài trợ cho chương trình “Đêm hội trăng rằm”, đồng thời hướng đến sự hợp tác lâu dài và tích cực giữa hai bên. Thời gian dự kiến: 18h30 ngày 13/09/2024 (Thứ 6) Mọi thông tin chi tiết xin vui lòng liên hệ: Trưởng Ban Đối ngoại: Vũ Thị Thu Trang Số điện thoại: 0393 211 004',
-    location: 'Quảng Ngãi',
-    avatar_filepath: anh, // Sử dụng đường dẫn ảnh dưới dạng chuỗi
-    start_time: '10/09/2025',
-    end_time: '11/09/2025',
-    status: 'approved'
-  },  {
-    id: 5,
-    name: 'Trung thu cho em',
-    description: 'Ban Tổ chức Ngày hội hiến máu “Trung Thu Cho Em 2024” đã tổ chức chương trình “Đêm hội trăng rằm” nhằm mang đến một mùa Trung thu ý nghĩa, trọn vẹn cho các em. Trò chơi giao lưu, tạo sự kết nối giữa các em và Tình nguyện viên. Ngoài ra còn có các hoạt động khác như: Phá cỗ Trung thu, biểu diễn kỳ lân,... Để hoàn thành sứ mệnh cao cả đó, chúng tôi rất mong nhận được sự quan tâm và hỗ trợ từ phía Quý ông, Quý bà và Quý đơn vị với tư cách là Nhà tài trợ cho chương trình “Đêm hội trăng rằm”, đồng thời hướng đến sự hợp tác lâu dài và tích cực giữa hai bên. Thời gian dự kiến: 18h30 ngày 13/09/2024 (Thứ 6) Mọi thông tin chi tiết xin vui lòng liên hệ: Trưởng Ban Đối ngoại: Vũ Thị Thu Trang Số điện thoại: 0393 211 004',
-    location: 'Quảng Ngãi',
-    avatar_filepath: anh, // Sử dụng đường dẫn ảnh dưới dạng chuỗi
-    start_time: '10/09/2025',
-    end_time: '11/09/2025',
-    status: 'approved'
-  },
-  {
-    id: 6,
-    name: 'Trung thu cho em',
-    description: 'Ban Tổ chức Ngày hội hiến máu “Trung Thu Cho Em 2024” đã tổ chức chương trình “Đêm hội trăng rằm” nhằm mang đến một mùa Trung thu ý nghĩa, trọn vẹn cho các em. Trò chơi giao lưu, tạo sự kết nối giữa các em và Tình nguyện viên. Ngoài ra còn có các hoạt động khác như: Phá cỗ Trung thu, biểu diễn kỳ lân,... Để hoàn thành sứ mệnh cao cả đó, chúng tôi rất mong nhận được sự quan tâm và hỗ trợ từ phía Quý ông, Quý bà và Quý đơn vị với tư cách là Nhà tài trợ cho chương trình “Đêm hội trăng rằm”, đồng thời hướng đến sự hợp tác lâu dài và tích cực giữa hai bên.\n Thời gian dự kiến: 18h30 ngày 13/09/2024 (Thứ 6) \nMọi thông tin chi tiết xin vui lòng liên hệ: Trưởng Ban Đối ngoại: Vũ Thị Thu Trang Số điện thoại: 0393 211 004',
-    location: 'Quảng Ngãi',
-    avatar_filepath: anh, // Sử dụng đường dẫn ảnh dưới dạng chuỗi
-    start_time: '10/09/2025',
-    end_time: '11/09/2025',
-    status: 'approved'
-  },
-];
-
 
 const Home = () => {
-    return (
-      <div className="p-6 bg-gray-100 min-h-screen">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Danh sách dự án</h1>
-        <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-6">
-          <Search />
-          <Filter />
-        </div>
-        <ProjectList projects={projects} />
-      </div>
-    );
+  const [projects, setProjects] = useState([]); // State để lưu danh sách dự án
+  const [loading, setLoading] = useState(true); // State để hiển thị trạng thái loading
+  const [error, setError] = useState(null); // State để lưu lỗi nếu có
+  const [selectedSort, setSelectedSort] = useState("Newest"); // State để lưu tùy chọn sort mặc định
+
+  const sortOptions = {
+    Newest: "http://localhost:8080/api/projects/approved?sort=startTime&direction=desc",
+    "Most liked": "http://localhost:8080/api/projects/approved?sort=likesCount&direction=desc",
+    "Most volunteers": "http://localhost:8080/api/projects/approved?sort=participantsCount&direction=desc",
+    Remaining: "http://localhost:8080/api/projects/approved?sort=remaining&direction=desc",
+    Liked: "http://localhost:8080/api/projects/liked",
+   
   };
-  
-  export default Home;
+
+  const fetchProjects = async (sortKey) => {
+    try {
+      setLoading(true); // Bật trạng thái loading
+      const token = localStorage.getItem('token'); // Lấy token từ localStorage
+      console.log("Token:", token); // In ra token để kiểm tra
+
+      const response = await axios.get(sortOptions[sortKey], {
+        headers: {
+          Authorization: `Bearer ${token}`, // Gửi token trong header
+        },
+      });
+
+      console.log("Response data:", response.data); // In ra dữ liệu trả về từ API
+      setProjects(response.data); // Lưu danh sách dự án vào state
+    } catch (err) {
+      console.error("Error fetching projects:", err); // In ra lỗi nếu có
+
+      if (err.response) {        
+          setError("Lỗi server! Vui lòng thử lại sau.");      
+      } else {
+        setError("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+      }
+    } finally {
+      setLoading(false); // Tắt trạng thái loading
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects(selectedSort); // Gọi API với tùy chọn mặc định "Newest"
+  }, [selectedSort]); // Gọi lại API khi `selectedSort` thay đổi
+
+  const handleSearch = (data) => {
+    setProjects(data); // Cập nhật danh sách dự án khi tìm kiếm
+  };
+
+  if (loading) {
+    return <div className="text-center mt-10">Đang tải danh sách dự án...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center mt-10 text-red-500">{error}</div>;
+  }
+
+  return (
+    <div className="bg-gray-100 min-h-screen">
+      <Header />
+      <h1 className="text-3xl font-bold text-center text-gray-800 mb-0">Danh sách dự án</h1>
+      <div className="flex justify-center mb-2"> {/* Căn giữa Find */}
+        <Search onSearch={handleSearch} onSortChange={setSelectedSort} defaultSort="Newest" />
+      </div>
+      <ProjectList projects={projects} /> {/* Truyền danh sách dự án vào ProjectList */}
+    </div>
+  );
+};
+
+export default Home;
