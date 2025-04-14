@@ -16,6 +16,14 @@ const [showImageForm, setShowImageForm] = useState(false);
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState("");
 
+const formatDate = (date) => {
+  if (!date) return "";
+  const d = new Date(date);
+  const month = `${d.getMonth() + 1}`.padStart(2, "0");
+  const day = `${d.getDate()}`.padStart(2, "0");
+  const year = d.getFullYear();
+  return `${year}-${month}-${day}`;
+};
 
 
 
@@ -30,8 +38,8 @@ const [error, setError] = useState("");
         name: title,
         description,
         location,
-        start_time: startDate,
-        end_time: endDate,
+        start_time: formatDate(startDate),
+        end_time: formatDate(endDate),        
         avatar_filepath: avatar,
         pm_id: "1", 
         status,

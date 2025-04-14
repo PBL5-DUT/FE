@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import PMUpdate from "./PMUpdate";
+import Donation from "./Donation";
 
 const PMDetail = () => {
   const { id } = useParams();
@@ -39,11 +40,14 @@ const PMDetail = () => {
     console.error("Lỗi khi cập nhật lại dữ liệu dự án:", error);
   }
   };
-
-  const AddDonate = () => {
-    // Logic cho thêm donation
-    console.log("Thêm donation");
+  const formatDateTime = (arr) => {
+    if (!arr || arr.length < 3) return "N/A";
+    const [year, month, day, hour = 0, minute = 0, second = 0] = arr;
+    const date = new Date(year, month - 1, day, hour, minute, second);
+    return date.toLocaleString("vi-VN");
   };
+  
+  
 
   if (loading) return <h1 className="text-left">Đang tải dữ liệu...</h1>;
   if (!project) return <h1 className="text-left">Project không tồn tại</h1>;
@@ -103,7 +107,7 @@ const PMDetail = () => {
         <div className="flex-1 max-w-3xl">
           <h1 className="text-4xl font-bold mb-8">{project.name}</h1>
           <h2 className="text-sm font-medium text-gray-500 mb-4">
-            Updated at: {project.updated_at}
+          Updated at: {formatDateTime(project.updated_at)}
           </h2>
           <img
             src={project.avatar_filepath}
@@ -112,10 +116,10 @@ const PMDetail = () => {
           />
           <p className="text-gray-700 whitespace-pre-line">{project.description}</p>
           <div className="flex justify-start w-full gap-4 mt-8">
-            - Ngày bắt đầu: {project.start_time}
+            - Ngày bắt đầu: {new Date(project.start_time).toLocaleDateString("vi-VN")}
           </div>
           <div className="flex justify-start w-full gap-4 mt-8">
-            - Ngày kết thúc: {project.end_time}
+            - Ngày kết thúc: {new Date(project.end_time).toLocaleDateString("vi-VN")}
           </div>
           <div className="flex justify-start w-full gap-4 mt-8">
             - Địa điểm: {project.location}
@@ -130,46 +134,8 @@ const PMDetail = () => {
             </button>
           </div>
         </div>
-
         {/* Cột bên phải: Bảng donations */}
-        <div className="w-80 bg-white p-5 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4 text-red-500">DONATIONS</h2>
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="text-left">NAME</th>
-                <th className="text-right">VND</th>
-              </tr>
-            </thead>
-            <tbody>
-              {project.donations?.length > 0 ? (
-                project.donations.map((donation, index) => (
-                  <tr key={index}>
-                    <td className="border-b border-red-500 py-3">{donation.name}</td>
-                    <td className="border-b border-red-500 py-3">
-                      {donation.amount.toLocaleString()} VND
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="2" className="text-center py-3">
-                    Chưa có đóng góp nào
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          <div className="mt-8">
-            <p className="text-lg font-semibold">
-              Total:{" "}
-              {project.donations?.reduce((sum, d) => sum + d.amount, 0).toLocaleString()} VND
-            </p>
-            <button className="mt-4 py-2 px-3 text-lg font-semibold bg-red-500 text-black rounded-full flex items-center gap-8 shadow-md">
-              +
-            </button>
-          </div>
-        </div>
+        <Donation donations={project.donations} />
       </div>
       {isEditOpen && (
       <PMUpdate
