@@ -1,6 +1,6 @@
 import React from 'react';
 import Search from '../../components/VLT/Find';
-import Filter from '../../components/VLT/Filter';
+import Header from '../../components/VLT/Header';
 import ProjectList from '../../components/VLT/ProjectList';
 import anh from '../../assets/project.jpg';
 
@@ -68,11 +68,13 @@ const projects = [
 
 const Home = () => {
     return (
-      <div className="p-6 bg-gray-100 min-h-screen">
+      <div className=" bg-gray-100 min-h-screen">
+         <Header/>
+       
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Danh sách dự án</h1>
         <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-6">
           <Search />
-          <Filter />
+          
         </div>
         <ProjectList projects={projects} />
       </div>
