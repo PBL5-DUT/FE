@@ -121,19 +121,19 @@ const PMDetail = () => {
         <div className="flex-1 max-w-3xl">
           <h1 className="text-4xl font-bold mb-8">{project.name}</h1>
           <h2 className="text-sm font-medium text-gray-500 mb-4">
-          Updated at: {formatDateTime(project.updated_at)}
+          Updated at: {formatDateTime(project.updatedAt)}
           </h2>
           <img
-            src={project.avatar_filepath}
+            src={project.avatarFilepath}
             alt={project.name}
             className="w-full h-[30rem] object-cover rounded-lg mb-4"
           />
           <p className="text-gray-700 whitespace-pre-line">{project.description}</p>
           <div className="flex justify-start w-full gap-4 mt-8">
-            - Ngày bắt đầu: {new Date(project.start_time).toLocaleDateString("vi-VN")}
+            - Ngày bắt đầu: {new Date(project.startTime).toLocaleDateString("vi-VN")}
           </div>
           <div className="flex justify-start w-full gap-4 mt-8">
-            - Ngày kết thúc: {new Date(project.end_time).toLocaleDateString("vi-VN")}
+            - Ngày kết thúc: {new Date(project.endTime).toLocaleDateString("vi-VN")}
           </div>
           <div className="flex justify-start w-full gap-4 mt-8">
             - Địa điểm: {project.location}
@@ -141,7 +141,7 @@ const PMDetail = () => {
           <div className="flex justify-start w-full mt-8">
             <button
               className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-full flex items-center gap-2 shadow-md hover:bg-blue-600"
-              onClick={() => navigate(`/forum/${project.project_id}`)}
+              onClick={() => navigate(`/forum/${project.projectId}`)}
             >
               Go to forum
               <span className="text-xl">→</span>

@@ -7,7 +7,7 @@ import Menu from "./Menu";
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <div className="p-4 bg-white flex items-center justify-between relative">
+    <div className="p-4 bg-white flex items-center justify-between relative shadow-md z-50 fixed top-0 left-0 w-full">
       <div className="flex flex-col items-center">
         <img src={logo} alt="Volunteer Logo" className="h-12 mb-1" />
         <h1 className="text-xs font-bold text-gray-800">Volunteer</h1>

@@ -10,6 +10,10 @@ import Profile from './pages/VLT/Profile';
 import ProjectDetail from "./pages/VLT/ProjectDetail";
 import { UserProvider } from './user/UserProvider';
 
+import PmDetail from './pages/PM/PMDetailPage';
+import PmManager from './pages/PM/PmManagerPage';
+
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -20,6 +24,8 @@ const AppRoutes = () => {
       <Route path="/aboutus" element={<AboutUs />} /> 
       <Route path="/profile" element={<Profile />} /> 
       <Route path="/projects/:id" element={<ProjectDetail />} />
+      <Route path="PmDetail/:id" element={<PmDetail />} />
+      <Route path="/project-manager" element={<PmManager />} />  
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
