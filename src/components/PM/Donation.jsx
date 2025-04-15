@@ -3,8 +3,8 @@ import React, { useState } from "react";
 const Donation = ({ donations }) => {
   const [activeTab, setActiveTab] = useState("Money");
 
-  const moneyDonations = donations?.filter(d => d.type === "money") || [];
-  const goodsDonations = donations?.filter(d => d.type === "goods") || [];
+  const moneyDonations = donations || [];
+  const goodsDonations = [];  
 
   const totalMoney = moneyDonations.reduce((sum, d) => sum + d.amount, 0);
 
@@ -44,8 +44,8 @@ const Donation = ({ donations }) => {
           {(activeTab === "Money" ? moneyDonations : goodsDonations).length > 0 ? (
             (activeTab === "Money" ? moneyDonations : goodsDonations).map((donation, index) => (
               <tr key={index}>
-                <td className="border-b border-red-500 py-3">{donation.name}</td>
-                <td className="border-b border-red-500 py-3 text-right">
+              <td className="border-b border-red-500 py-3">User #{donation.userId}</td>
+              <td className="border-b border-red-500 py-3 text-right">
                   {activeTab === "Money"
                     ? `${donation.amount.toLocaleString()} VND`
                     : donation.amount}

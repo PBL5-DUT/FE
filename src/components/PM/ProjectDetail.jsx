@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { useState } from "react";
 import p1 from "../../assets/p1_img.jpg";
 import p2 from "../../assets/p2_img.png";
@@ -17,60 +16,87 @@ const projects = [
       "**Trưởng Ban Đối ngoại:** Vũ Thị Thu Trang\n" +
       "📱 **Số điện thoại:** 0393 211 004",
     image: p1,
-  },
-  { id: 2, name: "Chung tay mùa đông", description: "Hỗ trợ trẻ em nghèo có áo ấm", image: p2 },
+  }
 ];
-
+const mockToken = 'mockToken12345';
 const ProjectDetail = () => {
-  const { id } = useParams();
-  const project = projects.find((p) => p.id.toString() === id);
-  const [showMessage, setShowMessage] = useState(false);
+  const project = projects[0]; // Lấy dự án đầu tiên từ mảng projects
+  const [showDonate, setShowDonate] = useState(false);
+  const [amount, setAmount] = useState('');
 
-  if (!project) return <h1 className="text-left">Project không tồn tại</h1>;
+  const processDonation = async () => {
+    if (!amount || isNaN(amount)) {
+      alert("Vui lòng nhập số tiền hợp lệ");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/api/payment/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${mockToken}`, 
+        },
+        body: JSON.stringify({
+          amount: amount,
+          userId: 123, 
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Lỗi khi tạo thanh toán");
+      }
+
+      const data = await response.json();
+      window.location.href = data.paymentUrl; // Chuyển hướng đến VNPay
+    } catch (error) {
+      console.error("Lỗi khi tạo thanh toán:", error);
+      alert("Không thể kết nối đến hệ thống thanh toán.");
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-2 flex flex-col gap-8 text-left" style={{ marginLeft: '2rem', marginRight: '2rem' }}>
       <div className="flex gap-8">
-        {/* Cột bên trái: Nội dung dự án */}
         <div className="flex-1">
           <h1 className="text-4xl font-bold mb-8">{project.name}</h1>
           <img src={project.image} alt={project.name} className="w-full h-120 object-cover rounded-lg mb-4" />
           <p className="text-gray-700 whitespace-pre-line">{project.description}</p>
 
-          {/* Hàng chứa nút Register và Donate */}
           <div className="flex justify-start w-full gap-4 mt-8">
             <button className="py-3 px-6 text-lg font-semibold bg-purple-200 text-purple-700 rounded-lg shadow-md hover:bg-purple-300">
               ❤️ Register
             </button>
             <button
               className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900"
-              onClick={() => setShowMessage(!showMessage)}
+              onClick={() => setShowDonate(!showDonate)}
             >
               » Donate
             </button>
           </div>
 
-          {/* Hộp thư xuất hiện khi nhấn Donate */}
-          {showMessage && (
+          {showDonate && (
             <div className="mt-4 p-4 border border-purple-300 rounded-lg bg-purple-100 text-purple-900">
-              <p>
-                Ủng hộ hiện kim <br />
-                903294029930 - BIDV - VU THI THU TRANG <br />
-                Nội dung: "Ten nguoi gui - SDT - IDTaiKhoan"
-                <br />
-                <br />
-                Ủng hộ hiện vật <br />
-                Gửi về địa chỉ sau: <br />
-                54 Nguyễn Lương Bằng - Hoà Khánh Bắc - ĐN <br />
-                Hãy ghi rõ các món đồ bạn gửi để chúng mình tiện kiểm tra nhé!
-              </p>
+              <p className="mb-2">Nhập số tiền muốn ủng hộ (VND):</p>
+              <input
+                type="number"
+                className="p-2 border rounded w-full mb-3"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="VD: 500000"
+              />
+              <button
+                className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-800"
+                onClick={processDonation}
+              >
+                Xác nhận ủng hộ
+              </button>
             </div>
           )}
         </div>
 
-        {/* Cột bên phải: Bảng donations */}
         <div className="w-5 bg-white p-5 rounded-lg">
-          <h2 className="text-2xl font-bold mb-4 text-red-500">DONATIONS</h2> {/* Thêm màu đỏ cho chữ DONATIONS */}
+          <h2 className="text-2xl font-bold mb-4 text-red-500">DONATIONS</h2>
           <table className="w-sm">
             <thead>
               <tr>
@@ -79,26 +105,12 @@ const ProjectDetail = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className="border-b border-red-500 py-3">______</td> {/* Thêm màu đỏ cho dấu gạch ngang */}
-                <td className="border-b border-red-500 py-3">______</td> {/* Thêm màu đỏ cho dấu gạch ngang */}
-              </tr>
-              <tr>
-                <td className="border-b border-red-500 py-3">______</td> {/* Thêm màu đỏ cho dấu gạch ngang */}
-                <td className="border-b border-red-500 py-3">______</td> {/* Thêm màu đỏ cho dấu gạch ngang */}
-              </tr>
-              <tr>
-                <td className="border-b border-red-500 py-3">______</td> {/* Thêm màu đỏ cho dấu gạch ngang */}
-                <td className="border-b border-red-500 py-3">______</td> {/* Thêm màu đỏ cho dấu gạch ngang */}
-              </tr>
-              <tr>
-                <td className="border-b border-red-500 py-3">______</td> {/* Thêm màu đỏ cho dấu gạch ngang */}
-                <td className="border-b border-red-500 py-3">______</td> {/* Thêm màu đỏ cho dấu gạch ngang */}
-              </tr>
-              <tr>
-                <td className="border-b border-red-500 py-3">______</td> {/* Thêm màu đỏ cho dấu gạch ngang */}
-                <td className="border-b border-red-500 py-3">______</td> {/* Thêm màu đỏ cho dấu gạch ngang */}
-              </tr>
+              {[...Array(5)].map((_, idx) => (
+                <tr key={idx}>
+                  <td className="border-b border-red-500 py-3">______</td>
+                  <td className="border-b border-red-500 py-3 text-right">______</td>
+                </tr>
+              ))}
             </tbody>
           </table>
           <div className="mt-4">

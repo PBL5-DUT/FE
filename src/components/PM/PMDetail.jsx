@@ -46,7 +46,21 @@ const PMDetail = () => {
     const date = new Date(year, month - 1, day, hour, minute, second);
     return date.toLocaleString("vi-VN");
   };
-  
+  const [donations, setDonations] = useState([]);
+
+  useEffect(() => {
+  const fetchDonations = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/donations/project/${id}`);
+      setDonations(response.data);
+    } catch (error) {
+      console.error("Lỗi khi tải donations:", error);
+    }
+  };
+
+  fetchDonations();
+}, [id]);
+
   
 
   if (loading) return <h1 className="text-left">Đang tải dữ liệu...</h1>;
@@ -135,7 +149,7 @@ const PMDetail = () => {
           </div>
         </div>
         {/* Cột bên phải: Bảng donations */}
-        <Donation donations={project.donations} />
+        <Donation donations={donations} />
       </div>
       {isEditOpen && (
       <PMUpdate
