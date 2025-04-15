@@ -8,12 +8,12 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    // Điều hướng nếu đã đăng nhập
+    // ✅ FIXED: Chỉ phụ thuộc vào user.jwt để tránh vòng lặp vô hạn
     useEffect(() => {
         if (user?.jwt) {
             navigate(`/home`);
         }
-    }, [user, navigate]);
+    }, [user.jwt, navigate]);
 
     // Hàm gửi yêu cầu đăng nhập
     const sendLoginRequest = () => {
@@ -39,14 +39,21 @@ const Login = () => {
                     return Promise.reject('Invalid login attempt!');
                 }
             })
-            .then(([body, headers]) => {
+            .then(([body, _headers]) => {
                 console.log('Response body:', body);
-                user.setJwt(headers.get('authorization')); // Lưu JWT vào context
-                navigate('/home'); // Điều hướng đến dashboard sau khi đăng nhập thành công
+
+                const token = body.token;
+                if (token) {
+                    user.setJwt(token);
+                    localStorage.setItem('token', token);
+                    navigate('/home');
+                } else {
+                    throw new Error('Token not found in response!');
+                }
             })
-            .catch((message) => {
-                console.error('Login error:', message);
-                alert(message);
+            .catch((error) => {
+                console.error('Login error:', error);
+                alert("Login failed. Please check your credentials.");
             });
     };
 
