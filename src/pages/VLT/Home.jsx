@@ -52,6 +52,7 @@ const Home = () => {
 
   const handleSearch = (data) => {
     setProjects(data); // Cập nhật danh sách dự án khi tìm kiếm
+
   };
 
   if (loading) {

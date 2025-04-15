@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+
 import Home from './pages/VLT/Home'; 
 import Information from './pages/VLT/Infomation';
 import AboutUs from './pages/VLT/AboutUs';
@@ -24,11 +25,14 @@ const AppRoutes = () => {
   );
 };
 
+
 const App = () => {
   return (
     <UserProvider>
       <Router>
+
         <AppRoutes />
+
       </Router>
     </UserProvider>
   );
