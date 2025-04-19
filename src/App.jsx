@@ -26,7 +26,7 @@ const AppRoutes = () => {
       <Route path="/projects/:id" element={<ProjectDetail />} />
       <Route path="PmDetail/:id" element={<PmDetail />} />
       <Route path="/project-manager" element={<PmManager />} />  
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="*" element={<Navigate to="/login" />} /> 
     </Routes>
   );
 };

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const ProjectCard = ({ project }) => {
   return (
-    <Link to={`/projects/${project.project_id}`} className="block">
+    <Link to={`/projects/${project.projectId}`} className="block">
       <div className="flex border rounded-lg shadow-md p-4 bg-white w-full">
         <img
           src={project.image}

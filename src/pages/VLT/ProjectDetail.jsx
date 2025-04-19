@@ -4,7 +4,7 @@ import axios from "axios";
 import Header from "../../components/VLT/Header"; // Import Header
 
 const ProjectDetail = () => {
-  const { id } = useParams(); // Lấy ID từ URL
+  const { id } = useParams(); 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDonate, setShowDonate] = useState(false);
@@ -30,9 +30,9 @@ const ProjectDetail = () => {
 
   };
   const processDonation = async () => {
-    const token = localStorage.getItem("token"); 
+    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
-    console.log("Token:", token); 
+  
     if (!amount || isNaN(amount)) {
       alert("Vui lòng nhập số tiền hợp lệ");
       return;
@@ -43,7 +43,7 @@ const ProjectDetail = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, 
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           amount: amount,
@@ -51,18 +51,22 @@ const ProjectDetail = () => {
         }),
       });
   
-      if (!response.ok) {
-        console.error("Chi tiết lỗi từ backend:", data); // 🔍 Log lỗi thật
-        throw new Error("Lỗi khi tạo thanh toán");
+      // Kiểm tra xem response có phải là JSON hợp lệ không
+      if (response.ok) {
+        const data = await response.json(); // Chỉ parse khi phản hồi hợp lệ
+        window.location.href = data.paymentUrl; // Điều hướng đến URL thanh toán
+      } else {
+        const errorText = await response.text(); // Lấy phản hồi dưới dạng text khi có lỗi
+        console.error("Lỗi từ server:", errorText);
+        alert("Không thể kết nối đến hệ thống thanh toán.");
       }
-  
-      const data = await response.json();
-      window.location.href = data.paymentUrl; // Chuyển hướng đến VNPay
     } catch (error) {
       console.error("Lỗi khi tạo thanh toán:", error);
       alert("Không thể kết nối đến hệ thống thanh toán.");
     }
   };
+  
+  
   
   useEffect(() => {
     fetchProjectDetail();
