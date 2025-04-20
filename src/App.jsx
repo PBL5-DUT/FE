@@ -1,47 +1,84 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
 
-import Home from './pages/VLT/Home'; 
-import Information from './pages/VLT/Infomation';
-import AboutUs from './pages/VLT/AboutUs';
-import Profile from './pages/VLT/Profile';
+import React from "react";
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Route,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
+
+import { AuthContextProvider, AuthContext } from "./util/AuthContext";
+import Header from "./components/VLT/Header";
+import Home from "./pages/VLT/Home";
+import Profile from "./pages/VLT/Profile";
 import ProjectDetail from "./pages/VLT/ProjectDetail";
-import { UserProvider } from './user/UserProvider';
+
 
 import PmDetail from './pages/PM/PMDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
 
+const ProtectedRoute = ({ children }) => {
+  const { currentUser } = React.useContext(AuthContext);
 
-const AppRoutes = () => {
-  return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/home" element={<Home />} />       
-      <Route path="/information" element={<Information />} /> 
-      <Route path="/aboutus" element={<AboutUs />} /> 
-      <Route path="/profile" element={<Profile />} /> 
-      <Route path="/projects/:id" element={<ProjectDetail />} />
-      <Route path="PmDetail/:id" element={<PmDetail />} />
-      <Route path="/project-manager" element={<PmManager />} />  
-      <Route path="*" element={<Navigate to="/login" />} /> 
-    </Routes>
-  );
+  if (!currentUser) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
 };
 
+function App() {
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <ProtectedRoute>
+          <Header />
+          <Outlet />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          path: "/home",
+          element: <Home /> ,            
+        },
 
-const App = () => {
+        {
+          path: "/profile",
+          element: <Profile />,
+        },
+        {
+          path: "/projects/:id",
+          element: <ProjectDetail />,
+        },
+        {
+          path: "PmDetail/:id",
+          element: <PmDetail />,
+        },
+        {
+          path: "/project-manager",
+          element: <PmManager />,
+        },
+      ],
+    },
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: "/register",
+      element: <Register />,
+    },
+  ]);
+
   return (
-    <UserProvider>
-      <Router>
-
-        <AppRoutes />
-
-      </Router>
-    </UserProvider>
+    <AuthContextProvider>
+      <RouterProvider router={router} />
+    </AuthContextProvider>
   );
-};
+}
 
 export default App;
