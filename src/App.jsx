@@ -1,4 +1,3 @@
-
 import React from "react";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
@@ -10,11 +9,15 @@ import {
   Outlet,
 } from "react-router-dom";
 
-
 import { AuthContextProvider, AuthContext } from "./util/AuthContext";
 import Header from "./components/VLT/Header";
 import Home from "./pages/VLT/Home";
 import Profile from "./pages/VLT/Profile";
+import ProjectDetail from "./pages/VLT/ProjectDetail";
+
+
+import PmDetail from './pages/PM/PMDetailPage';
+import PmManager from './pages/PM/PmManagerPage';
 
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = React.useContext(AuthContext);
@@ -45,6 +48,18 @@ function App() {
         {
           path: "/profile",
           element: <Profile />,
+        },
+        {
+          path: "/projects/:id",
+          element: <ProjectDetail />,
+        },
+        {
+          path: "PmDetail/:id",
+          element: <PmDetail />,
+        },
+        {
+          path: "/project-manager",
+          element: <PmManager />,
         },
       ],
     },
