@@ -13,12 +13,12 @@ const Find = ({ onSortChange, defaultSort }) => {
   ];
 
   const handleSort = (sortValue) => {
-    setSelectedSort(sortValue); 
-    onSortChange(sortValue);
+    setSelectedSort(sortValue); // Cập nhật trạng thái selectedSort
+    onSortChange(sortValue); // Gọi callback để thông báo thay đổi
   };
 
   const handleSearch = (e) => {
-    setSearch(e.target.value); 
+    setSearch(e.target.value);
     console.log("Search value:", e.target.value);
   };
 
@@ -33,9 +33,7 @@ const Find = ({ onSortChange, defaultSort }) => {
           value={search}
           onChange={handleSearch}
         />
-        <button className="text-gray-500 hover:text-gray-700">
-          🔍
-        </button>
+        <button className="text-gray-500 hover:text-gray-700">🔍</button>
       </div>
 
       {/* Các tùy chọn sắp xếp */}
@@ -45,7 +43,7 @@ const Find = ({ onSortChange, defaultSort }) => {
             key={option.value}
             className={`px-4 py-2 rounded-full border text-sm truncate ${
               selectedSort === option.value
-                ? "bg-gray-200 border-gray-400 font-bold" // In đậm tùy chọn được chọn
+                ? "bg-gray-200 border-gray-400 font-bold" 
                 : "border-gray-300"
             } text-gray-700 hover:bg-gray-100`}
             onClick={() => handleSort(option.value)}

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import Header from "../../components/VLT/Header"; // Import Header
-
+import { apiConfig } from "../../config/apiConfig"; // Import apiConfig
 const ProjectDetail = () => {
   const { id } = useParams(); 
   const [project, setProject] = useState(null);
@@ -14,12 +12,7 @@ const ProjectDetail = () => {
   const fetchProjectDetail = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token"); // Lấy token từ localStorage
-      const response = await axios.get(`http://localhost:8080/api/projects/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Gửi token trong header
-        },
-      });
+      const response = await apiConfig.get(`/projects/${id}`);
       setProject(response.data); // Lưu thông tin dự án vào state
     } catch (err) {
       console.error("Error fetching project detail:", err);
@@ -27,37 +20,32 @@ const ProjectDetail = () => {
     } finally {
       setLoading(false);
     }
-
   };
+
   const processDonation = async () => {
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
-    const projectId = id; // Lấy ID dự án từ URL
-  
     if (!amount || isNaN(amount)) {
       alert("Vui lòng nhập số tiền hợp lệ");
       return;
     }
   
+    const user = JSON.parse(localStorage.getItem("user"));
+  
+    if (!user || !user.userId) {
+      alert("Bạn cần đăng nhập để ủng hộ.");
+      return;
+    }
+  
     try {
-      const response = await fetch('http://localhost:8080/api/payment/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          amount: amount,
-          userId: userId,
-          projectId: projectId,
-        }),
+      const response = await apiConfig.post('/payment/create', {
+        amount: amount,
+        userId: user.userId, 
+        projectId: id,
       });
-      if (response.ok) {
-        const data = await response.json(); 
-        window.location.href = data.paymentUrl; 
+  
+      if (response.status === 200) {
+        window.location.href = response.data.paymentUrl;
       } else {
-        const errorText = await response.text(); 
-        console.error("Lỗi từ server:", errorText);
+        console.error("Lỗi từ server:", response.data);
         alert("Không thể kết nối đến hệ thống thanh toán.");
       }
     } catch (error) {
@@ -86,7 +74,6 @@ const ProjectDetail = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <Header /> {/* Thêm Header */}
       <div className="max-w-5xl mx-auto p-4 flex flex-col gap-8 text-left">
         <div className="flex gap-8">
           {/* Cột bên trái: Nội dung dự án */}
