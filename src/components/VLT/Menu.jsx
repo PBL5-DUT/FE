@@ -1,22 +1,23 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import userAvatar from "../../assets/avatar-icon.avif";
-import { useUser } from "../../user/UserProvider";
 
-const Menu = ({ isOpen }) => {
+const Menu = ({ isOpen, setMenuOpen }) => {
   const navigate = useNavigate();
-  const user = useUser();
 
   const handleLogout = () => {
-    user.setJwt(null); // Xóa token trong context
-    localStorage.removeItem("token"); // Xóa token trong localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");  
     navigate("/login");
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="absolute top-16 right-4 bg-white shadow-lg rounded-lg w-48 p-2 z-50">
+    <div
+      className="absolute top-16 right-4 bg-white shadow-lg rounded-lg w-48 p-2 z-50"
+      onMouseLeave={() => setMenuOpen(false)} // 👈 Auto close menu
+    >
       <div className="flex flex-col items-center py-2">
         <img
           src={userAvatar}
@@ -47,5 +48,6 @@ const Menu = ({ isOpen }) => {
     </div>
   );
 };
+
 
 export default Menu;
