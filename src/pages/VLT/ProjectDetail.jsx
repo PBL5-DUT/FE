@@ -7,6 +7,8 @@ const ProjectDetail = () => {
   const { id } = useParams(); // Lấy ID từ URL
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showDonate, setShowDonate] = useState(false);
+  const [amount, setAmount] = useState('');
   const [error, setError] = useState(null);
 
   const fetchProjectDetail = async () => {
@@ -25,8 +27,43 @@ const ProjectDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
 
+  };
+  const processDonation = async () => {
+    const token = localStorage.getItem("token"); 
+    const userId = localStorage.getItem("userId");
+    console.log("Token:", token); 
+    if (!amount || isNaN(amount)) {
+      alert("Vui lòng nhập số tiền hợp lệ");
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:8080/api/payment/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, 
+        },
+        body: JSON.stringify({
+          amount: amount,
+          userId: userId,
+        }),
+      });
+  
+      if (!response.ok) {
+        console.error("Chi tiết lỗi từ backend:", data); // 🔍 Log lỗi thật
+        throw new Error("Lỗi khi tạo thanh toán");
+      }
+  
+      const data = await response.json();
+      window.location.href = data.paymentUrl; // Chuyển hướng đến VNPay
+    } catch (error) {
+      console.error("Lỗi khi tạo thanh toán:", error);
+      alert("Không thể kết nối đến hệ thống thanh toán.");
+    }
+  };
+  
   useEffect(() => {
     fetchProjectDetail();
   }, [id]);
@@ -78,10 +115,30 @@ const ProjectDetail = () => {
               <button className="py-3 px-6 text-lg font-semibold bg-purple-200 text-purple-700 rounded-lg shadow-md hover:bg-purple-300">
                 ❤️ Register
               </button>
-              <button className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900">
+              <button className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900"
+                onClick={() => setShowDonate(!showDonate)}
+>
                 » Donate
               </button>
             </div>
+            {showDonate && (
+            <div className="mt-4 p-4 border border-purple-300 rounded-lg bg-purple-100 text-purple-900">
+              <p className="mb-2">Nhập số tiền muốn ủng hộ (VND):</p>
+              <input
+                type="number"
+                className="p-2 border rounded w-full mb-3"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="VD: 500000"
+              />
+              <button
+                className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-800"
+                onClick={processDonation}
+              >
+                Xác nhận ủng hộ
+              </button>
+            </div>
+          )}
           </div>
 
           {/* Cột bên phải: Thông tin bổ sung */}
