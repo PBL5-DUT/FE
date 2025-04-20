@@ -15,7 +15,6 @@ const Information = () => {
       }}
     >
       <div className="bg-white bg-opacity-90 min-h-screen px-4 md:px-16 py-0">
-        <Header />
 
         <h1 className="text-4xl font-bold text-center text-teal-700 mb-6">
           Kết nối Tình Nguyện Viên với Cộng Đồng

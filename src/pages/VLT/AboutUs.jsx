@@ -15,8 +15,6 @@ const AboutUs = () => {
       }}
     >
       <div className="bg-white bg-opacity-90 min-h-screen px-4 md:px-20 py-0">
-        <Header />
-
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">
           Giới thiệu về chúng tôi
         </h1>

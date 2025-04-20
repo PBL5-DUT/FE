@@ -13,9 +13,9 @@ const Find = ({ onSortChange, defaultSort }) => {
   ];
 
   const handleSort = (sortValue) => {
-    setSelectedSort(sortValue); // Cập nhật trạng thái selectedSort
-    onSortChange(sortValue); // Gọi callback để thông báo thay đổi
-  };
+    setSelectedSort(sortValue); 
+    onSortChange(sortValue); 
+  }
 
   const handleSearch = (e) => {
     setSearch(e.target.value);

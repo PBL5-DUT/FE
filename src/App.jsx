@@ -14,15 +14,17 @@ import Header from "./components/VLT/Header";
 import Home from "./pages/VLT/Home";
 import Profile from "./pages/VLT/Profile";
 import ProjectDetail from "./pages/VLT/ProjectDetail";
+import Information from "./pages/VLT/Information";
+import AboutUs from "./pages/VLT/AboutUs";
 
 
 import PmDetail from './pages/PM/PMDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
 
 const ProtectedRoute = ({ children }) => {
-  const { currentUser } = React.useContext(AuthContext);
+  const token = localStorage.getItem("token");
 
-  if (!currentUser) {
+  if (!token) {
     return <Navigate to="/login" />;
   }
 
@@ -40,6 +42,10 @@ function App() {
         </ProtectedRoute>
       ),
       children: [
+        {
+          path: "/",
+          element: <Navigate to="/home" replace />, // Điều hướng từ "/" đến "/home"
+        },
         {
           path: "/home",
           element: <Home /> ,            
@@ -60,6 +66,14 @@ function App() {
         {
           path: "/project-manager",
           element: <PmManager />,
+        },
+        {
+          path: "/information",
+          element: <Information />,
+        },
+        {
+          path: "/aboutus",
+          element: <AboutUs/>,
         },
       ],
     },
