@@ -70,6 +70,12 @@ const Donation = ({ donations }) => {
           </p>
         </div>
       )}
+      <button
+        className="mt-4 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition"
+        onClick={() => alert("Donate button clicked!")}
+      >
+        +
+      </button>
     </div>
   );
 };

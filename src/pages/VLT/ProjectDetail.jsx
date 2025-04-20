@@ -32,6 +32,7 @@ const ProjectDetail = () => {
   const processDonation = async () => {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
+    const projectId = id; // Lấy ID dự án từ URL
   
     if (!amount || isNaN(amount)) {
       alert("Vui lòng nhập số tiền hợp lệ");
@@ -48,15 +49,14 @@ const ProjectDetail = () => {
         body: JSON.stringify({
           amount: amount,
           userId: userId,
+          projectId: projectId,
         }),
       });
-  
-      // Kiểm tra xem response có phải là JSON hợp lệ không
       if (response.ok) {
-        const data = await response.json(); // Chỉ parse khi phản hồi hợp lệ
-        window.location.href = data.paymentUrl; // Điều hướng đến URL thanh toán
+        const data = await response.json(); 
+        window.location.href = data.paymentUrl; 
       } else {
-        const errorText = await response.text(); // Lấy phản hồi dưới dạng text khi có lỗi
+        const errorText = await response.text(); 
         console.error("Lỗi từ server:", errorText);
         alert("Không thể kết nối đến hệ thống thanh toán.");
       }
