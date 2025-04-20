@@ -1,62 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../../user/UserProvider';
+import { useContext } from 'react';
+import { AuthContext } from "../../util/AuthContext"
 
 const Login = () => {
-    const user = useUser(); // Lấy thông tin user từ context
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const navigate = useNavigate();
+   
+  const [inputs, setInputs] = useState({
+    username: "",
+    password: "",
+  })
 
-    // ✅ FIXED: Chỉ phụ thuộc vào user.jwt để tránh vòng lặp vô hạn
-    useEffect(() => {
-        if (user?.jwt) {
-            navigate(`/home`);
-        }
-    }, [user.jwt, navigate]);
+  const [err, setErr] = useState(null);
 
-    // Hàm gửi yêu cầu đăng nhập
-    const sendLoginRequest = () => {
-        const reqBody = {
-            username: username,
-            password: password,
-        };
+  const navigate = useNavigate()
 
-        console.log('Sending login request with:', reqBody);
+  const handleChange = e => {
+    setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  }
 
-        fetch('http://localhost:8080/api/v1/auth/login', {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            method: 'POST',
-            body: JSON.stringify(reqBody),
-        })
-            .then((response) => {
-                console.log('Response status:', response.status);
-                if (response.status === 200) {
-                    return Promise.all([response.json(), response.headers]);
-                } else {
-                    return Promise.reject('Invalid login attempt!');
-                }
-            })
-            .then(([body, _headers]) => {
-                console.log('Response body:', body);
+  const { login, currentUser } = useContext(AuthContext);
+  useEffect(()=>{
+    if(currentUser){
+      navigate("/home")
+    }
+  })
 
-                const token = body.token;
-                if (token) {
-                    user.setJwt(token);
-                    localStorage.setItem('token', token);
-                    navigate('/home');
-                } else {
-                    throw new Error('Token not found in response!');
-                }
-            })
-            .catch((error) => {
-                console.error('Login error:', error);
-                alert("Login failed. Please check your credentials.");
-            });
-    };
-
+  const handleLogin = (e) => {
+    e.preventDefault();
+      try {
+        login(inputs);
+      } catch (error) {
+        console.log("error", error)
+        alert(error.response.data)
+        setErr(error)
+      }
+  };
     return (
         <div className="flex h-screen">
             {/* Left Panel */}
@@ -94,7 +72,7 @@ const Login = () => {
                                 type="text"
                                 id="username"
                                 name="username"
-                                onChange={(e) => setUsername(e.target.value)}
+                                onChange={handleChange}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter your username"
                             />
@@ -110,14 +88,14 @@ const Login = () => {
                                 type="password"
                                 id="password"
                                 name="password"
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={handleChange}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter your password"
                             />
                         </div>
                         <button
                             type="button"
-                            onClick={sendLoginRequest}
+                            onClick={handleLogin}
                             className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
                         >
                             Login now
