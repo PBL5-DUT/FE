@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import NewPj from "./NewPj"; 
-import axios from "axios";
+import { apiConfig } from "../../config/apiConfig";
 
 const PjManager = () => {
   const [projects, setProjects] = useState([]);
@@ -26,7 +26,7 @@ const PjManager = () => {
 
   const loadProjects = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/projects/");
+      const response = await apiConfig.get("http://localhost:8080/api/projects/");
       console.log("API data:", response.data);
       setProjects(response.data);
     } catch (error) {
@@ -42,13 +42,13 @@ const PjManager = () => {
     if (action === "forum") {
       navigate(`/forum/${projectId}`);
     } else if (action === "lock") {
-      axios.put(`http://localhost:8080/api/projects/${projectId}`, { status: "locked" })
+      apiConfig.put(`http://localhost:8080/api/projects/${projectId}`, { status: "locked" })
         .then(() => loadProjects())
         .catch((error) => console.error("Lỗi khi khóa dự án:", error));
     } else if (action === "edit") {
       navigate(`/edit-project/${projectId}`);
     } else if (action === "copy") {
-      axios.post(`http://localhost:8080/api/projects/${projectId}/copy`)
+      apiConfig.post(`http://localhost:8080/api/projects/${projectId}/copy`)
         .then(() => loadProjects())
         .catch((error) => console.error("Lỗi khi sao chép dự án:", error));
     }
