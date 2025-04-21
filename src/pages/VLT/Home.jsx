@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import Find from '../../components/VLT/Find';
 import ProjectList from '../../components/VLT/ProjectList';
 import { apiConfig } from '../../config/apiConfig';
@@ -12,7 +11,9 @@ const Home = () => {
       <div className="flex justify-center mb-2">
         <Find onSortChange={setSelectedSort} defaultSort="Newest" />
       </div>
-      <ProjectListWrapper selectedSort={selectedSort} />
+      <div className="px-4">
+        <ProjectListWrapper selectedSort={selectedSort} />
+      </div>
     </div>
   );
 };
