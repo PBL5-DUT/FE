@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { apiConfig } from "../../config/apiConfig"; // Import apiConfig
 import Donation from "../../components/VLT/Donation"; // Import component Donation
 
 const ProjectDetail = () => {
-  const { id } = useParams(); 
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDonate, setShowDonate] = useState(false);
   const [amount, setAmount] = useState('');
   const [error, setError] = useState(null);
+  const [status, setStatus] = useState(null); // Trạng thái tham gia dự án
+  const [isWaiting, setIsWaiting] = useState(false); // Trạng thái chờ duyệt
 
   const fetchProjectDetail = async () => {
     try {
@@ -24,42 +27,35 @@ const ProjectDetail = () => {
     }
   };
 
-  const processDonation = async () => {
-    if (!amount || isNaN(amount)) {
-      alert("Vui lòng nhập số tiền hợp lệ");
-      return;
-    }
-  
-    const user = JSON.parse(localStorage.getItem("user"));
-  
-    if (!user || !user.userId) {
-      alert("Bạn cần đăng nhập để ủng hộ.");
-      return;
-    }
-  
+  const checkJoinedStatus = async () => {
     try {
-      const response = await apiConfig.post('/payment/create', {
-        amount: amount,
-        userId: user.userId, 
-        projectId: id,
-      });
-  
-      if (response.status === 200) {
-        window.location.href = response.data.paymentUrl;
-      } else {
-        console.error("Lỗi từ server:", response.data);
-        alert("Không thể kết nối đến hệ thống thanh toán.");
-      }
+      const response = await apiConfig.get(`/requests/${id}/check-join`);
+      setStatus(response.data.status); // Cập nhật trạng thái tham gia
     } catch (error) {
-      console.error("Lỗi khi tạo thanh toán:", error);
-      alert("Không thể kết nối đến hệ thống thanh toán.");
+      console.error("Error checking joined status:", error);
     }
   };
-  
-  
-  
+
+  const handleRegister = async () => {
+    try {
+      setIsWaiting(true); // Hiển thị trạng thái "Waiting for approving"
+      await apiConfig.post(`/requests/${id}/join`); // Gửi yêu cầu tham gia
+      alert("Đã gửi yêu cầu tham gia. Vui lòng chờ admin duyệt.");
+      setStatus("pending"); // Cập nhật trạng thái thành "pending"
+    } catch (error) {
+      console.error("Error joining project:", error);
+      alert("Không thể gửi yêu cầu tham gia. Vui lòng thử lại sau.");
+      setIsWaiting(false); // Quay lại trạng thái ban đầu nếu lỗi
+    }
+  };
+
+  const handleGoToForum = () => {
+    navigate(`/forum/${id}`); // Điều hướng đến trang forum
+  };
+
   useEffect(() => {
     fetchProjectDetail();
+    checkJoinedStatus();
   }, [id]);
   const [donations, setDonations] = useState([]);
 
@@ -120,33 +116,58 @@ const ProjectDetail = () => {
 
             {/* Nút hành động */}
             <div className="flex justify-start w-full gap-4 mt-8">
-              <button className="py-3 px-6 text-lg font-semibold bg-purple-200 text-purple-700 rounded-lg shadow-md hover:bg-purple-300">
-                ❤️ Register
-              </button>
-              <button className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900"
+              {status === "pending" ? (
+                <button
+                  className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md"
+                  disabled
+                >
+                  Waiting for approving
+                </button>
+              ) : status === "approved" ? (
+                <button
+                  className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
+                  onClick={handleGoToForum}
+                >
+                  Go to Forum
+                </button>
+              ) : (
+                <button
+                  className={`py-3 px-6 text-lg font-semibold rounded-lg shadow-md ${
+                    isWaiting
+                      ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                      : "bg-purple-200 text-purple-700 hover:bg-purple-300"
+                  }`}
+                  onClick={isWaiting ? null : handleRegister}
+                  disabled={isWaiting}
+                >
+                  {isWaiting ? "Waiting for approving" : "❤️ Register"}
+                </button>
+              )}
+              <button
+                className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900"
                 onClick={() => setShowDonate(!showDonate)}
->
+              >
                 » Donate
               </button>
             </div>
             {showDonate && (
-            <div className="mt-4 p-4 border border-purple-300 rounded-lg bg-purple-100 text-purple-900">
-              <p className="mb-2">Nhập số tiền muốn ủng hộ (VND):</p>
-              <input
-                type="number"
-                className="p-2 border rounded w-full mb-3"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="VD: 500000"
-              />
-              <button
-                className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-800"
-                onClick={processDonation}
-              >
-                Xác nhận ủng hộ
-              </button>
-            </div>
-          )}
+              <div className="mt-4 p-4 border border-purple-300 rounded-lg bg-purple-100 text-purple-900">
+                <p className="mb-2">Nhập số tiền muốn ủng hộ (VND):</p>
+                <input
+                  type="number"
+                  className="p-2 border rounded w-full mb-3"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="VD: 500000"
+                />
+                <button
+                  className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-800"
+                  onClick={processDonation}
+                >
+                  Xác nhận ủng hộ
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Cột bên phải: Thông tin bổ sung */}

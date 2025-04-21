@@ -25,11 +25,11 @@ const ProjectListWrapper = ({ selectedSort }) => {
   const [error, setError] = useState(null);
 
   const sortOptions = {
-    Newest: "/projects/approved?sort=startTime&direction=desc",
-    "Most liked": "/projects/approved?sort=likesCount&direction=desc",
-    "Most volunteers": "/projects/approved?sort=participantsCount&direction=desc",
-    Remaining: "/projects/approved?sort=remaining&direction=desc",
-    Liked: "/projects/liked",
+    Newest: "/projects/approved?sort=startTime",
+    "Most liked": "/projects/approved?sort=likesCount",
+    "Most volunteers": "/projects/approved?sort=participantsCount",
+    Remaining: "/projects/approved?sort=remaining",
+    Liked: "/projects/approved?sort=liked",
   };
 
   const fetchProjects = useCallback(async () => {
