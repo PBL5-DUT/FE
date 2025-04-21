@@ -9,7 +9,7 @@ const Donation = ({ donations }) => {
   const totalMoney = moneyDonations.reduce((sum, d) => sum + d.amount, 0);
 
   return (
-    <div className="w-[26rem] bg-white p-6 rounded-lg shadow-md"> {/* Tăng chiều rộng container */}
+    <div className="w-[28rem] bg-white p-6 rounded-lg shadow-md"> {/* Tăng chiều rộng container */}
       <h2 className="text-2xl font-bold mb-4 text-red-500">DONATIONS</h2>
 
       {/* Tabs */}
@@ -37,6 +37,7 @@ const Donation = ({ donations }) => {
         <thead>
           <tr>
             <th className="text-left">STT</th>
+            <th className="text-left">ID</th>
             <th className="text-left">NAME</th>
             <th className="text-right">{activeTab === "Money" ? "VND" : "SỐ LƯỢNG"}</th>
           </tr>
@@ -46,7 +47,8 @@ const Donation = ({ donations }) => {
             (activeTab === "Money" ? moneyDonations : goodsDonations).map((donation, index) => (
               <tr key={index}>
                 <td className="border-b border-red-500 py-3">{index + 1}</td>
-                <td className="border-b border-red-500 py-3">User #{donation.userId}</td>
+                <td className="border-b border-red-500 py-3">{donation.user.userId}</td>
+                <td className="border-b border-red-500 py-3">{donation.user.fullName}</td>
                 <td className="border-b border-red-500 py-3 text-right">
                   {activeTab === "Money"
                     ? `${donation.amount.toLocaleString()} VND`
