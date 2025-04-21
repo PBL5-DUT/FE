@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { apiConfig } from "../../config/apiConfig";
 import PMUpdate from "./PMUpdate";
 import Donation from "./Donation";
+
 
 const PMDetail = () => {
   const { id } = useParams();
@@ -14,7 +15,7 @@ const PMDetail = () => {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/projects/${id}`);
+        const response = await apiConfig.get(`http://localhost:8080/api/projects/${id}`);
         setProject(response.data);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu dự án:", error);
@@ -34,7 +35,7 @@ const PMDetail = () => {
 
   const handleProjectUpdated = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/projects/${id}`);
+    const response = await apiConfig.get(`http://localhost:8080/api/projects/${id}`);
     setProject(response.data);
   } catch (error) {
     console.error("Lỗi khi cập nhật lại dữ liệu dự án:", error);
@@ -51,8 +52,9 @@ const PMDetail = () => {
   useEffect(() => {
   const fetchDonations = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/donations/project/${id}`);
+      const response = await apiConfig.get(`http://localhost:8080/api/donations/project/${id}`);
       setDonations(response.data);
+      console.log("Donations:", response.data);
     } catch (error) {
       console.error("Lỗi khi tải donations:", error);
     }

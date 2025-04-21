@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiConfig } from "../../config/apiConfig"; // Import apiConfig
+import Donation from "../../components/VLT/Donation"; // Import component Donation
+
 const ProjectDetail = () => {
   const { id } = useParams(); 
   const [project, setProject] = useState(null);
@@ -28,14 +30,22 @@ const ProjectDetail = () => {
       return;
     }
   
+    const user = JSON.parse(localStorage.getItem("user"));
+  
+    if (!user || !user.userId) {
+      alert("Bạn cần đăng nhập để ủng hộ.");
+      return;
+    }
+  
     try {
       const response = await apiConfig.post('/payment/create', {
         amount: amount,
-        userId: localStorage.getItem("userId"),
+        userId: user.userId, 
+        projectId: id,
       });
   
       if (response.status === 200) {
-        window.location.href = response.data.paymentUrl; // Điều hướng đến URL thanh toán
+        window.location.href = response.data.paymentUrl;
       } else {
         console.error("Lỗi từ server:", response.data);
         alert("Không thể kết nối đến hệ thống thanh toán.");
@@ -51,6 +61,21 @@ const ProjectDetail = () => {
   useEffect(() => {
     fetchProjectDetail();
   }, [id]);
+  const [donations, setDonations] = useState([]);
+
+  useEffect(() => {
+  const fetchDonations = async () => {
+    try {
+      const response = await apiConfig.get(`http://localhost:8080/api/donations/project/${id}`);
+      setDonations(response.data);
+      console.log("Donations:", response.data);
+    } catch (error) {
+      console.error("Lỗi khi tải donations:", error);
+    }
+  };
+
+  fetchDonations();
+}, [id]);
 
   if (loading) {
     return <div className="text-center mt-10">Đang tải thông tin dự án...</div>;
@@ -66,7 +91,7 @@ const ProjectDetail = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <div className="max-w-5xl mx-auto p-4 flex flex-col gap-8 text-left">
+      <div className="max-w-7xl mx-auto p-2 flex flex-col gap-10 text-left">
         <div className="flex gap-8">
           {/* Cột bên trái: Nội dung dự án */}
           <div className="flex-1">
@@ -125,15 +150,7 @@ const ProjectDetail = () => {
           </div>
 
           {/* Cột bên phải: Thông tin bổ sung */}
-          <div className="w-1/3 bg-white p-5 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-red-500">Thông tin bổ sung</h2>
-            <p className="text-gray-700">
-              <strong>Trạng thái:</strong> {project.status}
-            </p>
-            <p className="text-gray-700">
-              <strong>Quản lý dự án:</strong> {project.pmId}
-            </p>
-          </div>
+          <Donation donations={donations} />
         </div>
       </div>
     </div>
