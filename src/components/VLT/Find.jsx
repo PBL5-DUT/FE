@@ -1,40 +1,54 @@
 import { useState } from "react";
-import { Search } from "lucide-react";
 
-const Find = () => {
-  const [search, setSearch] = useState("");
-  const [selectedSort, setSelectedSort] = useState(null);
+const Find = ({ onSortChange, defaultSort }) => {
+  const [selectedSort, setSelectedSort] = useState(defaultSort || "Newest");
+  const [search, setSearch] = useState(""); // State để lưu giá trị tìm kiếm
 
   const sortOptions = [
-    "Liked",
-    "Nearest",
-    "Amount of volunteers",
-    "Newest",
+    { label: "Newest", value: "Newest" },
+    { label: "Most volunteers", value: "Most volunteers" },
+    { label: "Most liked", value: "Most liked" },
+    { label: "Remaining", value: "Remaining" },
+    { label: "Liked", value: "Liked" },
   ];
+
+  const handleSort = (sortValue) => {
+    setSelectedSort(sortValue); 
+    onSortChange(sortValue); 
+  }
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    console.log("Search value:", e.target.value);
+  };
+
   return (
     <div className="w-full max-w-xl p-4">
-      <div className="flex items-center border border-gray-300 rounded-full px-2 py-1">
+      {/* Thanh tìm kiếm */}
+      <div className="flex items-center border border-gray-300 rounded-full px-4 py-2 mb-4">
         <input
           type="text"
           placeholder="Search..."
-          className="flex-grow outline-none text-gray-700"
+          className="flex-grow outline-none text-sm text-gray-700"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={handleSearch}
         />
-        <button className="text-gray-500 hover:text-gray-700">
-          <Search size={20} />
-        </button>
+        <button className="text-gray-500 hover:text-gray-700">🔍</button>
       </div>
-      <div className="flex gap-4 mt-4">
+
+      {/* Các tùy chọn sắp xếp */}
+      <div className="flex gap-2 mt-4">
         {sortOptions.map((option) => (
           <button
-            key={option}
-            className={`px-1 scroll-py-0.5 rounded-full border ${
-              selectedSort === option ? "bg-gray-200 border-gray-400" : "border-gray-300"
+            key={option.value}
+            className={`px-4 py-2 rounded-full border text-sm truncate ${
+              selectedSort === option.value
+                ? "bg-gray-200 border-gray-400 font-bold" 
+                : "border-gray-300"
             } text-gray-700 hover:bg-gray-100`}
-            onClick={() => setSelectedSort(option)}
+            onClick={() => handleSort(option.value)}
           >
-            {option}
+            {option.label}
           </button>
         ))}
       </div>

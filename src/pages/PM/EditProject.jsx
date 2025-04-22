@@ -27,7 +27,7 @@ const EditProject = () => {
   };
 
   const handleUpdate = async () => {
-    if (!project.name || !project.description || !project.location || !project.start_time || !project.end_time) {
+    if (!project.name || !project.description || !project.location || !project.startTime || !project.endTime) {
       setError("Vui lòng nhập đầy đủ thông tin.");
       return;
     }
@@ -82,7 +82,7 @@ const EditProject = () => {
       <input
         type="date"
         name="start_time"
-        value={project.start_time}
+        value={project.startTime}
         onChange={handleChange}
         className="w-full p-2 border rounded mb-3"
       />
@@ -91,7 +91,7 @@ const EditProject = () => {
       <input
         type="date"
         name="end_time"
-        value={project.end_time}
+        value={project.endTime}
         onChange={handleChange}
         className="w-full p-2 border rounded mb-3"
       />
@@ -100,7 +100,7 @@ const EditProject = () => {
       <input
         type="text"
         name="avatar_filepath"
-        value={project.avatar_filepath}
+        value={project.avatarFilepath}
         onChange={handleChange}
         className="w-full p-2 border rounded mb-3"
         placeholder="Nhập URL ảnh"

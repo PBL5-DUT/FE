@@ -7,6 +7,7 @@ const NewPj = ({ onClose }) => {
   const [location, setLocation] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [maxParticipation, setMaxParticipation] = useState(10);
   const [avatar, setAvatar] = useState("");
   const [showImageForm, setShowImageForm] = useState(false);
   const [error, setError] = useState("");
@@ -23,23 +24,30 @@ const NewPj = ({ onClose }) => {
 
     try {
       const currentTime = new Date().toISOString();
-      
+      const token = localStorage.getItem("token"); // Lấy JWT từ localStorage
+    
       const response = await axios.post("http://localhost:8080/api/projects", {
         name: title,
         description,
         location,
-        start_time: startDate,
-        end_time: endDate,
-        avatar_filepath: avatar, // Lưu URL ảnh
-        pm_id: "1",
+        startTime: startDate,
+        endTime: endDate,
+        avatarFilepath: avatar, 
+        maxParticipations: maxParticipation,
+        pmId: "1",
         status,
-        created_at: currentTime,
-        updated_at: currentTime,
+        createdAt: currentTime,
+        updatedAt: currentTime,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
       });
-
+    
       console.log("Dự án đã được lưu:", response.data);
       onClose();
-    } catch (error) {
+    }
+    catch (error) {
       if (error.response) {
         setError(`Lỗi: ${error.response.data.message || "Không thể lưu dự án"}`);
       } else {
@@ -72,6 +80,9 @@ const NewPj = ({ onClose }) => {
 
         <label className="block font-semibold">End Date</label>
         <input type="date" className="w-full p-2 border rounded mb-3" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+
+        <label className="block font-semibold">Max Participations</label>
+        <input type="number" className="w-full p-2 border rounded mb-3" value={maxParticipation} onChange={(e) => setMaxParticipation(e.target.value)} />
 
         {avatar && <img src={avatar} alt="Project Avatar" className="w-40 h-24 rounded-lg object-cover mb-3" />}
 

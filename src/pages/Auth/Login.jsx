@@ -1,55 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../../user/UserProvider';
+import { useContext } from 'react';
+import { AuthContext } from "../../util/AuthContext"
 
 const Login = () => {
-    const user = useUser(); // Lấy thông tin user từ context
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const navigate = useNavigate();
+   
+  const [inputs, setInputs] = useState({
+    username: "",
+    password: "",
+  })
 
-    // Điều hướng nếu đã đăng nhập
-    useEffect(() => {
-        if (user?.jwt) {
-            navigate(`/home`);
-        }
-    }, [user, navigate]);
+  const [err, setErr] = useState(null);
 
-    // Hàm gửi yêu cầu đăng nhập
-    const sendLoginRequest = () => {
-        const reqBody = {
-            username: username,
-            password: password,
-        };
+  const navigate = useNavigate()
 
-        console.log('Sending login request with:', reqBody);
+  const handleChange = e => {
+    setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  }
 
-        fetch('http://localhost:8080/api/v1/auth/login', {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            method: 'POST',
-            body: JSON.stringify(reqBody),
-        })
-            .then((response) => {
-                console.log('Response status:', response.status);
-                if (response.status === 200) {
-                    return Promise.all([response.json(), response.headers]);
-                } else {
-                    return Promise.reject('Invalid login attempt!');
-                }
-            })
-            .then(([body, headers]) => {
-                console.log('Response body:', body);
-                user.setJwt(headers.get('authorization')); // Lưu JWT vào context
-                navigate('/home'); // Điều hướng đến dashboard sau khi đăng nhập thành công
-            })
-            .catch((message) => {
-                console.error('Login error:', message);
-                alert(message);
-            });
-    };
+  const { login, currentUser } = useContext(AuthContext);
+  useEffect(()=>{
+    if(currentUser){
+      navigate("/home")
+    }
+  })
 
+  const handleLogin = (e) => {
+    e.preventDefault();
+      try {
+        login(inputs);
+      } catch (error) {
+        console.log("error", error)
+        alert(error.response.data)
+        setErr(error)
+      }
+  };
     return (
         <div className="flex h-screen">
             {/* Left Panel */}
@@ -87,7 +72,7 @@ const Login = () => {
                                 type="text"
                                 id="username"
                                 name="username"
-                                onChange={(e) => setUsername(e.target.value)}
+                                onChange={handleChange}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter your username"
                             />
@@ -103,14 +88,14 @@ const Login = () => {
                                 type="password"
                                 id="password"
                                 name="password"
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={handleChange}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter your password"
                             />
                         </div>
                         <button
                             type="button"
-                            onClick={sendLoginRequest}
+                            onClick={handleLogin}
                             className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
                         >
                             Login now

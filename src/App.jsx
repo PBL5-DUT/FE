@@ -1,33 +1,97 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
-import PmDetail from './pages/PM/PmDetailPage'; 
+import React from "react";
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Route,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
+
+import { AuthContextProvider, AuthContext } from "./util/AuthContext";
+import Header from "./components/VLT/Header";
+import Home from "./pages/VLT/Home";
+import Profile from "./pages/VLT/Profile";
+import ProjectDetail from "./pages/VLT/ProjectDetail";
+import Information from "./pages/VLT/Information";
+import AboutUs from "./pages/VLT/AboutUs";
+
+
+import PmDetail from './pages/PM/PMDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
-import Forum from './pages/PM/ForumPM';
-import PjDetail from './components/PM/ProjectDetail';
-import { UserProvider } from './user/UserProvider';
 
-import Home from './pages/VLT/Home';
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
 
-const App = () => {
-  return (
-    <UserProvider>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register/>} />
-          <Route path="/home" element={<Home />} />
-          <Route path="*" element={<Navigate to="/login" />} />
-          <Route path="PmDetail/:id" element={<PmDetail />} />
-          <Route path="/project-manager" element={<PmManager />} />  
-          <Route path="/forum" element={<Forum />} />
-          <Route path="/forum/:id" element={<Forum />} />     
-          <Route path="/test" element={<PjDetail />} />
-        </Routes>
-      </Router>
-    </UserProvider>
-  );
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
 };
+
+function App() {
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <ProtectedRoute>
+          <Header />
+          <Outlet />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          path: "/",
+          element: <Navigate to="/home" replace />, // Điều hướng từ "/" đến "/home"
+        },
+        {
+          path: "/home",
+          element: <Home /> ,            
+        },
+
+        {
+          path: "/profile",
+          element: <Profile />,
+        },
+        {
+          path: "/projects/:id",
+          element: <ProjectDetail />,
+        },
+        {
+          path: "PmDetail/:id",
+          element: <PmDetail />,
+        },
+        {
+          path: "/project-manager",
+          element: <PmManager />,
+        },
+        {
+          path: "/information",
+          element: <Information />,
+        },
+        {
+          path: "/aboutus",
+          element: <AboutUs/>,
+        },
+      ],
+    },
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: "/register",
+      element: <Register />,
+    },
+  ]);
+
+  return (
+    <AuthContextProvider>
+      <RouterProvider router={router} />
+    </AuthContextProvider>
+  );
+}
 
 export default App;

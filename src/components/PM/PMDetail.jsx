@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { apiConfig } from "../../config/apiConfig";
 import PMUpdate from "./PMUpdate";
 import Donation from "./Donation";
+
 
 const PMDetail = () => {
   const { id } = useParams();
@@ -14,7 +15,7 @@ const PMDetail = () => {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/projects/${id}`);
+        const response = await apiConfig.get(`http://localhost:8080/api/projects/${id}`);
         setProject(response.data);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu dự án:", error);
@@ -34,7 +35,7 @@ const PMDetail = () => {
 
   const handleProjectUpdated = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/projects/${id}`);
+    const response = await apiConfig.get(`http://localhost:8080/api/projects/${id}`);
     setProject(response.data);
   } catch (error) {
     console.error("Lỗi khi cập nhật lại dữ liệu dự án:", error);
@@ -51,8 +52,9 @@ const PMDetail = () => {
   useEffect(() => {
   const fetchDonations = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/donations/project/${id}`);
+      const response = await apiConfig.get(`http://localhost:8080/api/donations/project/${id}`);
       setDonations(response.data);
+      console.log("Donations:", response.data);
     } catch (error) {
       console.error("Lỗi khi tải donations:", error);
     }
@@ -121,19 +123,19 @@ const PMDetail = () => {
         <div className="flex-1 max-w-3xl">
           <h1 className="text-4xl font-bold mb-8">{project.name}</h1>
           <h2 className="text-sm font-medium text-gray-500 mb-4">
-          Updated at: {formatDateTime(project.updated_at)}
+          Updated at: {formatDateTime(project.updatedAt)}
           </h2>
           <img
-            src={project.avatar_filepath}
+            src={project.avatarFilepath}
             alt={project.name}
             className="w-full h-[30rem] object-cover rounded-lg mb-4"
           />
           <p className="text-gray-700 whitespace-pre-line">{project.description}</p>
           <div className="flex justify-start w-full gap-4 mt-8">
-            - Ngày bắt đầu: {new Date(project.start_time).toLocaleDateString("vi-VN")}
+            - Ngày bắt đầu: {new Date(project.startTime).toLocaleDateString("vi-VN")}
           </div>
           <div className="flex justify-start w-full gap-4 mt-8">
-            - Ngày kết thúc: {new Date(project.end_time).toLocaleDateString("vi-VN")}
+            - Ngày kết thúc: {new Date(project.endTime).toLocaleDateString("vi-VN")}
           </div>
           <div className="flex justify-start w-full gap-4 mt-8">
             - Địa điểm: {project.location}
@@ -141,7 +143,7 @@ const PMDetail = () => {
           <div className="flex justify-start w-full mt-8">
             <button
               className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-full flex items-center gap-2 shadow-md hover:bg-blue-600"
-              onClick={() => navigate(`/forum/${project.project_id}`)}
+              onClick={() => navigate(`/forum/${project.projectId}`)}
             >
               Go to forum
               <span className="text-xl">→</span>

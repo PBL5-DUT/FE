@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import NewPj from "./NewPj"; 
-import axios from "axios";
+import { apiConfig } from "../../config/apiConfig";
 
 const PjManager = () => {
   const [projects, setProjects] = useState([]);
@@ -26,7 +26,7 @@ const PjManager = () => {
 
   const loadProjects = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/projects");
+      const response = await apiConfig.get("http://localhost:8080/api/projects/");
       console.log("API data:", response.data);
       setProjects(response.data);
     } catch (error) {
@@ -42,13 +42,13 @@ const PjManager = () => {
     if (action === "forum") {
       navigate(`/forum/${projectId}`);
     } else if (action === "lock") {
-      axios.put(`http://localhost:8080/api/projects/${projectId}`, { status: "locked" })
+      apiConfig.put(`http://localhost:8080/api/projects/${projectId}`, { status: "locked" })
         .then(() => loadProjects())
         .catch((error) => console.error("Lỗi khi khóa dự án:", error));
     } else if (action === "edit") {
       navigate(`/edit-project/${projectId}`);
     } else if (action === "copy") {
-      axios.post(`http://localhost:8080/api/projects/${projectId}/copy`)
+      apiConfig.post(`http://localhost:8080/api/projects/${projectId}/copy`)
         .then(() => loadProjects())
         .catch((error) => console.error("Lỗi khi sao chép dự án:", error));
     }
@@ -83,12 +83,12 @@ const PjManager = () => {
                 .filter((project) => project.status === tabMap[activeTab])
                 .map((project) => (
                   <div 
-                    key={project.project_id}  
+                    key={project.projectId}  
                     className="flex items-center border-b pb-4 cursor-pointer hover:bg-gray-100 relative"
-                    onClick={() => navigate(`/PmDetail/${project.project_id}`)} 
+                    onClick={() => navigate(`/PmDetail/${project.projectId}`)} 
                   >
                     <img 
-                      src={project.avatar_filepath || "https://via.placeholder.com/150"} 
+                      src={project.avatarFilepath || "https://via.placeholder.com/150"} 
                       alt={project.name} 
                       className="w-40 h-24 rounded-lg object-cover"
                     />
@@ -96,8 +96,8 @@ const PjManager = () => {
                       <h2 className="text-lg font-semibold">{project.name}</h2>
                       <p className="text-gray-600 font-medium">{project.location}</p>
                       <p className="text-gray-500 text-sm line-clamp-2">{project.description}</p>
-                      <p className="text-gray-500 text-sm">📅 {new Date(project.start_time).toLocaleDateString()} - {new Date(project.end_time).toLocaleDateString()}</p>
-                      <p className="text-gray-500 text-sm">🕒 Cập nhật: {new Date(project.updated_at).toLocaleDateString()}</p>
+                      <p className="text-gray-500 text-sm">📅 {new Date(project.startTime).toLocaleDateString()} - {new Date(project.endTime).toLocaleDateString()}</p>
+                      <p className="text-gray-500 text-sm">🕒 Cập nhật: {new Date(project.updatedAt).toLocaleDateString()}</p>
                       <p className="text-sm text-gray-400">Trạng thái: {reverseTabMap[project.status] || project.status}</p>
                     </div>
                   </div>
