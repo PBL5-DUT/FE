@@ -68,11 +68,10 @@ const Donation = ({ donations }) => {
 
       {/* Total chỉ hiện ở tab Money */}
       {activeTab === "Money" && (
-        <div className="mt-8">
-          <p className="text-lg font-semibold">
-            Total: {totalMoney.toLocaleString()} VND
-          </p>
-        </div>
+        <div className="mt-8 flex justify-between items-center">
+        <p className="text-lg font-semibold">Total:</p>
+        <p className="text-lg font-semibold text-right">{totalMoney.toLocaleString()} VND</p>
+      </div>
       )}
       
     </div>

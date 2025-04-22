@@ -16,7 +16,7 @@ import Profile from "./pages/VLT/Profile";
 import ProjectDetail from "./pages/VLT/ProjectDetail";
 
 
-import PmDetail from './pages/PM/PMDetailPage';
+import PmDetail from './pages/PM/PmDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
 
 const ProtectedRoute = ({ children }) => {

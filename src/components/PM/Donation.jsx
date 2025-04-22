@@ -34,45 +34,46 @@ const Donation = ({ donations }) => {
 
       {/* Content */}
       <table className="w-full table-auto">
-        <thead>
-          <tr>
-            <th className="text-left">STT</th>
-            <th className="text-left">ID</th>
-            <th className="text-left">NAME</th>
-            <th className="text-right">{activeTab === "Money" ? "VND" : "SỐ LƯỢNG"}</th>
+      <thead>
+      <tr>
+        <th className="text-left">STT</th>
+        <th className="text-left">ID</th>
+        <th className="text-left">NAME</th>
+        <th className="text-right">
+          {activeTab === "Money" ? "VND" : "SỐ LƯỢNG"}
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      {(activeTab === "Money" ? moneyDonations : goodsDonations).length > 0 ? (
+        (activeTab === "Money" ? moneyDonations : goodsDonations).map((donation, index) => (
+          <tr key={index}>
+            <td className="border-b border-red-500 py-3">{index + 1}</td>
+            <td className="border-b border-red-500 py-3">{donation.user.userId}</td>
+            <td className="border-b border-red-500 py-3">{donation.user.fullName}</td>
+            <td className="border-b border-red-500 py-3 text-right">
+              {activeTab === "Money"
+                ? `${donation.amount.toLocaleString()} VND`
+                : donation.amount}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {(activeTab === "Money" ? moneyDonations : goodsDonations).length > 0 ? (
-            (activeTab === "Money" ? moneyDonations : goodsDonations).map((donation, index) => (
-              <tr key={index}>
-                <td className="border-b border-red-500 py-3">{index + 1}</td>
-                <td className="border-b border-red-500 py-3">{donation.user.userId}</td>
-                <td className="border-b border-red-500 py-3">{donation.user.fullName}</td>
-                <td className="border-b border-red-500 py-3 text-right">
-                  {activeTab === "Money"
-                    ? `${donation.amount.toLocaleString()} VND`
-                    : donation.amount}
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="3" className="text-center py-3">
-                Chưa có đóng góp nào
-              </td>
-            </tr>
-          )}
-        </tbody>
+        ))
+      ) : (
+        <tr>
+          <td colSpan="4" className="text-center py-3">
+            Chưa có đóng góp nào
+          </td>
+        </tr>
+      )}
+      </tbody>
       </table>
 
       {/* Total chỉ hiện ở tab Money */}
       {activeTab === "Money" && (
-        <div className="mt-8">
-          <p className="text-lg font-semibold">
-            Total: {totalMoney.toLocaleString()} VND
-          </p>
-        </div>
+      <div className="mt-8 flex justify-between items-center">
+        <p className="text-lg font-semibold">Total:</p>
+        <p className="text-lg font-semibold text-right">{totalMoney.toLocaleString()} VND</p>
+      </div>
       )}
       <button
         className="mt-4 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition"
