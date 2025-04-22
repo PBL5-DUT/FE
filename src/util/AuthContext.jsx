@@ -23,6 +23,8 @@ export const AuthContextProvider = ({ children }) => {
         localStorage.setItem("user", JSON.stringify(user)); // Lưu user vào localStorage
         localStorage.setItem("token", token); // Lưu token vào localStorage
         console.log("User and token saved to localStorage.");
+        console.log("User:", user);
+        console.log("Token:", token);
       } else {
         console.error("Login response does not contain user or token.");
       }

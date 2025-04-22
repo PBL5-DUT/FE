@@ -7,8 +7,9 @@ const Menu = ({ isOpen, setMenuOpen }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");  
+    localStorage.removeItem("user");
     navigate("/login");
+    window.location.reload(); // Đảm bảo trạng thái được cập nhật
   };
 
   if (!isOpen) return null;

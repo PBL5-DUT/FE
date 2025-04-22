@@ -9,14 +9,14 @@ const Profile = () => {
     fullName: "",
     phone: "",
     address: "",
-    password: "", 
+    password: "",
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [showPassword, setShowPassword] = useState(false); 
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("user"));
@@ -33,24 +33,14 @@ const Profile = () => {
         password: "",
         confirmPassword: "",
       });
-      console.log("Profile state updated:", storedData);
     }
     setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const payload = JSON.parse(atob(token.split(".")[1])); // Giải mã payload của JWT
-      console.log("Token payload:", payload);
-      const isExpired = payload.exp * 1000 < Date.now();
-      console.log("Is token expired:", isExpired);
-    }
   }, []);
 
   const handleSave = async () => {
     try {
       setLoading(true);
+      setError(null);
       const payload = {
         userId: profile.userId,
         username: profile.username,
@@ -64,11 +54,21 @@ const Profile = () => {
 
       const response = await apiConfig.put(`/users/${profile.userId}`, payload);
 
+      setProfile((prev) => ({
+        ...prev,
+        ...response.data, 
+        password: "",
+        confirmPassword: "",
+      }));
+
+      // Lưu dữ liệu mới vào localStorage
+      localStorage.setItem("user", JSON.stringify(response.data));
+
       setSuccessMessage("Cập nhật thông tin thành công!");
       console.log("Update response:", response.data);
     } catch (err) {
       console.error("Error updating profile:", err);
-
+      setError("Cập nhật thông tin thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -111,7 +111,7 @@ const Profile = () => {
               label: "Tên người dùng",
               value: profile.username,
               key: "username",
-              readOnly: true, 
+              readOnly: true,
             },
             {
               label: "Họ tên",
@@ -135,7 +135,7 @@ const Profile = () => {
               label: "Email",
               value: profile.email,
               key: "email",
-              readOnly: true, 
+              readOnly: true,
             },
           ].map((field, index) => (
             <div key={index} className="mb-4">
@@ -163,7 +163,7 @@ const Profile = () => {
           {/* Mật khẩu mới */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Mật khẩu 
+              Mật khẩu
             </label>
             <div className="relative">
               <input
@@ -226,8 +226,11 @@ const Profile = () => {
           </div>
 
           <button
-            onClick={isPasswordMatch? handleSave: null}
-            className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
+            onClick={isPasswordMatch ? handleSave : null}
+            disabled={loading || !isPasswordMatch}
+            className={`bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition ${
+              loading || !isPasswordMatch ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             Save
           </button>

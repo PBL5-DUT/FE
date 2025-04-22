@@ -24,8 +24,8 @@ const Header = () => {
           <span className="text-sm font-semibold text-gray-800">UserName</span>
         </button>
         <Menu isOpen={menuOpen} setMenuOpen={setMenuOpen} />
-
       </div>
+      <hr className="absolute bottom-0 left-0 w-full border-gray-800 border-0.7" />
     </div>
   );
 };
