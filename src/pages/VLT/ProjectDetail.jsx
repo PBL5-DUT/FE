@@ -69,6 +69,7 @@ const ProjectDetail = () => {
       console.error("Lỗi khi tải donations:", error);
     }
   };
+  
 
   fetchDonations();
 }, [id]);

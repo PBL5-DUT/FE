@@ -16,7 +16,7 @@ import Profile from "./pages/VLT/Profile";
 import ProjectDetail from "./pages/VLT/ProjectDetail";
 import Information from "./pages/VLT/Information";
 import AboutUs from "./pages/VLT/AboutUs";
-
+import JoinedProject from "./pages/VLT/JoinedProject";
 
 import PmDetail from './pages/PM/PMDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
@@ -75,6 +75,10 @@ function App() {
         {
           path: "/aboutus",
           element: <AboutUs />,
+        },
+        {
+          path: "/joined",
+          element: <JoinedProject />,
         },
       ],
     },
