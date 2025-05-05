@@ -37,20 +37,21 @@ function App() {
       path: "/",
       element: (
         <ProtectedRoute>
-          <Header />
-          <Outlet />
+          <div>
+            <Header />
+            <Outlet />
+          </div>
         </ProtectedRoute>
       ),
       children: [
         {
           path: "/",
-          element: <Navigate to="/home" replace />, // Điều hướng từ "/" đến "/home"
+          element: <Navigate to="/home" replace />,
         },
         {
           path: "/home",
-          element: <Home /> ,            
+          element: <Home />,
         },
-
         {
           path: "/profile",
           element: <Profile />,
@@ -73,7 +74,7 @@ function App() {
         },
         {
           path: "/aboutus",
-          element: <AboutUs/>,
+          element: <AboutUs />,
         },
       ],
     },

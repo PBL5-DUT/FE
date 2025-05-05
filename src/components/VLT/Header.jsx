@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, {useContext, useState} from "react";
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/logo_conen.jpg";
 import userAvatar from "../../assets/avatar-icon.avif";
 import Menu from "./Menu";
-
+import { AuthContext } from "../../util/AuthContext"; 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  return (
+  const { currentUser } = useContext(AuthContext);
+    return (
     <div className="p-4 bg-white flex items-center justify-between relative">
       <div className="flex flex-col items-center">
         <img src={logo} alt="Volunteer Logo" className="h-12 mb-1" />
@@ -20,8 +21,12 @@ const Header = () => {
       </nav>
       <div className="relative">
         <button onClick={() => setMenuOpen(!menuOpen)} className="flex flex-col items-center">
-          <img src={userAvatar} alt="User Avatar" className="h-10 w-10 rounded-full border cursor-pointer" />
-          <span className="text-sm font-semibold text-gray-800">UserName</span>
+        <img
+          src={currentUser.avatarFilepath } 
+          alt="User Avatar"
+          className="h-10 w-10 rounded-full border cursor-pointer"
+        />
+         <span className="text-sm font-semibold text-gray-800">{currentUser.username}</span>
         </button>
         <Menu isOpen={menuOpen} setMenuOpen={setMenuOpen} />
       </div>
