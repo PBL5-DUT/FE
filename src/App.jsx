@@ -20,6 +20,7 @@ import AboutUs from "./pages/VLT/AboutUs";
 
 import PmDetail from './pages/PM/PMDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
+import DonationChart from "./components/PM/DonationChart";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -66,7 +67,7 @@ function App() {
         {
           path: "/project-manager",
           element: <PmManager />,
-        },
+        },       
         {
           path: "/information",
           element: <Information />,
@@ -74,6 +75,10 @@ function App() {
         {
           path: "/aboutus",
           element: <AboutUs/>,
+        },
+        {
+          path: "/project/:id/statistics",
+          element: <DonationChart />
         },
       ],
     },
@@ -85,6 +90,7 @@ function App() {
       path: "/register",
       element: <Register />,
     },
+    
   ]);
 
   return (
