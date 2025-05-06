@@ -1,6 +1,5 @@
 import React from "react";
 import PjManager from "../../components/PM/PjManager";
-import Header from "../../components/PM/Header";
 
 const PmManager = () => {
   return (

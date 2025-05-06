@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; 
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigate, useParams } from "react-router-dom"; 
 import NewPj from "./NewPj"; 
 import { apiConfig } from "../../config/apiConfig";
+import { AuthContext } from "../../util/AuthContext"; 
 
 const PjManager = () => {
+  const { currentUser } = useContext(AuthContext);
   const [projects, setProjects] = useState([]);
   const [activeTab, setActiveTab] = useState("Active");
   const [showNewPj, setShowNewPj] = useState(false);
@@ -26,7 +28,7 @@ const PjManager = () => {
 
   const loadProjects = async () => {
     try {
-      const response = await apiConfig.get("http://localhost:8080/api/projects/");
+      const response = await apiConfig.get(`http://localhost:8080/api/projects/`);
       console.log("API data:", response.data);
       setProjects(response.data);
     } catch (error) {
@@ -37,24 +39,6 @@ const PjManager = () => {
   useEffect(() => {
     loadProjects();
   }, []);
-
-  const handleMenuClick = (projectId, action) => {
-    if (action === "forum") {
-      navigate(`/forum/${projectId}`);
-    } else if (action === "lock") {
-      apiConfig.put(`http://localhost:8080/api/projects/${projectId}`, { status: "locked" })
-        .then(() => loadProjects())
-        .catch((error) => console.error("Lỗi khi khóa dự án:", error));
-    } else if (action === "edit") {
-      navigate(`/edit-project/${projectId}`);
-    } else if (action === "copy") {
-      apiConfig.post(`http://localhost:8080/api/projects/${projectId}/copy`)
-        .then(() => loadProjects())
-        .catch((error) => console.error("Lỗi khi sao chép dự án:", error));
-    }
-    setMenuOpen(null);
-  };
-
   return (
     <div className="p-6">
       {showNewPj ? (
@@ -80,8 +64,11 @@ const PjManager = () => {
               <p className="text-gray-500">Không có dự án nào.</p>
             ) : (
               projects
-                .filter((project) => project.status === tabMap[activeTab])
-                .map((project) => (
+              .filter((project) => 
+              project.pmId === (currentUser.userId) && project.status === tabMap[activeTab],
+              console.log(currentUser.userId)
+            )
+              .map((project) => (
                   <div 
                     key={project.projectId}  
                     className="flex items-center border-b pb-4 cursor-pointer hover:bg-gray-100 relative"
