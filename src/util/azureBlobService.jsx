@@ -1,18 +1,21 @@
 import { BlobServiceClient } from "@azure/storage-blob";
 
 // Lấy thông tin từ .env
-const AZURE_STORAGE_CONNECTION_STRING = process.env.REACT_APP_AZURE_STORAGE_CONNECTION_STRING;
+const AZURE_STORAGE_ACCOUNT_NAME = import.meta.env.VITE_AZURE_STORAGE_ACCOUNT_NAME;
+const AZURE_STORAGE_SAS_TOKEN = import.meta.env.VITE_AZURE_STORAGE_SAS_TOKEN;
 
-// Kiểm tra nếu không có connection string
-if (!AZURE_STORAGE_CONNECTION_STRING) {
-  throw new Error("Azure Storage connection string is not defined in .env");
+// Kiểm tra nếu không có SAS Token hoặc Account Name
+if (!AZURE_STORAGE_ACCOUNT_NAME || !AZURE_STORAGE_SAS_TOKEN) {
+  throw new Error("Azure Storage account name hoặc SAS token is not defined in .env");
 }
 
-// Khởi tạo BlobServiceClient
-const blobServiceClient = BlobServiceClient.fromConnectionString(AZURE_STORAGE_CONNECTION_STRING);
+// Khởi tạo BlobServiceClient bằng URL và SAS Token
+const blobServiceClient = new BlobServiceClient(
+  `https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net${AZURE_STORAGE_SAS_TOKEN}`
+);
 
 /**
- * Upload file lên Azure Blob Storage
+ * Upload file ảnh lên Azure Blob Storage
  * @param {string} containerName - Tên container (user, post, project)
  * @param {string} blobName - Tên blob (ví dụ: 'volunteer2.png')
  * @param {File} file - File cần tải lên
@@ -20,6 +23,11 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(AZURE_STORAGE_C
  */
 export const uploadFileToAzure = async (containerName, blobName, file) => {
   try {
+    // Kiểm tra nếu file không phải là ảnh
+    if (!file.type.startsWith("image/")) {
+      throw new Error("File không phải là ảnh. Vui lòng chọn file ảnh.");
+    }
+
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
@@ -32,24 +40,6 @@ export const uploadFileToAzure = async (containerName, blobName, file) => {
     return blockBlobClient.url; // Trả về URL của blob
   } catch (error) {
     console.error("Error uploading file to Azure Blob Storage:", error);
-    throw error;
-  }
-};
-
-/**
- * Lấy URL của một blob từ Azure Blob Storage
- * @param {string} containerName - Tên container (user, post, project)
- * @param {string} blobName - Tên blob (ví dụ: 'volunteer2.png')
- * @returns {string} - URL của blob
- */
-export const getBlobUrl = (containerName, blobName) => {
-  try {
-    const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobClient = containerClient.getBlobClient(blobName);
-
-    return blobClient.url; // Trả về URL của blob
-  } catch (error) {
-    console.error("Error getting blob URL from Azure Blob Storage:", error);
     throw error;
   }
 };
