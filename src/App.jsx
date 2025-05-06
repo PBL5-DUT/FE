@@ -19,7 +19,7 @@ import AboutUs from "./pages/VLT/AboutUs";
 import JoinedProject from "./pages/VLT/JoinedProject";
 // import Forum from "./pages/VLT/Forum";
 
-import PmDetail from './pages/PM/PMDetailPage';
+import PmDetail from './pages/PM/PmDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
 import DonationChart from "./components/PM/DonationChart";
 
