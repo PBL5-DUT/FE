@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { apiConfig } from "../../config/apiConfig";
 
 const Loop = ({ projectId, onClose, onCopied }) => {
   const [loading, setLoading] = useState(false);
@@ -9,8 +9,8 @@ const Loop = ({ projectId, onClose, onCopied }) => {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post(`http://localhost:8080/api/projects/${projectId}/copy`);
-      onCopied?.(response.data); // Nếu có callback để cập nhật lại giao diện
+      const response = await apiConfig.post(`http://localhost:8080/api/projects/${projectId}/copy`);
+      onCopied?.(response.data); 
       onClose(); 
     } catch (err) {
       setError("Có lỗi xảy ra khi nhân bản dự án.");
@@ -21,7 +21,7 @@ const Loop = ({ projectId, onClose, onCopied }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-30">
+    <div className="fixed inset-0 bg-white bg-opacity-40 flex items-center justify-center z-30">
       <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
         <h2 className="text-xl font-bold mb-4">Nhân bản dự án</h2>
         <p>Bạn có chắc chắn muốn nhân bản dự án này không?</p>
