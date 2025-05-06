@@ -2,59 +2,95 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 
 const formatDate = (dateString) => {
-  const options = { day: "2-digit", month: "2-digit", year: "numeric" }; // Định dạng dd/MM/yyyy
-  return new Date(dateString).toLocaleDateString("vi-VN", options); // Hiển thị ngày tháng theo định dạng tiếng Việt
+  const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+  return new Date(dateString).toLocaleDateString("vi-VN", options);
 };
 
 const truncateText = (text, maxLength) => {
-  if (text.length > maxLength) {
-    return text.slice(0, maxLength) + "..."; // Cắt chuỗi và thêm dấu "..."
-  }
-  return text;
+  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
 };
 
 const ProjectCard = ({ project }) => {
-  const [isFavorite, setIsFavorite] = useState(false); // State để lưu trạng thái yêu thích
+  const [isLiked, setIsLiked] = useState(project.isLiked || false);
+  const [likeCount, setLikeCount] = useState(project.likesCount || 0);
 
-  const toggleFavorite = (e) => {
-    e.preventDefault(); // Ngăn chặn điều hướng khi nhấn trái tim
-    setIsFavorite(!isFavorite); // Đổi trạng thái yêu thích
-    console.log(`Project ${project.name} is ${!isFavorite ? "added to" : "removed from"} favorites.`);
+  const toggleLike = (e) => {
+    e.preventDefault();
+    const updatedCount = isLiked ? likeCount - 1 : likeCount + 1;
+    setIsLiked(!isLiked);
+    setLikeCount(updatedCount);
+    console.log(
+      `Project ${project.name} is ${!isLiked ? "liked" : "unliked"} (${updatedCount} likes)`
+    );
   };
 
+  const statusText = project.hasJoined ? "Đã tham gia" : "Chưa tham gia";
+  const statusColor = project.hasJoined
+    ? "bg-green-100 text-green-800"
+    : "bg-red-100 text-red-800";
+
   return (
-    <Link to={`/projects/${project.projectId}`} className="block relative">
-      <div className="flex border rounded-lg shadow-md p-4 bg-white w-full relative">
+    <Link
+      to={`/projects/${project.projectId}`}
+      className="block relative group hover:shadow-lg transition-all"
+    >
+      <div className="flex border rounded-2xl shadow-md p-4 bg-white w-full relative overflow-hidden">
+        {/* Image */}
         <img
-          src={project.avatarFilepath || "/default-image.jpg"} // Hiển thị ảnh đại diện hoặc ảnh mặc định
+          src={project.avatarFilepath || "/default-image.jpg"}
           alt={project.name}
-          className="w-48 h-48 rounded-lg object-cover"
+          className="w-44 h-44 rounded-xl object-cover border"
         />
-        <div className="ml-6 flex-1">
-          <h2 className="text-lg font-bold">{project.name}</h2>
-          <p className="text-sm text-gray-600">Địa điểm: {project.location}</p>
-          <p className="text-gray-700 mt-2">
-            Mô tả: {truncateText(project.description, 50)}
-          </p>
-          <p className="text-gray-700 mt-2">
-            Số lượng tham gia tối đa: {project.maxParticipants}
-          </p>
-          <p className="text-gray-700 mt-2">
-            Số lượng hiện tại: {project.memberCount}
-          </p>
-          <p className="text-gray-700 mt-2">
-            Thời gian: {formatDate(project.startTime)} - {formatDate(project.endTime)}
-          </p>
+
+        {/* Info */}
+        <div className="ml-6 flex-1 flex flex-col justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-1">
+              {project.name}
+            </h2>
+            <p className="text-sm text-gray-500 mb-1">
+              Location: {project.location}
+            </p>
+            <p className="text-gray-700 text-sm mb-2">
+              Description: {truncateText(project.description, 70)}
+            </p>
+
+            <div className="text-sm space-y-1">
+              <p>
+                Participants:{" "}
+                <span className="font-medium">
+                  {project.participantsCount} /{" "}
+                  {project.maxParticipants || "∞"}
+                </span>
+              </p>
+              <p>
+                Time: {formatDate(project.startTime)} →{" "}
+                {formatDate(project.endTime)}
+              </p>
+            </div>
+          </div>
+
+          {/* Status + Like */}
+          <div className="flex justify-between items-center mt-4">
+            {/* Status */}
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColor}`}
+            >
+              {statusText}
+            </span>
+
+            {/* Like + Count */}
+            <button
+              onClick={toggleLike}
+              className="flex items-center space-x-1 text-gray-400 hover:text-red-500 transition text-sm"
+            >
+              <span className={`text-2xl ${isLiked ? "text-red-500" : ""}`}>
+                ♥
+              </span>
+              <span className="font-medium">{likeCount}</span>
+            </button>
+          </div>
         </div>
-        {/* Biểu tượng trái tim */}
-        <button
-          onClick={toggleFavorite}
-          className={`absolute bottom-4 right-4 text-2xl ${
-            isFavorite ? "text-red-500" : "text-gray-400"
-          } hover:text-red-500 transition`}
-        >
-          ♥
-        </button>
       </div>
     </Link>
   );

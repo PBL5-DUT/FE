@@ -1,51 +1,54 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useCallback } from 'react';
 import Find from '../../components/VLT/Find';
 import ProjectList from '../../components/VLT/ProjectList';
-import { apiConfig } from '../../config/apiConfig'; // Import apiConfig từ config
+import { apiConfig } from '../../config/apiConfig';
 
 const Home = () => {
-  const [projects, setProjects] = useState([]); 
-  const [loading, setLoading] = useState(true); 
+  const [selectedSort, setSelectedSort] = useState("Newest");
+
+  return (
+    <div className="bg-white min-h-screen">
+      <div className="flex justify-center mb-2">
+        <Find onSortChange={setSelectedSort} defaultSort="Newest" />
+      </div>
+      <div className="px-4">
+        <ProjectListWrapper selectedSort={selectedSort} />
+      </div>
+    </div>
+  );
+};
+
+// Component riêng để load project theo sort
+const ProjectListWrapper = ({ selectedSort }) => {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedSort, setSelectedSort] = useState("Newest"); 
 
   const sortOptions = {
-    Newest: "/projects/approved?sort=startTime&direction=desc",
-    "Most liked": "/projects/approved?sort=likesCount&direction=desc",
-    "Most volunteers": "/projects/approved?sort=participantsCount&direction=desc",
-    Remaining: "/projects/approved?sort=remaining&direction=desc",
-    Liked: "/projects/liked",
+    Newest: "/projects/approved?sort=startTime",
+    "Most liked": "/projects/approved?sort=likesCount",
+    "Most volunteers": "/projects/approved?sort=participantsCount",
+    Remaining: "/projects/approved?sort=remaining",
+    Liked: "/projects/approved?sort=liked",
   };
 
-  const fetchProjects = async (sortKey) => {
+  const fetchProjects = useCallback(async () => {
     try {
-      setLoading(true); 
-      const token = localStorage.getItem('token'); 
-      const response = await apiConfig.get(sortOptions[sortKey]);
-
-      console.log("Response data:", response.data); 
-      setProjects(response.data); 
+      setLoading(true);
+      const response = await apiConfig.get(sortOptions[selectedSort]);
+      setProjects(response.data);
+      setError(null);
     } catch (err) {
-      console.error("Error fetching projsects:", err); 
-
-      if (err.response) {        
-          setError("Lỗi server! Vui lòng thử lại sau.");      
-      } else {
-        setError("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-      }
+      console.error("Lỗi khi fetch:", err);
+      setError("Không thể tải dự án. Vui lòng thử lại.");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
-  };
+  }, [selectedSort]);
 
   useEffect(() => {
-    fetchProjects(selectedSort); 
-  }, [selectedSort]); 
-
-  const handleSearch = (data) => {
-    setProjects(data); 
-  };
+    fetchProjects();
+  }, [fetchProjects]);
 
   if (loading) {
     return <div className="text-center mt-10">Đang tải danh sách dự án...</div>;
@@ -55,15 +58,7 @@ const Home = () => {
     return <div className="text-center mt-10 text-red-500">{error}</div>;
   }
 
-  return (
-    <div className="bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-center text-gray-800 mb-0">Danh sách dự án</h1>
-      <div className="flex justify-center mb-2"> {/* Căn giữa Find */}
-        <Find onSortChange={setSelectedSort} defaultSort="Newest" />
-      </div>
-      <ProjectList projects={projects} /> {/* Truyền danh sách dự án vào ProjectList */}
-    </div>
-  );
+  return <ProjectList projects={projects} />;
 };
 
 export default Home;

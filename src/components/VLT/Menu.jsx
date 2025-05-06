@@ -1,14 +1,18 @@
-import React from "react";
+import React, {useContext} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import userAvatar from "../../assets/avatar-icon.avif";
+import { AuthContext } from "../../util/AuthContext";
+
 
 const Menu = ({ isOpen, setMenuOpen }) => {
   const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);  
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");  
+    localStorage.removeItem("user");
     navigate("/login");
+    window.location.reload(); // Đảm bảo trạng thái được cập nhật
   };
 
   if (!isOpen) return null;
@@ -20,7 +24,7 @@ const Menu = ({ isOpen, setMenuOpen }) => {
     >
       <div className="flex flex-col items-center py-2">
         <img
-          src={userAvatar}
+          src={  currentUser.avatarFilepath}
           alt="User Avatar"
           className="h-14 w-14 rounded-full mb-2"
         />
