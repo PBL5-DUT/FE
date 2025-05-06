@@ -68,15 +68,16 @@ const Profile = () => {
     if (!file) return;
     try {
       setAvatarUploading(true);
-      const url = await uploadFileToAzure("user", `${profile.userId}.png`, file);
+      const uniqueFileName = `${profile.userId}-${Date.now()}.png`; // Tạo tên file duy nhất
+      const url = await uploadFileToAzure("user", uniqueFileName, file);
       const updated = { ...profile, avatarFilepath: url };
       const res = await apiConfig.put(`/users/${profile.userId}`, updated);
       setProfile((prev) => ({ ...prev, avatarFilepath: url }));
       setCurrentUser(res.data);
       localStorage.setItem("user", JSON.stringify(res.data));
-      setSuccessMessage("✅ Avatar cập nhật thành công!");
+      setSuccessMessage("Avatar cập nhật thành công!");
     } catch {
-      setError("❌ Không thể cập nhật avatar.");
+      setError("Không thể cập nhật avatar.");
     } finally {
       setAvatarUploading(false);
     }

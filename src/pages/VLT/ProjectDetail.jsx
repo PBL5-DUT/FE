@@ -1,24 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { apiConfig } from "../../config/apiConfig"; // Import apiConfig
-import Donation from "../../components/VLT/Donation"; // Import component Donation
+import { apiConfig } from "../../config/apiConfig";
+import Donation from "../../components/VLT/Donation";
+
+const formatDate = (dateString) => {
+  const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+  return new Date(dateString).toLocaleDateString("vi-VN", options);
+};
 
 const ProjectDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDonate, setShowDonate] = useState(false);
   const [amount, setAmount] = useState('');
   const [error, setError] = useState(null);
-  const [status, setStatus] = useState(null); // Trạng thái tham gia dự án
-  const [isWaiting, setIsWaiting] = useState(false); // Trạng thái chờ duyệt
+  const [status, setStatus] = useState(null);
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [donations, setDonations] = useState([]);
 
+  // Fetch project detail
   const fetchProjectDetail = async () => {
     try {
       setLoading(true);
       const response = await apiConfig.get(`/projects/${id}`);
-      setProject(response.data); // Lưu thông tin dự án vào state
+      setProject(response.data);
     } catch (err) {
       console.error("Error fetching project detail:", err);
       setError("Không thể tải thông tin dự án. Vui lòng thử lại sau.");
@@ -27,52 +35,84 @@ const ProjectDetail = () => {
     }
   };
 
+  // Fetch donations
+  const fetchDonations = async () => {
+    try {
+      const response = await apiConfig.get(`/donations/project/${id}`);
+      setDonations(response.data);
+    } catch (error) {
+      console.error("Lỗi khi tải donations:", error);
+    }
+  };
+
+  // Check project join status
   const checkJoinedStatus = async () => {
     try {
       const response = await apiConfig.get(`/requests/${id}/check-join`);
-      setStatus(response.data.status); // Cập nhật trạng thái tham gia
+      setStatus(response.data.status);
     } catch (error) {
       console.error("Error checking joined status:", error);
     }
   };
 
+  // Handle project join request
   const handleRegister = async () => {
     try {
-      setIsWaiting(true); // Hiển thị trạng thái "Waiting for approving"
-      await apiConfig.post(`/requests/${id}/join`); // Gửi yêu cầu tham gia
+      setIsWaiting(true);
+      await apiConfig.post(`/requests/${id}/join`);
       alert("Đã gửi yêu cầu tham gia. Vui lòng chờ admin duyệt.");
-      setStatus("pending"); // Cập nhật trạng thái thành "pending"
+      setStatus("pending");
     } catch (error) {
       console.error("Error joining project:", error);
       alert("Không thể gửi yêu cầu tham gia. Vui lòng thử lại sau.");
-      setIsWaiting(false); // Quay lại trạng thái ban đầu nếu lỗi
+      setIsWaiting(false);
     }
   };
 
+  // Handle navigation to forum
   const handleGoToForum = () => {
-    navigate(`/forum/${id}`); // Điều hướng đến trang forum
+    navigate(`/forum/${id}`);
   };
 
+  // Handle donation processing
+  const processDonation = async () => {
+    if (!amount || isNaN(amount)) {
+      alert("Vui lòng nhập số tiền hợp lệ");
+      return;
+    }
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user || !user.userId) {
+      alert("Bạn cần đăng nhập để ủng hộ.");
+      return;
+    }
+
+    try {
+      const response = await apiConfig.post('/payment/create', {
+        amount,
+        userId: user.userId,
+        projectId: id,
+      });
+
+      if (response.status === 200) {
+        window.location.href = response.data.paymentUrl;
+      } else {
+        console.error("Lỗi từ server:", response.data);
+        alert("Không thể kết nối đến hệ thống thanh toán.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo thanh toán:", error);
+      alert("Không thể kết nối đến hệ thống thanh toán.");
+    }
+  };
+
+  // Initial fetch
   useEffect(() => {
     fetchProjectDetail();
+    fetchDonations();
     checkJoinedStatus();
   }, [id]);
-  const [donations, setDonations] = useState([]);
-
-  useEffect(() => {
-  const fetchDonations = async () => {
-    try {
-      const response = await apiConfig.get(`http://localhost:8080/api/donations/project/${id}`);
-      setDonations(response.data);
-      console.log("Donations:", response.data);
-    } catch (error) {
-      console.error("Lỗi khi tải donations:", error);
-    }
-  };
-  
-
-  fetchDonations();
-}, [id]);
 
   if (loading) {
     return <div className="text-center mt-10">Đang tải thông tin dự án...</div>;
@@ -88,9 +128,9 @@ const ProjectDetail = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <div className="max-w-7xl mx-auto p-2 flex flex-col gap-10 text-left">
+      <div className="max-w-7xl mx-auto p-4 flex flex-col gap-10 text-left">
         <div className="flex gap-8">
-          {/* Cột bên trái: Nội dung dự án */}
+          {/* Left Column */}
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-4">{project.name}</h1>
             <img
@@ -99,36 +139,22 @@ const ProjectDetail = () => {
               className="w-full h-96 object-cover rounded-lg mb-4"
             />
             <p className="text-gray-700 mb-4">{project.description}</p>
+            <p className="text-gray-700"><strong>Địa điểm:</strong> {project.location}</p>
             <p className="text-gray-700">
-              <strong>Địa điểm:</strong> {project.location}
+              <strong>Thời gian:</strong> {formatDate(project.startTime)} → {formatDate(project.endTime)}
             </p>
-            <p className="text-gray-700">
-              <strong>Thời gian:</strong> {`${project.startTime[2]}/${project.startTime[1]}/${project.startTime[0]}`} - {`${project.endTime[2]}/${project.endTime[1]}/${project.endTime[0]}`}
-            </p>
-            <p className="text-gray-700">
-              <strong>Số lượng tham gia tối đa:</strong> {project.maxParticipants}
-            </p>
-            <p className="text-gray-700">
-              <strong>Số lượng hiện tại:</strong> {project.participantsCount}
-            </p>
-            <p className="text-gray-700">
-              <strong>Lượt thích:</strong> {project.likesCount}
-            </p>
+            <p className="text-gray-700"><strong>Số lượng tham gia tối đa:</strong> {project.maxParticipants}</p>
+            <p className="text-gray-700"><strong>Số lượng hiện tại:</strong> {project.participantsCount}</p>
+            <p className="text-gray-700"><strong>Lượt thích:</strong> {project.likesCount}</p>
 
-            {/* Nút hành động */}
+            {/* Buttons */}
             <div className="flex justify-start w-full gap-4 mt-8">
               {status === "pending" ? (
-                <button
-                  className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md"
-                  disabled
-                >
+                <button className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md" disabled>
                   Waiting for approving
                 </button>
               ) : status === "approved" ? (
-                <button
-                  className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
-                  onClick={handleGoToForum}
-                >
+                <button className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700" onClick={handleGoToForum}>
                   Go to Forum
                 </button>
               ) : (
@@ -151,6 +177,8 @@ const ProjectDetail = () => {
                 » Donate
               </button>
             </div>
+
+            {/* Donation Form */}
             {showDonate && (
               <div className="mt-4 p-4 border border-purple-300 rounded-lg bg-purple-100 text-purple-900">
                 <p className="mb-2">Nhập số tiền muốn ủng hộ (VND):</p>
@@ -171,7 +199,7 @@ const ProjectDetail = () => {
             )}
           </div>
 
-          {/* Cột bên phải: Thông tin bổ sung */}
+          {/* Right Column */}
           <Donation donations={donations} />
         </div>
       </div>

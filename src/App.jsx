@@ -17,6 +17,7 @@ import ProjectDetail from "./pages/VLT/ProjectDetail";
 import Information from "./pages/VLT/Information";
 import AboutUs from "./pages/VLT/AboutUs";
 import JoinedProject from "./pages/VLT/JoinedProject";
+// import Forum from "./pages/VLT/Forum";
 
 import PmDetail from './pages/PM/PMDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
@@ -80,6 +81,10 @@ function App() {
           path: "/joined",
           element: <JoinedProject />,
         },
+        // {
+        //   path: "/forum",
+        //   element: <Forum />,
+        // },
       ],
     },
     {
