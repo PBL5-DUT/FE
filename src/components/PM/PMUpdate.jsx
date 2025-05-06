@@ -97,7 +97,6 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
         createdAt: project?.createdAt || new Date().toISOString(),
         updatedAt: currentTime,
       });
-
       console.log("Dự án đã được cập nhật:", response.data);
       if (onUpdated) onUpdated();
       onClose();

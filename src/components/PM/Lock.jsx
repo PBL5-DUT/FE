@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { apiConfig } from "../../config/apiConfig";
 
 const Lock = ({ projectId, onClose, onLocked }) => {
   const [loading, setLoading] = useState(false);
@@ -9,8 +9,8 @@ const Lock = ({ projectId, onClose, onLocked }) => {
     setLoading(true);
     setError("");
     try {
-      await axios.post(`http://localhost:8080/api/projects/${projectId}/lock`);
-      onLocked?.(); // callback nếu có
+      await apiConfig.post(`http://localhost:8080/api/projects/${projectId}/lock`);
+      onLocked?.(); 
       onClose(); 
     } catch (err) {
       setError("Có lỗi khi khoá dự án.");

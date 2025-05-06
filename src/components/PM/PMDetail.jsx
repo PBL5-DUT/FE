@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { apiConfig } from "../../config/apiConfig";
 import PMUpdate from "./PMUpdate";
 import Donation from "./Donation";
+import Loop from "./Loop";
+import Lock from "./Lock";
 
 
 const PMDetail = () => {
@@ -11,6 +13,7 @@ const PMDetail = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
+
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -41,6 +44,24 @@ const PMDetail = () => {
     console.error("Lỗi khi cập nhật lại dữ liệu dự án:", error);
   }
   };
+  const [isCopied, setIsLoop] = useState(false);
+  const handleCopy = async () => {
+    try {
+      const response = await apiConfig.get(`http://localhost:8080/api/projects/${id}`);
+      setProject(response.data);
+    } catch (error) {
+      console.error("Lỗi khi cập nhật lại dữ liệu dự án:", error);
+    }
+  };
+  const [isLocked, setIsLocked] = useState(false);
+  const handleLock = async () => {
+    try {
+      const response = await apiConfig.get(`http://localhost:8080/api/projects/${id}`);
+      setProject(response.data);
+    } catch (error) {
+      console.error("Lỗi khi cập nhật lại dữ liệu dự án:", error);
+    }
+  }
   const formatDateTime = (arr) => {
     if (!arr || arr.length < 3) return "N/A";
     const [year, month, day, hour = 0, minute = 0, second = 0] = arr;
@@ -73,7 +94,7 @@ const PMDetail = () => {
     <div className="max-w-7xl mx-auto p-2 flex flex-col gap-8 text-left relative">
       {/* Button hamburger */}
       <button
-        className="fixed top-80 left-4 w-12 h-12 bg-gray-200 rounded-md flex flex-col justify-center items-center gap-1.5 z-20"
+        className="fixed top-90 left-4 w-12 h-12 bg-gray-200 rounded-md flex flex-col justify-center items-center gap-1.5 z-20"
         onClick={toggleMenu}
       >
         <span className="w-6 h-0.5 bg-black"></span>
@@ -98,8 +119,8 @@ const PMDetail = () => {
             <li
               className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={() => {
-                // Logic cho nhân bản dự án
                 console.log("Nhân bản dự án");
+                setIsLoop(true);
                 setIsMenuOpen(false);
               }}
             >
@@ -108,12 +129,21 @@ const PMDetail = () => {
             <li
               className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={() => {
-                // Logic cho khoá dự án
+                setIsLocked(true);
                 console.log("Khoá dự án");
                 setIsMenuOpen(false);
               }}
             >
               Khoá dự án
+            </li>
+            <li
+              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={() => {
+                navigate(`/project/${id}/statistics`);
+                setIsMenuOpen(false);
+              }}
+            >
+              Xem thống kê
             </li>
           </ul>
         </div>
@@ -159,6 +189,20 @@ const PMDetail = () => {
         onClose={() => setIsEditOpen(false)}
         onUpdated={handleProjectUpdated}
       />
+      )}
+      {isCopied && (
+      <Loop
+        project={project}
+        onClose={() => setIsLoop(false)}
+        onCopied={handleCopy}
+      />
+      )}
+      {isLocked && (
+        <Lock
+        project={project}
+        onClose={() => setIsLocked(false)}
+        onLocked={handleLock}
+        />
       )}
     </div>
   );
