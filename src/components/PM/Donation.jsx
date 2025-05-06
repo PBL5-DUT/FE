@@ -1,15 +1,19 @@
+import { useParams } from "react-router-dom";
 import React, { useState } from "react";
+import AddDonation from "./AddDonation"; 
+import axios from "axios";
 
 const Donation = ({ donations }) => {
   const [activeTab, setActiveTab] = useState("Money");
-
+  const [showForm, setShowForm] = useState(false);
+  const { id } = useParams();
   const moneyDonations = donations || [];
   const goodsDonations = [];
-
   const totalMoney = moneyDonations.reduce((sum, d) => sum + d.amount, 0);
 
+
   return (
-    <div className="w-[28rem] bg-white p-6 rounded-lg shadow-md"> {/* Tăng chiều rộng container */}
+    <div className="w-[28rem] bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-red-500">DONATIONS</h2>
 
       {/* Tabs */}
@@ -37,8 +41,7 @@ const Donation = ({ donations }) => {
         <thead>
           <tr>
             <th className="text-left">STT</th>
-            <th className="text-left">ID</th>
-            <th className="text-left">NAME</th>
+            <th className="text-left">USERNAME</th>
             <th className="text-right">{activeTab === "Money" ? "VND" : "SỐ LƯỢNG"}</th>
           </tr>
         </thead>
@@ -47,8 +50,7 @@ const Donation = ({ donations }) => {
             (activeTab === "Money" ? moneyDonations : goodsDonations).map((donation, index) => (
               <tr key={index}>
                 <td className="border-b border-red-500 py-3">{index + 1}</td>
-                <td className="border-b border-red-500 py-3">{donation.user.userId}</td>
-                <td className="border-b border-red-500 py-3">{donation.user.fullName}</td>
+                <td className="border-b border-red-500 py-3">{donation.user?.username || "Anonymous"}</td>
                 <td className="border-b border-red-500 py-3 text-right">
                   {activeTab === "Money"
                     ? `${donation.amount.toLocaleString()} VND`
@@ -66,7 +68,6 @@ const Donation = ({ donations }) => {
         </tbody>
       </table>
 
-      {/* Total chỉ hiện ở tab Money */}
       {activeTab === "Money" && (
         <div className="mt-8">
           <p className="text-lg font-semibold">
@@ -74,12 +75,26 @@ const Donation = ({ donations }) => {
           </p>
         </div>
       )}
+
       <button
         className="mt-4 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition"
-        onClick={() => alert("Donate button clicked!")}
+        onClick={() => setShowForm(true)}
       >
         +
       </button>
+
+      {showForm && (
+        <AddDonation
+        isOpen={showForm}
+        onRequestClose={() => setShowForm(false)}
+        onSuccess={() => {
+        setShowForm(false);
+        window.location.reload(); 
+        }}
+        projectId={id} 
+      />
+      
+      )}
     </div>
   );
 };

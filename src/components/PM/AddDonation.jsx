@@ -1,4 +1,3 @@
-// AddDonation.jsx
 import React, { useState } from "react";
 import Modal from "react-modal";
 import { apiConfig } from "../../config/apiConfig";
@@ -48,7 +47,7 @@ const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
       onRequestClose={onRequestClose}
       contentLabel="Add Donation"
       className="bg-white p-6 rounded-lg w-[32rem] mx-auto mt-24 shadow-lg relative"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      overlayClassName="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center"
     >
       <h2 className="text-xl font-bold mb-4">Add Donation</h2>
       <form onSubmit={handleSubmit} className="space-y-4">

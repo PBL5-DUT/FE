@@ -12,46 +12,61 @@ const DonationChart = () => {
       try {
         const response = await apiConfig.get(`http://localhost:8080/api/donations/project/${id}`);
         const donations = response.data;
-  
-        // Nhóm theo ngày (YYYY-MM-DD) và tính tổng số tiền
+
+        if (donations.length === 0) {
+          setData([]);
+          return;
+        }
+
         const grouped = {};
+        let minDate = new Date(donations[0].createdAt);
+        let maxDate = new Date(donations[0].createdAt);
+
         donations.forEach(d => {
-          const date = new Date(d.createdAt).toISOString().slice(0, 10); // "YYYY-MM-DD"
-          grouped[date] = (grouped[date] || 0) + d.amount;
+          const created = new Date(d.createdAt);
+          const dateStr = created.toISOString().slice(0, 10); // "YYYY-MM-DD"
+          grouped[dateStr] = (grouped[dateStr] || 0) + d.amount;
+
+          if (created < minDate) minDate = created;
+          if (created > maxDate) maxDate = created;
         });
-  
-        // Chuyển về mảng dữ liệu cho biểu đồ
-        const chartData = Object.keys(grouped).map(date => ({
+
+        const allDates = [];
+        const currentDate = new Date(minDate);
+        while (currentDate <= maxDate) {
+          const dateStr = currentDate.toISOString().slice(0, 10);
+          allDates.push(dateStr);
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        const chartData = allDates.map(date => ({
           date,
-          totalAmount: grouped[date],
+          totalAmount: grouped[date] || 0,
         }));
-  
+
         setData(chartData);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu thống kê:", error);
       }
     };
-  
+
     fetchDonations();
   }, [id]);
-  
 
   return (
     <div className="max-w-5xl mx-auto mt-12">
-    <h2 className="text-2xl font-bold mb-6">Thống kê số tiền quyên góp cho dự án</h2>
-    <ResponsiveContainer width="100%" height={400}>
-    <BarChart data={data}>
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis dataKey="date" />
-    <YAxis />
-    <Tooltip formatter={(value) => `${value.toLocaleString()} đ`} />
-    <Bar dataKey="totalAmount" fill="#3182CE" />
-    </BarChart>
-
-    </ResponsiveContainer>
+      <h2 className="text-2xl font-bold mb-6">Thống kê số tiền quyên góp cho dự án</h2>
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip formatter={(value) => `${value.toLocaleString()} đ`} />
+          <Bar dataKey="totalAmount" fill="#3182CE" />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
-  
 };
 
 export default DonationChart;
