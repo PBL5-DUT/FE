@@ -71,7 +71,7 @@ const ProjectDetail = () => {
 
   // Handle navigation to forum
   const handleGoToForum = () => {
-    navigate(`/forum/${id}`);
+    navigate(`/forumoverview/${id}`);
   };
 
   // Handle donation processing
@@ -150,11 +150,17 @@ const ProjectDetail = () => {
             {/* Buttons */}
             <div className="flex justify-start w-full gap-4 mt-8">
               {status === "pending" ? (
-                <button className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md" disabled>
+                <button
+                  className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md"
+                  disabled
+                >
                   Waiting for approving
                 </button>
               ) : status === "approved" ? (
-                <button className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700" onClick={handleGoToForum}>
+                <button
+                  className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
+                  onClick={handleGoToForum}
+                >
                   Go to Forum
                 </button>
               ) : (

@@ -49,9 +49,8 @@ const Donation = ({ donations }) => {
       <table className="w-full table-auto">
         <thead>
           <tr>
-            <th className="text-left">STT</th>
-            <th className="text-left">ID</th>
-            <th className="text-left">NAME</th>
+            <th className="text-left">STT</th>            
+            <th className="text-left">USERNAME</th>
             <th className="text-right">
               {activeTab === "Money" ? "VND" : "SỐ LƯỢNG"}
             </th>
@@ -65,8 +64,7 @@ const Donation = ({ donations }) => {
                   <td className="border-b border-red-500 py-3">
                     {index + 1 + (currentPage - 1) * itemsPerPage}
                   </td>
-                  <td className="border-b border-red-500 py-3">{donation.user.userId}</td>
-                  <td className="border-b border-red-500 py-3">{donation.user.fullName}</td>
+                  <td className="border-b border-red-500 py-3">{donation.user.username}</td>                 
                   <td className="border-b border-red-500 py-3 text-right">
                     {activeTab === "Money"
                       ? `${donation.amount.toLocaleString()} VND`

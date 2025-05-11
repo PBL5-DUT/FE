@@ -1,18 +1,41 @@
-import React from 'react';
+import React, { useState } from "react";
 
-const PostNew = () => {
+const PostNew = ({ onPost }) => {
+  const [content, setContent] = useState("");
+
+  const handlePost = () => {
+    if (content.trim()) {
+      const newPost = {
+        id: Date.now(),
+        author: "CurrentUser",
+        date: new Date().toLocaleString(),
+        content,
+        details: "",
+        likes: 0,
+        comments: 0,
+      };
+      onPost(newPost);
+      setContent("");
+    }
+  };
+
   return (
-    <div className="post-new p-6 bg-gray-100 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Forum</h2>
+    <div className="bg-white p-6 rounded-lg shadow-md">
       <textarea
-        placeholder="Write your post or question here"
-        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+        className="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        rows="3"
+        placeholder="Write your post or question here..."
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
       ></textarea>
-      <div className="post-new-actions flex justify-end space-x-4">
-        <button className="add-media-button bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-300">
+      <div className="flex justify-between items-center mt-4">
+        <button className="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
           Add media
         </button>
-        <button className="post-button bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300">
+        <button
+          onClick={handlePost}
+          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition"
+        >
           Post
         </button>
       </div>

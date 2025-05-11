@@ -17,6 +17,7 @@ import ProjectDetail from "./pages/VLT/ProjectDetail";
 import Information from "./pages/VLT/Information";
 import AboutUs from "./pages/VLT/AboutUs";
 import JoinedProject from "./pages/VLT/JoinedProject";
+import ForumOverview from "./pages/VLT/ForumOverview";
 // import Forum from "./pages/VLT/Forum";
 
 import PmDetail from './pages/PM/PmDetailPage';
@@ -87,6 +88,10 @@ function App() {
           path: "/project/:id/statistics",
           element: <DonationChart />
         },
+        {
+          path:"/forumoverview/:projectId",
+          element: <ForumOverview />
+        }
 
         // {
         //   path: "/forum",
