@@ -19,7 +19,6 @@ const ProjectDetail = () => {
   const [error, setError] = useState(null);
   const [status, setStatus] = useState(null);
   const [isWaiting, setIsWaiting] = useState(false);
-  const [donations, setDonations] = useState([]);
 
   // Fetch project detail
   const fetchProjectDetail = async () => {
@@ -32,16 +31,6 @@ const ProjectDetail = () => {
       setError("Không thể tải thông tin dự án. Vui lòng thử lại sau.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Fetch donations
-  const fetchDonations = async () => {
-    try {
-      const response = await apiConfig.get(`/donations/project/${id}`);
-      setDonations(response.data);
-    } catch (error) {
-      console.error("Lỗi khi tải donations:", error);
     }
   };
 
@@ -110,7 +99,6 @@ const ProjectDetail = () => {
   // Initial fetch
   useEffect(() => {
     fetchProjectDetail();
-    fetchDonations();
     checkJoinedStatus();
   }, [id]);
 
@@ -206,7 +194,7 @@ const ProjectDetail = () => {
           </div>
 
           {/* Right Column */}
-          <Donation donations={donations} />
+          <Donation projectId={id} />
         </div>
       </div>
     </div>

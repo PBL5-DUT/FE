@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CommentList from '../CommentList'; // Import component CommentList
+import CommentList from './CommentList';
 
 const Post = ({ post }) => {
   const [liked, setLiked] = useState(false);

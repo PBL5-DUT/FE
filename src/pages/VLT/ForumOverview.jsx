@@ -59,7 +59,7 @@ const ForumOverview = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-6">
           Danh sách diễn đàn
         </h1>
-        <ForumList forums={forums} />
+        <ForumList forums={forums} projectId={projectId} />
       </div>
     </div>
   );

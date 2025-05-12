@@ -1,5 +1,5 @@
 import React from 'react';
-import Post from '../Post/Post'; // Import component Post
+import Post from './Post'; // Import the Post component
 import anh from '../../assets/post.png';
 import anh2 from '../../assets/project.jpg';
 import anh1 from '../../assets/avatar.png';

@@ -18,7 +18,7 @@ import Information from "./pages/VLT/Information";
 import AboutUs from "./pages/VLT/AboutUs";
 import JoinedProject from "./pages/VLT/JoinedProject";
 import ForumOverview from "./pages/VLT/ForumOverview";
-// import Forum from "./pages/VLT/Forum";
+import Forum from "./pages/VLT/Forum";
 
 import PmDetail from './pages/PM/PmDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
@@ -40,8 +40,11 @@ function App() {
       path: "/",
       element: (
         <ProtectedRoute>
-          <div>
-            <Header />
+         <div>
+            {/* Header cố định */}
+            <div className="sticky top-0 z-50 bg-white shadow-md">
+              <Header />
+            </div>
             <Outlet />
           </div>
         </ProtectedRoute>
@@ -91,12 +94,11 @@ function App() {
         {
           path:"/forumoverview/:projectId",
           element: <ForumOverview />
-        }
-
-        // {
-        //   path: "/forum",
-        //   element: <Forum />,
-        // },
+        },
+        {
+          path: "/forum/:forumId",
+          element: <Forum />,
+        },
 
       ],
     },
