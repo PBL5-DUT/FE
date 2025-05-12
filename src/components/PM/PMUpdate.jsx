@@ -2,10 +2,12 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiConfig } from "../../config/apiConfig";
+import { AuthContext } from "../../util/AuthContext"; // Adjust the import path as necessary
 
 const PMUpdate = ({ project, onClose, onUpdated }) => {
   const { id } = useParams();
-
+  const { currentUser } = useContext(AuthContext);
+  
   // Initialize states with fallback values
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -33,9 +35,8 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
     }
   };
 
-  // Fetch project data if project prop is not provided
   useEffect(() => {
-    console.log("Received project prop:", project); // Debug log
+    console.log("Received project prop:", project); 
     if (project) {
       // Initialize states from project prop
       setTitle(project.name || "");
@@ -51,7 +52,7 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
         try {
           const response = await apiConfig.get(`http://localhost:8080/api/projects/${id}`);
           const projectData = response.data;
-          console.log("Fetched project data:", projectData); // Debug log
+          console.log("Fetched project data:", projectData); 
           setTitle(projectData.name || "");
           setDescription(projectData.description || "");
           setLocation(projectData.location || "");
@@ -78,13 +79,11 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
       const formattedStartDate = formatDate(startDate);
       const formattedEndDate = formatDate(endDate);
 
-      // Optional: Validate dates
       if (!formattedStartDate || !formattedEndDate) {
         setError("Vui lòng chọn ngày bắt đầu và ngày kết thúc hợp lệ.");
         setLoading(false);
         return;
       }
-
       const response = await apiConfig.put(`http://localhost:8080/api/projects/${id}`, {
         name: title,
         description,
@@ -92,7 +91,8 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
         startTime: formattedStartDate,
         endTime: formattedEndDate,
         avatarFilepath: avatar,
-        pmId: "1",
+        pmId: currentUser.userId,
+        maxParticipants: project?.maxParticipants || 10,
         status,
         createdAt: project?.createdAt || new Date().toISOString(),
         updatedAt: currentTime,

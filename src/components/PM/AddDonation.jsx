@@ -1,14 +1,19 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useContext } from "react";
 import Modal from "react-modal";
 import { apiConfig } from "../../config/apiConfig";
+import { AuthContext } from "../../util/AuthContext";
 
 Modal.setAppElement("#root");
 
 const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
+  const { currentUser } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     userId: "",
     amount: "",
     type: "money",
+    goodDescription: "",
     anonymous: false,
   });
 
@@ -25,11 +30,12 @@ const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
 
     const payload = {
       amount: parseInt(formData.amount, 10),
-      projectId: parseInt(projectId),
+      projectId: parseInt(projectId, 10),
       txnRef: formData.anonymous ? "anonymous" : "",
       type: formData.type,
       status: "success",
-      user: formData.anonymous ? null : { userId: parseInt(formData.userId, 10) },
+      goodDescription: formData.goodDescription || "",
+      user: formData.anonymous ? {userId: currentUser.userId }  : { userId: parseInt(formData.userId, 10) },
     };
 
     try {
@@ -74,11 +80,19 @@ const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
         <input
           type="number"
           name="amount"
-          placeholder="Amount (VND)"
+          placeholder="Amount"
           className="w-full p-2 border rounded"
           value={formData.amount}
           onChange={handleChange}
           required
+        />
+        <input
+          type="text"
+          name="goodDescription"
+          placeholder="Description"
+          className="w-full p-2 border rounded"
+          value={formData.goodDescription}
+          onChange={handleChange}
         />
         <div>
           <label className="mr-4">

@@ -9,7 +9,7 @@ const NewPj = ({ onClose }) => {
   const [location, setLocation] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [maxParticipation, setMaxParticipation] = useState(10);
+  const [maxParticipants, setMaxParticipants] = useState(10);
   const [avatar, setAvatar] = useState('');
   const [showImageForm, setShowImageForm] = useState(false);
   const [error, setError] = useState('');
@@ -43,7 +43,7 @@ const NewPj = ({ onClose }) => {
           startTime: startDate,
           endTime: endDate,
           avatarFilepath: avatar,
-          maxParticipations: maxParticipation,
+          maxParticipants: maxParticipants,
           pmId: currentUser.userId, // Sử dụng currentUser.id
           status,
           createdAt: currentTime,
@@ -79,10 +79,10 @@ const NewPj = ({ onClose }) => {
           ❌
         </button>
 
-        <h2 className="text-2xl font-bold mb-4">Tạo Dự Án Mới</h2>
+        <h2 className="text-2xl font-bold mb-4">Tạo dự án mới</h2>
         {error && <p className="text-red-500 mb-3">{error}</p>}
 
-        <label className="block font-semibold">Tên Dự Án</label>
+        <label className="block font-semibold">Tên dự án</label>
         <input
           type="text"
           className="w-full p-2 border rounded mb-3"
@@ -90,14 +90,14 @@ const NewPj = ({ onClose }) => {
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        <label className="block font-semibold">Mô Tả</label>
+        <label className="block font-semibold">Mô tả</label>
         <textarea
           className="w-full p-2 border rounded mb-3"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         ></textarea>
 
-        <label className="block font-semibold">Địa Điểm</label>
+        <label className="block font-semibold">Địa điểm</label>
         <input
           type="text"
           className="w-full p-2 border rounded mb-3"
@@ -105,7 +105,7 @@ const NewPj = ({ onClose }) => {
           onChange={(e) => setLocation(e.target.value)}
         />
 
-        <label className="block font-semibold">Ngày Bắt Đầu</label>
+        <label className="block font-semibold">Ngày bắt đầu</label>
         <input
           type="date"
           className="w-full p-2 border rounded mb-3"
@@ -113,7 +113,7 @@ const NewPj = ({ onClose }) => {
           onChange={(e) => setStartDate(e.target.value)}
         />
 
-        <label className="block font-semibold">Ngày Kết Thúc</label>
+        <label className="block font-semibold">Ngày kết thúc</label>
         <input
           type="date"
           className="w-full p-2 border rounded mb-3"
@@ -121,12 +121,12 @@ const NewPj = ({ onClose }) => {
           onChange={(e) => setEndDate(e.target.value)}
         />
 
-        <label className="block font-semibold">Số Người Tham Gia Tối Đa</label>
+        <label className="block font-semibold">Số người tham gia tối đa</label>
         <input
           type="number"
           className="w-full p-2 border rounded mb-3"
-          value={maxParticipation}
-          onChange={(e) => setMaxParticipation(e.target.value)}
+          value={maxParticipants}
+          onChange={(e) => setMaxParticipants(e.target.value)}
         />
 
         {avatar && (
@@ -139,7 +139,7 @@ const NewPj = ({ onClose }) => {
 
         {showImageForm ? (
           <div className="mb-3">
-            <label className="block font-semibold">URL Hình Ảnh</label>
+            <label className="block font-semibold">URL Hình ảnh</label>
             <input
               type="text"
               className="w-full p-2 border rounded mb-2"
@@ -158,7 +158,7 @@ const NewPj = ({ onClose }) => {
             className="bg-blue-500 text-white px-4 py-2 rounded mb-3"
             onClick={() => setShowImageForm(true)}
           >
-            Thêm Hình Ảnh
+            Thêm hình ảnh
           </button>
         )}
 

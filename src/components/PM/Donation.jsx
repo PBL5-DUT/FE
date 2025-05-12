@@ -1,39 +1,33 @@
 import { useParams } from "react-router-dom";
 import React, { useState } from "react";
-import AddDonation from "./AddDonation"; 
-import axios from "axios";
+import AddDonation from "./AddDonation";
 
 const Donation = ({ donations }) => {
   const [activeTab, setActiveTab] = useState("Money");
   const [showForm, setShowForm] = useState(false);
   const { id } = useParams();
-  const moneyDonations = donations || [];
-  const goodsDonations = [];
+
+  const moneyDonations = (donations || []).filter(d => d.type === "money");
+  const goodsDonations = (donations || []).filter(d => d.type === "goods");
+
   const totalMoney = moneyDonations.reduce((sum, d) => sum + d.amount, 0);
 
-
   return (
-    <div className="w-[28rem] bg-white p-6 rounded-lg shadow-md">
+    <div className="w-full table-auto">
       <h2 className="text-2xl font-bold mb-4 text-red-500">DONATIONS</h2>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-4">
-        <button
-          className={`px-4 py-2 rounded-full font-semibold ${
-            activeTab === "Money" ? "bg-red-500 text-white" : "bg-gray-200 text-black"
-          }`}
-          onClick={() => setActiveTab("Money")}
+      {/* Dropdown Tab */}
+      <div className="mb-4">
+        <label htmlFor="tab-select" className="mr-2 font-semibold">Select Type:</label>
+        <select
+          id="tab-select"
+          value={activeTab}
+          onChange={(e) => setActiveTab(e.target.value)}
+          className="px-4 py-2 rounded border border-gray-300"
         >
-          Money
-        </button>
-        <button
-          className={`px-4 py-2 rounded-full font-semibold ${
-            activeTab === "Goods" ? "bg-red-500 text-white" : "bg-gray-200 text-black"
-          }`}
-          onClick={() => setActiveTab("Goods")}
-        >
-          Goods
-        </button>
+          <option value="Money">Money</option>
+          <option value="Goods">Goods</option>
+        </select>
       </div>
 
       {/* Content */}
@@ -41,8 +35,10 @@ const Donation = ({ donations }) => {
         <thead>
           <tr>
             <th className="text-left">STT</th>
-            <th className="text-left">USERNAME</th>
-            <th className="text-right">{activeTab === "Money" ? "VND" : "SỐ LƯỢNG"}</th>
+            <th className="text-left">Username</th>
+            <th className="text-center">{activeTab === "Money" ? "" : "Description"}</th>
+            <th className="text-right">{activeTab === "Money" ? "VND" : "Amount"}</th>
+            
           </tr>
         </thead>
         <tbody>
@@ -50,7 +46,10 @@ const Donation = ({ donations }) => {
             (activeTab === "Money" ? moneyDonations : goodsDonations).map((donation, index) => (
               <tr key={index}>
                 <td className="border-b border-red-500 py-3">{index + 1}</td>
-                <td className="border-b border-red-500 py-3">{donation.user?.username || "Anonymous"}</td>
+                <td className="border-b border-red-500 py-3">
+                  {donation.txnRef === "anonymous" ? "Anonymous User" : donation.user?.username}
+                </td>
+                <td className="border-b border-red-500 py-3 text-center">  {donation.goodDescription || "No description"}</td>
                 <td className="border-b border-red-500 py-3 text-right">
                   {activeTab === "Money"
                     ? `${donation.amount.toLocaleString()} VND`
@@ -85,15 +84,14 @@ const Donation = ({ donations }) => {
 
       {showForm && (
         <AddDonation
-        isOpen={showForm}
-        onRequestClose={() => setShowForm(false)}
-        onSuccess={() => {
-        setShowForm(false);
-        window.location.reload(); 
-        }}
-        projectId={id} 
-      />
-      
+          isOpen={showForm}
+          onRequestClose={() => setShowForm(false)}
+          onSuccess={() => {
+            setShowForm(false);
+            window.location.reload();
+          }}
+          projectId={id}
+        />
       )}
     </div>
   );

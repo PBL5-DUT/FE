@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { apiConfig } from "../../config/apiConfig";
 import PMUpdate from "./PMUpdate";
 import Donation from "./Donation";
+import Expense from "./Expense";
 import Loop from "./Loop";
 import Lock from "./Lock";
 
@@ -13,6 +14,8 @@ const PMDetail = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
+  const [activeTab, setActiveTab] = useState("Donation"); // State để quản lý tab
+  const [expenses, setExpenses] = useState([]);
 
 
   useEffect(() => {
@@ -80,8 +83,16 @@ const PMDetail = () => {
       console.error("Lỗi khi tải donations:", error);
     }
   };
-
+  const fetchExpenses = async () => {
+    try {
+      const response = await apiConfig.get(`http://localhost:8080/api/expenses/project/${id}`);
+      setExpenses(response.data);
+    } catch (error) {
+      console.error("Lỗi khi tải expenses:", error);
+    }
+  };
   fetchDonations();
+  fetchExpenses();
 }, [id]);
 
   
@@ -181,7 +192,30 @@ const PMDetail = () => {
           </div>
         </div>
         {/* Cột bên phải: Bảng donations */}
-        <Donation donations={donations} />
+        <div className="w-[28rem] bg-white p-6 rounded-lg shadow-md">
+        <div className="flex gap-2 mb-4">
+          <button
+            className={`px-4 py-2 rounded-full font-semibold ${
+              activeTab === "Donation" ? "bg-red-500 text-white" : "bg-gray-200 text-black"
+            }`}
+            onClick={() => setActiveTab("Donation")}
+          >
+            Donation
+          </button>
+          <button
+            className={`px-4 py-2 rounded-full font-semibold ${
+              activeTab === "Expense" ? "bg-red-500 text-white" : "bg-gray-200 text-black"
+            }`}
+            onClick={() => setActiveTab("Expense")}
+          >
+            Expense
+          </button>
+        </div>
+
+        {/* Hiển thị bảng tương ứng */}
+        {activeTab === "Donation" && <Donation donations={donations} />}
+        {activeTab === "Expense" && <Expense expenses={expenses} />}
+      </div>
       </div>
       {isEditOpen && (
       <PMUpdate

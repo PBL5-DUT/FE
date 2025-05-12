@@ -13,16 +13,19 @@ const DonationChart = () => {
         const response = await apiConfig.get(`http://localhost:8080/api/donations/project/${id}`);
         const donations = response.data;
 
-        if (donations.length === 0) {
+        // Lọc các bản ghi có type = "money"
+        const moneyDonations = donations.filter(d => d.type === "money");
+
+        if (moneyDonations.length === 0) {
           setData([]);
           return;
         }
 
         const grouped = {};
-        let minDate = new Date(donations[0].createdAt);
-        let maxDate = new Date(donations[0].createdAt);
+        let minDate = new Date(moneyDonations[0].createdAt);
+        let maxDate = new Date(moneyDonations[0].createdAt);
 
-        donations.forEach(d => {
+        moneyDonations.forEach(d => {
           const created = new Date(d.createdAt);
           const dateStr = created.toISOString().slice(0, 10); // "YYYY-MM-DD"
           grouped[dateStr] = (grouped[dateStr] || 0) + d.amount;
