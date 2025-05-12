@@ -7,8 +7,9 @@ const Expense = ({ expenses }) => {
         <thead>
           <tr>
             <th className="text-left">STT</th>
-            <th className="text-left">DESCRIPTION</th>
-            <th className="text-right">AMOUNT</th>
+            <th className="text-left">Username</th>
+            <th className="text-left">Purpose</th>
+            <th className="text-right">Amount</th>
           </tr>
         </thead>
         <tbody>
@@ -16,6 +17,7 @@ const Expense = ({ expenses }) => {
             expenses.map((expense, index) => (
               <tr key={index}>
                 <td className="border-b border-red-500 py-3">{index + 1}</td>
+                <td className="border-b border-red-500 py-3">{expense.receiver.username}</td>
                 <td className="border-b border-red-500 py-3">{expense.purpose}</td>
                 <td className="border-b border-red-500 py-3 text-right">
                   {expense.amount.toLocaleString()} 

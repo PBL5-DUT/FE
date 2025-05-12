@@ -36,8 +36,8 @@ const Donation = ({ donations }) => {
           <tr>
             <th className="text-left">STT</th>
             <th className="text-left">Username</th>
-            <th className="text-center">{activeTab === "Money" ? "" : "Description"}</th>
-            <th className="text-right">{activeTab === "Money" ? "VND" : "Amount"}</th>
+            <th className="text-right">{activeTab === "Money" ? "" : ""}</th>
+            <th className="text-right">{activeTab === "Money" ? "VND" : "Description"}</th>
             
           </tr>
         </thead>
@@ -50,12 +50,11 @@ const Donation = ({ donations }) => {
                   {donation.txnRef === "anonymous" ? "Anonymous User" : donation.user?.username}
                 </td>
                 <td className="border-b border-red-500 py-3 text-center">
-                {activeTab === "Money" ? "" : donation.goodDescription}
                 </td>
                 <td className="border-b border-red-500 py-3 text-right">
                   {activeTab === "Money"
                     ? `${donation.amount.toLocaleString()} `
-                    : donation.amount}
+                    : donation.goodDescription}
                 </td>
               </tr>
             ))

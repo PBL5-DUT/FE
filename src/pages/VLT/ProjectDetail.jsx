@@ -148,35 +148,43 @@ const ProjectDetail = () => {
             <p className="text-gray-700"><strong>Lượt thích:</strong> {project.likesCount}</p>
 
             {/* Buttons */}
-            <div className="flex justify-start w-full gap-4 mt-8">
-              {status === "pending" ? (
-                <button className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md" disabled>
-                  Waiting for approving
-                </button>
-              ) : status === "approved" ? (
-                <button className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700" onClick={handleGoToForum}>
-                  Go to Forum
-                </button>
-              ) : (
-                <button
-                  className={`py-3 px-6 text-lg font-semibold rounded-lg shadow-md ${
-                    isWaiting
-                      ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                      : "bg-purple-200 text-purple-700 hover:bg-purple-300"
-                  }`}
-                  onClick={isWaiting ? null : handleRegister}
-                  disabled={isWaiting}
-                >
-                  {isWaiting ? "Waiting for approving" : "❤️ Register"}
-                </button>
-              )}
-              <button
-                className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900"
-                onClick={() => setShowDonate(!showDonate)}
-              >
-                » Donate
-              </button>
-            </div>
+<div className="flex justify-start w-full gap-4 mt-8">
+  {project.status === "locked" ? (
+    <div className="py-3 px-6 text-lg font-semibold text-red-600 bg-red-100 rounded-lg shadow-md">
+      This project is locked
+    </div>
+  ) : (
+    <>
+      {status === "pending" ? (
+        <button className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md" disabled>
+          Waiting for approving
+        </button>
+      ) : status === "approved" ? (
+        <button className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700" onClick={handleGoToForum}>
+          Go to Forum
+        </button>
+      ) : (
+        <button
+          className={`py-3 px-6 text-lg font-semibold rounded-lg shadow-md ${
+            isWaiting
+              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+              : "bg-purple-200 text-purple-700 hover:bg-purple-300"
+          }`}
+          onClick={isWaiting ? null : handleRegister}
+          disabled={isWaiting}
+        >
+          {isWaiting ? "Waiting for approving" : "❤️ Register"}
+        </button>
+      )}
+      <button
+        className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900"
+        onClick={() => setShowDonate(!showDonate)}
+      >
+        » Donate
+      </button>
+    </>
+  )}
+</div>
 
             {/* Donation Form */}
             {showDonate && (

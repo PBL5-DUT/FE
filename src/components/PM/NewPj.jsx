@@ -16,7 +16,6 @@ const NewPj = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (status) => {
-    // Kiểm tra thông tin bắt buộc
     if (!title || !description || !location || !startDate || !endDate) {
       setError('Vui lòng nhập đầy đủ thông tin.');
       return;
@@ -44,7 +43,7 @@ const NewPj = ({ onClose }) => {
           endTime: endDate,
           avatarFilepath: avatar,
           maxParticipants: maxParticipants,
-          pmId: currentUser.userId, // Sử dụng currentUser.id
+          pmId: currentUser.userId, 
           status,
           createdAt: currentTime,
           updatedAt: currentTime,

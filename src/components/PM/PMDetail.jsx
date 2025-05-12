@@ -14,7 +14,7 @@ const PMDetail = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
-  const [activeTab, setActiveTab] = useState("Donation"); // State để quản lý tab
+  const [activeTab, setActiveTab] = useState("Donation"); 
   const [expenses, setExpenses] = useState([]);
 
 
@@ -87,6 +87,7 @@ const PMDetail = () => {
     try {
       const response = await apiConfig.get(`http://localhost:8080/api/expenses/project/${id}`);
       setExpenses(response.data);
+      console.log("Expenses:", response.data);
     } catch (error) {
       console.error("Lỗi khi tải expenses:", error);
     }
