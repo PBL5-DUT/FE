@@ -49,10 +49,12 @@ const Donation = ({ donations }) => {
                 <td className="border-b border-red-500 py-3">
                   {donation.txnRef === "anonymous" ? "Anonymous User" : donation.user?.username}
                 </td>
-                <td className="border-b border-red-500 py-3 text-center">  {donation.goodDescription || "No description"}</td>
+                <td className="border-b border-red-500 py-3 text-center">
+                {activeTab === "Money" ? "" : donation.goodDescription}
+                </td>
                 <td className="border-b border-red-500 py-3 text-right">
                   {activeTab === "Money"
-                    ? `${donation.amount.toLocaleString()} VND`
+                    ? `${donation.amount.toLocaleString()} `
                     : donation.amount}
                 </td>
               </tr>
