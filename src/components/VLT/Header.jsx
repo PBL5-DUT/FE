@@ -10,7 +10,7 @@ const Header = () => {
   const { currentUser } = useContext(AuthContext);
 
   return (
-    <div className="p-4 bg-white flex items-center justify-between relative shadow-md">
+    <div className="p-2 bg-white flex items-center justify-between relative shadow-md">
       {/* Logo Section */}
      <div className="flex flex-col items-center">
              <img src={logo} alt="Volunteer Logo" className="h-8 mb-0" />

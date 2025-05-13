@@ -83,7 +83,7 @@ const Donation = ({ projectId }) => {
         <table className="w-full border-collapse border border-gray-300 text-xs">
           <thead>
             <tr className="bg-gray-100 text-gray-700">
-              <th className="border border-gray-300 px-2 py-2 text-left">#</th>
+              <th className="border border-gray-300 px-2 py-2 text-left">STT</th>
               <th className="border border-gray-300 px-2 py-2 text-left">Username</th>
               <th className="border border-gray-300 px-2 py-2 text-right">
                 {activeTab === "Money" ? "VND" : "Quantity"}

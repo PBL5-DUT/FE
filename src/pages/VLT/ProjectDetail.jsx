@@ -115,87 +115,88 @@ const ProjectDetail = () => {
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <div className="max-w-7xl mx-auto p-4 flex flex-col gap-10 text-left">
-        <div className="flex gap-8">
-          {/* Left Column */}
-          <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-4">{project.name}</h1>
-            <img
-              src={project.avatarFilepath}
-              alt={project.name}
-              className="w-full h-96 object-cover rounded-lg mb-4"
-            />
-            <p className="text-gray-700 mb-4">{project.description}</p>
-            <p className="text-gray-700"><strong>Địa điểm:</strong> {project.location}</p>
-            <p className="text-gray-700">
-              <strong>Thời gian:</strong> {formatDate(project.startTime)} → {formatDate(project.endTime)}
-            </p>
-            <p className="text-gray-700"><strong>Số lượng tham gia tối đa:</strong> {project.maxParticipants}</p>
-            <p className="text-gray-700"><strong>Số lượng hiện tại:</strong> {project.participantsCount}</p>
-            <p className="text-gray-700"><strong>Lượt thích:</strong> {project.likesCount}</p>
+    <div className="h-screen flex flex-col">
+      {/* Nội dung chính */}
+      <div className="max-w-6xl mx-auto p-4 flex gap-8 h-screen">
+        {/* Left Column */}
+        <div className="flex-1 overflow-y-auto">
+          <h1 className="text-4xl font-bold mb-4">{project.name}</h1>
+          <img
+            src={project.avatarFilepath}
+            alt={project.name}
+            className="w-full h-96 object-cover rounded-lg mb-4"
+          />
+          <p className="text-gray-700 mb-4">{project.description}</p>
+          <p className="text-gray-700"><strong>Địa điểm:</strong> {project.location}</p>
+          <p className="text-gray-700">
+            <strong>Thời gian:</strong> {formatDate(project.startTime)} → {formatDate(project.endTime)}
+          </p>
+          <p className="text-gray-700"><strong>Số lượng tham gia tối đa:</strong> {project.maxParticipants}</p>
+          <p className="text-gray-700"><strong>Số lượng hiện tại:</strong> {project.participantsCount}</p>
+          <p className="text-gray-700"><strong>Lượt thích:</strong> {project.likesCount}</p>
 
-            {/* Buttons */}
-            <div className="flex justify-start w-full gap-4 mt-8">
-              {status === "pending" ? (
-                <button
-                  className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md"
-                  disabled
-                >
-                  Waiting for approving
-                </button>
-              ) : status === "approved" ? (
-                <button
-                  className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
-                  onClick={handleGoToForum}
-                >
-                  Go to Forum
-                </button>
-              ) : (
-                <button
-                  className={`py-3 px-6 text-lg font-semibold rounded-lg shadow-md ${
-                    isWaiting
-                      ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                      : "bg-purple-200 text-purple-700 hover:bg-purple-300"
-                  }`}
-                  onClick={isWaiting ? null : handleRegister}
-                  disabled={isWaiting}
-                >
-                  {isWaiting ? "Waiting for approving" : "❤️ Register"}
-                </button>
-              )}
+          {/* Buttons */}
+          <div className="flex justify-start w-full gap-4 mt-8">
+            {status === "pending" ? (
               <button
-                className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900"
-                onClick={() => setShowDonate(!showDonate)}
+                className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md"
+                disabled
               >
-                » Donate
+                Waiting for approving
               </button>
-            </div>
-
-            {/* Donation Form */}
-            {showDonate && (
-              <div className="mt-4 p-4 border border-purple-300 rounded-lg bg-purple-100 text-purple-900">
-                <p className="mb-2">Nhập số tiền muốn ủng hộ (VND):</p>
-                <input
-                  type="number"
-                  className="p-2 border rounded w-full mb-3"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="VD: 500000"
-                />
-                <button
-                  className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-800"
-                  onClick={processDonation}
-                >
-                  Xác nhận ủng hộ
-                </button>
-              </div>
+            ) : status === "approved" ? (
+              <button
+                className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
+                onClick={handleGoToForum}
+              >
+                Go to Forum
+              </button>
+            ) : (
+              <button
+                className={`py-3 px-6 text-lg font-semibold rounded-lg shadow-md ${
+                  isWaiting
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                    : "bg-purple-200 text-purple-700 hover:bg-purple-300"
+                }`}
+                onClick={isWaiting ? null : handleRegister}
+                disabled={isWaiting}
+              >
+                {isWaiting ? "Waiting for approving" : "❤️ Register"}
+              </button>
             )}
+            <button
+              className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900"
+              onClick={() => setShowDonate(!showDonate)}
+            >
+              » Donate
+            </button>
           </div>
 
-          {/* Right Column */}
-          <Donation projectId={id} />
+          {/* Donation Form */}
+          {showDonate && (
+            <div className="mt-4 p-4 border border-purple-300 rounded-lg bg-purple-100 text-purple-900">
+              <p className="mb-2">Nhập số tiền muốn ủng hộ (VND):</p>
+              <input
+                type="number"
+                className="p-2 border rounded w-full mb-3"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="VD: 500000"
+              />
+              <button
+                className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-800"
+                onClick={processDonation}
+              >
+                Xác nhận ủng hộ
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Right Column */}
+        <aside className="w-[300px] bg-white p-4 shadow-md border-l border-gray-200 h-full overflow-y-auto flex-shrink-0">
+          <Donation projectId={id} />
+        </aside>
       </div>
     </div>
   );

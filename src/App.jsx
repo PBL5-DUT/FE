@@ -40,12 +40,18 @@ function App() {
       path: "/",
       element: (
         <ProtectedRoute>
-         <div>
+          <div className="h-screen flex flex-col">
             {/* Header cố định */}
-            <div className="sticky top-0 z-50 bg-white shadow-md">
+            <div className="bg-white shadow-md z-50 h-[64px] flex-shrink-0">
               <Header />
             </div>
-            <Outlet />
+
+            <div className="h-screen flex flex-col">
+  <div className="flex-1 overflow-y-auto">
+    <Outlet />
+  </div>
+</div>
+
           </div>
         </ProtectedRoute>
       ),
@@ -73,7 +79,7 @@ function App() {
         {
           path: "/project-manager",
           element: <PmManager />,
-        },       
+        },
         {
           path: "/information",
           element: <Information />,
@@ -86,20 +92,18 @@ function App() {
           path: "/joined",
           element: <JoinedProject />,
         },
-
         {
           path: "/project/:id/statistics",
-          element: <DonationChart />
+          element: <DonationChart />,
         },
         {
-          path:"/forumoverview/:projectId",
-          element: <ForumOverview />
+          path: "/forumoverview/:projectId",
+          element: <ForumOverview />,
         },
         {
           path: "/forum/:forumId",
           element: <Forum />,
         },
-
       ],
     },
     {
@@ -110,7 +114,6 @@ function App() {
       path: "/register",
       element: <Register />,
     },
-    
   ]);
 
   return (

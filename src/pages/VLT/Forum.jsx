@@ -1,62 +1,59 @@
-import React from "react";
 import { useParams, useLocation } from "react-router-dom";
 import LeftBar from "../../components/VLT/LeftBar";
 import ChatButton from "../../components/VLT/ChatButton";
 import PostNew from "../../components/VLT/PostNew";
 import PostList from "../../components/VLT/PostList";
 import Donation from "../../components/VLT/Donation";
+import { AuthContext } from "../../util/AuthContext";
+import { useContext } from "react";
+
+
+
 
 const Forum = () => {
-  const { forumId } = useParams(); // Lấy forumId từ URL
+  const { currentUser, setCurrentUser } = useContext(AuthContext);  
+  const { forumId } = useParams();
   const location = useLocation();
-  const { projectId } = location.state || {}; // Lấy projectId từ state
+  const { projectId, userId } = location.state || {};
 
   if (!projectId) {
-    return <div className="text-center mt-10 text-red-500">Không tìm thấy projectId.</div>;
+    return (
+      <div className="text-center mt-10 text-red-500">
+        Không tìm thấy projectId.
+      </div>
+    );
   }
 
   return (
-    // Layout chính: Chiều cao 100vh và chỉ nội dung chính được cuộn
-    <div className="bg-gray-50 h-screen flex overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden">     
+      {/* Layout 3 cột */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar trái */}
+        <aside className="w-[220px] bg-white border-r border-gray-200 shadow-md h-full overflow-y-auto flex-shrink-0">
+          <LeftBar />
+          <ChatButton />
+        </aside>
 
-      {/* Left Sidebar */}
-        <div className="w-[220px] bg-white border-r border-gray-200 shadow-md h-screen overflow-y-auto flex-shrink-0">
-            <LeftBar />          
-            <ChatButton /> 
-        </div>
+        {/* Nội dung chính */}
+        <main className="flex-1 h-full overflow-y-auto p-6 bg-gray-50">
+          <div className="max-w-4xl mx-auto">
+             {/* Đăng bài mới */}
+            <div className="mb-6">
+              <PostNew forumId={forumId} userId={currentUser.userId} />
+            </div>
 
-      {/* Main Content - Phần này sẽ cuộn */}
-      <div className="flex-1 p-6 overflow-y-auto">
-        <div className="max-w-4xl mx-auto">
-          {/* Forum Title */}
-          <div className="mb-6">
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Forum</h1>
-            <p className="text-sm text-gray-500">
-              Forum ID: <span className="font-medium text-gray-700">{forumId}</span>
-            </p>
-            <p className="text-sm text-gray-500">
-              Project ID: <span className="font-medium text-gray-700">{projectId}</span>
-            </p>
+            {/* Danh sách bài viết */}
+            <div>
+              <PostList forumId={forumId} />
+            </div>
           </div>
+        </main>
 
-          {/* Post New */}
-          <div className="mb-6">
-            <PostNew projectId={projectId} />
-          </div>
-
-          {/* Post List */}
-          <div>
-            <PostList forumId={forumId} />
-          </div>
-        </div>
+        {/* Sidebar phải */}
+        <aside className="w-[300px] bg-white p-4 shadow-md border-l border-gray-200 h-full overflow-y-auto flex-shrink-0">
+          <Donation projectId={projectId} />
+        </aside>
       </div>
-
-      {/* Donation */}
-        <div className="w-[300px] bg-white p-2 shadow-md border-l border-gray-200 h-screen overflow-y-auto flex-shrink-0">
-            <Donation projectId={projectId} />
-        </div>
-
-      
     </div>
   );
 };

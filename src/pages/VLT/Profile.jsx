@@ -55,9 +55,9 @@ const Profile = () => {
       const res = await apiConfig.put(`/users/${profile.userId}`, payload);
       localStorage.setItem("user", JSON.stringify(res.data));
       setCurrentUser(res.data);
-      setSuccessMessage("✅ Cập nhật thành công!");
+      setSuccessMessage("Cập nhật thành công!");
     } catch {
-      setError("❌ Có lỗi xảy ra. Vui lòng thử lại.");
+      setError("Có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -74,7 +74,7 @@ const Profile = () => {
       const res = await apiConfig.put(`/users/${profile.userId}`, updated);
       setProfile((prev) => ({ ...prev, avatarFilepath: url }));
       setCurrentUser(res.data);
-      localStorage.setItem("user", JSON.stringify(res.data));
+      localStorage.setItem("user",JSON.stringify(res.data));
       setSuccessMessage("Avatar cập nhật thành công!");
     } catch {
       setError("Không thể cập nhật avatar.");
