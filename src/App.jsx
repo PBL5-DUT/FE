@@ -42,16 +42,16 @@ function App() {
         <ProtectedRoute>
           <div className="h-screen flex flex-col">
             {/* Header cố định */}
-            <div className="bg-white shadow-md z-50 h-[64px] flex-shrink-0">
+            <div className="bg-white shadow-md z-50 h-[64px] flex-shrink-0 fixed w-full">
               <Header />
             </div>
 
-            <div className="h-screen flex flex-col">
-  <div className="flex-1 overflow-y-auto">
-    <Outlet />
-  </div>
-</div>
-
+            {/* Nội dung bên dưới Header */}
+            <div className="h-screen flex flex-col pt-[64px]">
+              <div className="flex-1 overflow-y-auto">
+                <Outlet />
+              </div>
+            </div>
           </div>
         </ProtectedRoute>
       ),

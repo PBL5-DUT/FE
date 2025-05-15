@@ -7,7 +7,7 @@ const Donation = ({ projectId }) => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("Money");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Hiển thị 10 người dùng mỗi trang
+  const itemsPerPage = 7; // Hiển thị 10 người dùng mỗi trang
 
   // Fetch donations
   const fetchDonations = async () => {
@@ -55,7 +55,7 @@ const Donation = ({ projectId }) => {
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-lg">
+    <div className="bg-white p-4 rounded-lg shadow-lg fixed right-0 top-[64px] w-[300px] h-[calc(100vh-64px)] overflow-hidden">
       <h2 className="text-sm font-bold mb-3 text-red-500">Donations</h2>
 
       {/* Tabs */}
@@ -78,52 +78,54 @@ const Donation = ({ projectId }) => {
         </button>
       </div>
 
-      {/* Content */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300 text-xs">
-          <thead>
-            <tr className="bg-gray-100 text-gray-700">
-              <th className="border border-gray-300 px-2 py-2 text-left">STT</th>
-              <th className="border border-gray-300 px-2 py-2 text-left">Username</th>
-              <th className="border border-gray-300 px-2 py-2 text-right">
-                {activeTab === "Money" ? "VND" : "Quantity"}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {(activeTab === "Money" ? moneyDonations : goodsDonations).length > 0 ? (
-              paginatedDonations(activeTab === "Money" ? moneyDonations : goodsDonations).map(
-                (donation, index) => (
-                  <tr
-                    key={index}
-                    className={`${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                    } hover:bg-gray-100 transition`}
-                  >
-                    <td className="border border-gray-300 px-2 py-2">
-                      {index + 1 + (currentPage - 1) * itemsPerPage}
-                    </td>
-                    <td className="border border-gray-300 px-2 py-2">{donation.user.username}</td>
-                    <td className="border border-gray-300 px-2 py-2 text-right">
-                      {activeTab === "Money"
-                        ? `${donation.amount.toLocaleString()}`
-                        : donation.amount}
-                    </td>
-                  </tr>
-                )
-              )
-            ) : (
-              <tr>
-                <td colSpan="3" className="text-center py-3 text-gray-500">
-                  No donations yet
-                </td>
+      {/* Content - giới hạn chiều cao của phần content */}
+      <div className="h-[calc(100%-160px)] overflow-hidden">
+        <div className="w-full h-full">
+          <table className="w-full border-collapse border border-gray-300 text-xs">
+            <thead>
+              <tr className="bg-gray-100 text-gray-700">
+                <th className="border border-gray-300 px-2 py-2 text-left">STT</th>
+                <th className="border border-gray-300 px-2 py-2 text-left">Username</th>
+                <th className="border border-gray-300 px-2 py-2 text-right">
+                  {activeTab === "Money" ? "VND" : "Quantity"}
+                </th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {(activeTab === "Money" ? moneyDonations : goodsDonations).length > 0 ? (
+                paginatedDonations(activeTab === "Money" ? moneyDonations : goodsDonations).map(
+                  (donation, index) => (
+                    <tr
+                      key={index}
+                      className={`${
+                        index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-gray-100 transition`}
+                    >
+                      <td className="border border-gray-300 px-2 py-2">
+                        {index + 1 + (currentPage - 1) * itemsPerPage}
+                      </td>
+                      <td className="border border-gray-300 px-2 py-2">{donation.user.username}</td>
+                      <td className="border border-gray-300 px-2 py-2 text-right">
+                        {activeTab === "Money"
+                          ? `${donation.amount.toLocaleString()}`
+                          : donation.amount}
+                      </td>
+                    </tr>
+                  )
+                )
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-center py-3 text-gray-500">
+                    No donations yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Total chỉ hiển thị ở tab Money */}
+      {/* Total Money - luôn hiển thị ở dưới */}
       {activeTab === "Money" && (
         <div className="mt-4 text-right">
           <p className="text-xs font-medium text-gray-700">
@@ -133,7 +135,7 @@ const Donation = ({ projectId }) => {
         </div>
       )}
 
-      {/* Pagination Controls */}
+      {/* Pagination - luôn hiển thị ở dưới */}
       {(activeTab === "Money" ? moneyDonations : goodsDonations).length > itemsPerPage && (
         <div className="mt-4 flex justify-between items-center text-xs">
           <button
