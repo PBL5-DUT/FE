@@ -7,7 +7,7 @@ const Donation = ({ projectId }) => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("Money");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7; // Hiển thị 10 người dùng mỗi trang
+  const itemsPerPage = 12; // Hiển thị 10 người dùng mỗi trang
 
   // Fetch donations
   const fetchDonations = async () => {
@@ -78,15 +78,15 @@ const Donation = ({ projectId }) => {
         </button>
       </div>
 
-      {/* Content - giới hạn chiều cao của phần content */}
+      {/* Content section */}
       <div className="h-[calc(100%-160px)] overflow-hidden">
         <div className="w-full h-full">
           <table className="w-full border-collapse border border-gray-300 text-xs">
             <thead>
               <tr className="bg-gray-100 text-gray-700">
-                <th className="border border-gray-300 px-2 py-2 text-left">STT</th>
-                <th className="border border-gray-300 px-2 py-2 text-left">Username</th>
-                <th className="border border-gray-300 px-2 py-2 text-right">
+                <th className="border border-gray-300 px-1 py-1 text-left">STT</th>
+                <th className="border border-gray-300 px-1 py-1 text-left">Username</th>
+                <th className="border border-gray-300 px-1 py-1 text-right">
                   {activeTab === "Money" ? "VND" : "Quantity"}
                 </th>
               </tr>
@@ -101,11 +101,11 @@ const Donation = ({ projectId }) => {
                         index % 2 === 0 ? "bg-white" : "bg-gray-50"
                       } hover:bg-gray-100 transition`}
                     >
-                      <td className="border border-gray-300 px-2 py-2">
+                      <td className="border border-gray-300 px-1 py-1">
                         {index + 1 + (currentPage - 1) * itemsPerPage}
                       </td>
-                      <td className="border border-gray-300 px-2 py-2">{donation.user.username}</td>
-                      <td className="border border-gray-300 px-2 py-2 text-right">
+                      <td className="border border-gray-300 px-1 py-1">{donation.user.username}</td>
+                      <td className="border border-gray-300 px-1 py-1 text-right">
                         {activeTab === "Money"
                           ? `${donation.amount.toLocaleString()}`
                           : donation.amount}
@@ -115,7 +115,7 @@ const Donation = ({ projectId }) => {
                 )
               ) : (
                 <tr>
-                  <td colSpan="3" className="text-center py-3 text-gray-500">
+                  <td colSpan="3" className="text-center py-2 text-gray-500">
                     No donations yet
                   </td>
                 </tr>
