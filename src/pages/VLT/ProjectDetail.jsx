@@ -149,10 +149,10 @@ const ProjectDetail = () => {
 
             {/* Buttons */}
 <div className="flex justify-start w-full gap-4 mt-8">
-  {project.status === "locked" ? (
-    <div className="py-3 px-6 text-lg font-semibold text-red-600 bg-red-100 rounded-lg shadow-md">
-      This project is locked
-    </div>
+  {project.status === "locked" ||  project.status === "lockedpending" ? (
+  <div className="py-3 px-6 text-lg font-semibold text-red-600 bg-red-100 rounded-lg shadow-md">
+    {project.status === "locked" ? "This project is locked" : "This project is pending lock approval"}
+  </div>
   ) : (
     <>
       {status === "pending" ? (
