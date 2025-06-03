@@ -11,6 +11,7 @@ const NewPj = ({ onClose }) => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [maxParticipants, setMaxParticipants] = useState(10);
+  const [bank, setBank] = useState('');
   const [avatar, setAvatar] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,6 +22,11 @@ const NewPj = ({ onClose }) => {
       setError('Vui lòng nhập đầy đủ thông tin.');
       return;
     }
+    const bankPattern = /^\d+\s*-\s*[^-]+-\s*[^-]+$/;
+    if (!bankPattern.test(bank.trim())) {
+    setError('Trường Ngân hàng phải đúng định dạng: "<SốTàiKhoản> - <TênTàiKhoản> - <TênNgânHàng>"');
+    return;
+  }
 
     if (!currentUser || !currentUser.userId) {
       setError('Bạn cần đăng nhập để tạo dự án.');
@@ -44,6 +50,7 @@ const NewPj = ({ onClose }) => {
           endTime: endDate,
           avatarFilepath: avatar, // Sử dụng URL ảnh đã upload
           maxParticipants: maxParticipants,
+          bank,
           pmId: currentUser.userId,
           status,
           createdAt: currentTime,
@@ -91,7 +98,7 @@ const NewPj = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-white bg-opacity-50 backdrop-blur-sm flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-1/2 relative">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-1/2 relative max-h-screen overflow-y-auto">
         <button
           className="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-xl"
           onClick={onClose}
@@ -139,6 +146,16 @@ const NewPj = ({ onClose }) => {
           className="w-full p-2 border rounded mb-3"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
+        />
+        <label className="block font-semibold">Ngân hàng</label>
+        <span className="block text-gray-400 text-sm mb-1">
+          Nhập đúng định dạng sau: &lt;Số Tài Khoản&gt; - &lt;Tên thụ hưởng&gt; - &lt;Tên ngân hàng&gt;
+        </span>
+        <input
+          type="text"
+          className="w-full p-2 border rounded mb-3"
+          value={bank}
+          onChange={(e) => setBank(e.target.value)}
         />
 
         <label className="block font-semibold">Số người tham gia tối đa</label>

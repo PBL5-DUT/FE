@@ -186,28 +186,42 @@ const ProjectDetail = () => {
   )}
 </div>
 
-            {/* Donation Form */}
             {showDonate && (
-              <div className="mt-4 p-4 border border-purple-300 rounded-lg bg-purple-100 text-purple-900">
-                <p className="mb-2">Nhập số tiền muốn ủng hộ (VND):</p>
-                <input
-                  type="number"
-                  className="p-2 border rounded w-full mb-3"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="VD: 500000"
-                />
-                <button
-                  className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-800"
-                  onClick={processDonation}
-                >
-                  Xác nhận ủng hộ
-                </button>
-              </div>
-            )}
+  <div className="mt-6 p-6 border border-purple-200 rounded-2xl bg-purple-50 text-purple-900 shadow-md space-y-4">
+    <div>
+      <h3 className="text-lg font-semibold mb-2">Cách 1: Ủng hộ gián tiếp qua chủ dự án</h3>
+      <div className="bg-white p-4 rounded-lg border text-sm">
+        <p className="font-medium text-gray-700">Thông tin chuyển khoản:</p>
+        <p className="mt-1 text-gray-900">{project.bank}</p>
+      </div>
+    </div>
+
+    <div className="border-t border-purple-300 my-4"></div>
+
+    <div>
+      <h3 className="text-lg font-semibold mb-2">Cách 2: Ủng hộ trực tiếp qua VNPay</h3>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Nhập số tiền muốn ủng hộ (VND):
+      </label>
+      <input
+        type="number"
+        className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent bg-white"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        placeholder="VD: 500000"
+      />
+      <button
+        className="mt-4 w-full py-2 px-4 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-all"
+        onClick={processDonation}
+      >
+        Xác nhận ủng hộ
+      </button>
+    </div>
+  </div>
+)}
+
           </div>
 
-          {/* Right Column */}
           <Donation donations={donations} />
         </div>
       </div>

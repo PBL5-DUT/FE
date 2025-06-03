@@ -67,7 +67,9 @@ const Donation = ({ donations }) => {
                   <td className="border-b border-red-500 py-3">{donation.user.username}</td>
                   <td className="border-b border-red-500 py-3 text-right">
                     {activeTab === "Money"
-                      ? `${donation.amount.toLocaleString()} VND`
+                      ? (donation.amount != null
+                          ? `${Number(donation.amount).toLocaleString()} VND`
+                          : "N/A")
                       : donation.amount}
                   </td>
                 </tr>

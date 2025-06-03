@@ -14,6 +14,7 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
   const [endDate, setEndDate] = useState("");
   const [avatar, setAvatar] = useState("");
   const [showImageForm, setShowImageForm] = useState(false);
+  const [bank, setBank] = useState("");
   const [maxParticipants, setMaxParticipants] = useState(10);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -42,6 +43,7 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
       setStartDate(formatDate(project.startTime) || "");
       setEndDate(formatDate(project.endTime) || "");
       setAvatar(project.avatarFilepath || "");
+      setBank(project.bank || "");
       setMaxParticipants(project.maxParticipants ? parseInt(project.maxParticipants, 10) : 10);
     } else {
       const fetchProject = async () => {
@@ -56,6 +58,7 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
           setStartDate(formatDate(projectData.startTime) || "");
           setEndDate(formatDate(projectData.endTime) || "");
           setAvatar(projectData.avatarFilepath || "");
+          setBank(projectData.bank || "");
           setMaxParticipants(projectData.maxParticipants ? parseInt(projectData.maxParticipants, 10) : 10);
         } catch (error) {
           console.error("Error fetching project:", error);
@@ -100,6 +103,7 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
         pmId: currentUser.userId,
         maxParticipants: maxParticipantsValue,
         status,
+        bank,
         createdAt: project?.createdAt || new Date().toISOString(),
         updatedAt: currentTime,
       });
@@ -127,11 +131,11 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
           ❌
         </button>
 
-        <h2 className="text-2xl font-bold mb-4">Update Project</h2>
+        <h2 className="text-2xl font-bold mb-4">Chỉnh sửa dự án</h2>
         {error && <p className="text-red-500 mb-3">{error}</p>}
         {loading && <p className="text-blue-500 mb-3">Đang tải...</p>}
 
-        <label className="block font-semibold">Project Name</label>
+        <label className="block font-semibold">Tên dự án</label>
         <input
           type="text"
           className="w-full p-2 border rounded mb-3"
@@ -139,14 +143,14 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        <label className="block font-semibold">Description</label>
+        <label className="block font-semibold">Mô tả</label>
         <textarea
           className="w-full p-2 border rounded mb-3"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         ></textarea>
 
-        <label className="block font-semibold">Location</label>
+        <label className="block font-semibold">Địa điểm</label>
         <input
           type="text"
           className="w-full p-2 border rounded mb-3"
@@ -154,7 +158,7 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
           onChange={(e) => setLocation(e.target.value)}
         />
 
-        <label className="block font-semibold">Start Date</label>
+        <label className="block font-semibold">Ngày bắt đầu</label>
         <input
           type="date"
           className="w-full p-2 border rounded mb-3"
@@ -162,15 +166,22 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
           onChange={(e) => setStartDate(e.target.value)}
         />
 
-        <label className="block font-semibold">End Date</label>
+        <label className="block font-semibold">Ngày kết thúc</label>
         <input
           type="date"
           className="w-full p-2 border rounded mb-3"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
         />
-
-        <label className="block font-semibold">Max Participants</label>
+        <label className="block font-semibold">Ngân hàng</label>
+        <input
+          type="text"
+          className="w-full p-2 border rounded mb-3"
+          value={bank}
+          onChange={(e) => setBank(e.target.value)}
+          placeholder="Bank Account - Account Holder - Bank Name"
+        />
+        <label className="block font-semibold">Số người tham gia</label>
         <input
           type="number"
           className="w-full p-2 border rounded mb-3"
