@@ -3,6 +3,7 @@ import Modal from "react-modal";
 import { apiConfig } from "../../config/apiConfig";
 import { AuthContext } from "../../util/AuthContext";
 
+
 Modal.setAppElement("#root");
 
 const AddExpense = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
@@ -26,17 +27,19 @@ const AddExpense = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
     e.preventDefault();
 
     const payload = {
-      receiverId: parseInt(formData.receiverId, 10),
       amount: parseInt(formData.amount, 10),
-      projectId: parseInt(projectId, 10),
       purpose: formData.purpose || "",
+      projectId: parseInt(projectId, 10),
+      receiverId: parseInt(formData.receiverId, 10),
+      senderId: currentUser.userId,
     };
 
     try {
-      await apiConfig.post("http://localhost:8080/api/donations", payload);
+      await apiConfig.post("http://localhost:8080/api/expenses", payload);
       onSuccess();
       onRequestClose();
     } catch (error) {
+      console.log("data", payload);
       console.error("Lỗi khi gửi donation:", error);
     }
   };

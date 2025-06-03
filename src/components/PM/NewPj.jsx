@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from "../../util/AuthContext"; 
+import { uploadFileToAzure } from "../../util/azureBlobService";
 
 const NewPj = ({ onClose }) => {
   const { currentUser } = useContext(AuthContext);
@@ -11,10 +12,10 @@ const NewPj = ({ onClose }) => {
   const [endDate, setEndDate] = useState('');
   const [maxParticipants, setMaxParticipants] = useState(10);
   const [avatar, setAvatar] = useState('');
-  const [showImageForm, setShowImageForm] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const [avatarUploading, setAvatarUploading] = useState(false); 
+  
   const handleSubmit = async (status) => {
     if (!title || !description || !location || !startDate || !endDate) {
       setError('Vui lòng nhập đầy đủ thông tin.');
@@ -41,9 +42,9 @@ const NewPj = ({ onClose }) => {
           location,
           startTime: startDate,
           endTime: endDate,
-          avatarFilepath: avatar,
+          avatarFilepath: avatar, // Sử dụng URL ảnh đã upload
           maxParticipants: maxParticipants,
-          pmId: currentUser.userId, 
+          pmId: currentUser.userId,
           status,
           createdAt: currentTime,
           updatedAt: currentTime,
@@ -65,6 +66,26 @@ const NewPj = ({ onClose }) => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUploadImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      setError('Vui lòng chọn một file ảnh.');
+      return;
+    }
+
+    try {
+      setAvatarUploading(true);
+      const uniqueFileName = `${currentUser.userId}-${Date.now()}-${file.name}`;
+      const url = await uploadFileToAzure("project", uniqueFileName, file); // Tải ảnh lên Azure
+      setAvatar(url); // Lưu URL ảnh vào trạng thái avatar
+    } catch (error) {
+      setError('Không thể tải ảnh lên Azure.');
+      console.error('Lỗi khi tải ảnh:', error);
+    } finally {
+      setAvatarUploading(false);
     }
   };
 
@@ -128,6 +149,7 @@ const NewPj = ({ onClose }) => {
           onChange={(e) => setMaxParticipants(e.target.value)}
         />
 
+        <label className="block font-semibold">Hình ảnh dự án</label>
         {avatar && (
           <img
             src={avatar}
@@ -135,47 +157,40 @@ const NewPj = ({ onClose }) => {
             className="w-40 h-24 rounded-lg object-cover mb-3"
           />
         )}
+        <input
+          id="avatar-upload"
+          type="file"
+          accept="image/*"
+          onChange={handleUploadImage}
+          className="hidden"
+          disabled={avatarUploading}
+        />
+        <button
+          type="button"
+          className={`px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 ${avatarUploading ? "opacity-50 cursor-not-allowed" : ""}`}
+          onClick={() => document.getElementById('avatar-upload').click()}
+          disabled={avatarUploading}
+        >
+          {avatarUploading ? 'Đang tải...' : 'Tải lên ảnh'}
+        </button>
 
-        {showImageForm ? (
-          <div className="mb-3">
-            <label className="block font-semibold">URL Hình ảnh</label>
-            <input
-              type="text"
-              className="w-full p-2 border rounded mb-2"
-              value={avatar}
-              onChange={(e) => setAvatar(e.target.value)}
-            />
-            <button
-              className="bg-green-500 text-white px-4 py-2 rounded"
-              onClick={() => setShowImageForm(false)}
-            >
-              OK
-            </button>
-          </div>
-        ) : (
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded mb-3"
-            onClick={() => setShowImageForm(true)}
-          >
-            Thêm hình ảnh
-          </button>
-        )}
+        {avatarUploading && <p className="text-blue-500">Đang tải ảnh lên...</p>}
 
         <div className="flex justify-between mt-4">
           <div>
             <button
               className="bg-gray-300 px-4 py-2 rounded mr-2"
               onClick={() => handleSubmit('draft')}
-              disabled={loading}
+              disabled={loading || avatarUploading}
             >
               {loading ? 'Đang lưu...' : 'Lưu nháp'}
             </button>
             <button
               className={`px-4 py-2 rounded ${
-                loading ? 'bg-gray-400' : 'bg-orange-400 text-white'
+                loading || avatarUploading ? 'bg-gray-400' : 'bg-orange-400 text-white'
               }`}
               onClick={() => handleSubmit('pending')}
-              disabled={loading}
+              disabled={loading || avatarUploading}
             >
               {loading ? 'Đang gửi...' : 'Gửi'}
             </button>

@@ -1,11 +1,12 @@
 import React from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import  { apiConfig } from "../../config/apiConfig";
-import { AuthContext } from "../../util/AuthContext";
 import AddExpense from "./AddExpense";
+import Modal from "react-modal";
 
 const Expense = ({ expenses }) => {
+  const { id } = useParams();
+  
   const [showForm, setShowForm] = useState(false);
   return (
     <div>
@@ -56,7 +57,7 @@ const Expense = ({ expenses }) => {
             setShowForm(false);
             window.location.reload();
           }}
-          projectId={expenses.projectId}
+          projectId={id}
         />
       )}
     </div>

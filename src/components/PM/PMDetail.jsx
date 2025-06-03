@@ -65,12 +65,7 @@ const PMDetail = () => {
       console.error("Lỗi khi cập nhật lại dữ liệu dự án:", error);
     }
   }
-  const formatDateTime = (arr) => {
-    if (!arr || arr.length < 3) return "N/A";
-    const [year, month, day, hour = 0, minute = 0, second = 0] = arr;
-    const date = new Date(year, month - 1, day, hour, minute, second);
-    return date.toLocaleString("vi-VN");
-  };
+  
   const [donations, setDonations] = useState([]);
 
   useEffect(() => {
@@ -165,7 +160,6 @@ const PMDetail = () => {
         <div className="flex-1 max-w-3xl">
           <h1 className="text-4xl font-bold mb-8">{project.name}</h1>
           <h2 className="text-sm font-medium text-gray-500 mb-4">
-          Updated at: {formatDateTime(project.updatedAt)}
           </h2>
           <img
             src={project.avatarFilepath}
