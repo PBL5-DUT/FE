@@ -1,33 +1,46 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
-import { Home, ArrowUpRight, Users } from "lucide-react"; // modern icons
+import React from 'react';
+import { FaHome, FaProjectDiagram, FaUsers } from 'react-icons/fa';
 
-const navItems = [
-  { to: "/forum", label: "Main", icon: <Home size={18} /> },
-  { to: "/projectchild", label: "Child Projects", icon: <ArrowUpRight size={18} /> },
-  { to: "/projectmember", label: "Members", icon: <Users size={18} /> },
-];
-
-const LeftBar = () => {
+const LeftBar = ({ activeTab, setActiveTab }) => {
   return (
-    <div className="bg-white w-auto min-w-[100px] h-[60vh] p-4 border-r border-gray-200">
-      <nav className="flex flex-col space-y-2">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
-                isActive
-                  ? "bg-gray-200 text-gray-900"
-                  : "text-gray-700 hover:bg-gray-100"
-              } transition`
-            }
-          >
-            {item.icon}
-            {item.label}
-          </NavLink>
-        ))}
+    <div className="p-4 fixed">
+      <h2 className="text-xl font-bold text-gray-800 mb-6">Forum Menu</h2>
+      <nav className="space-y-2">
+        <button
+          onClick={() => setActiveTab('home')}
+          className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+            activeTab === 'home'
+              ? 'bg-blue-50 text-blue-600'
+              : 'hover:bg-gray-50 text-gray-700'
+          }`}
+        >
+          <FaHome className="text-xl" />
+          <span className="font-medium">Trang chủ</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('projects')}
+          className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+            activeTab === 'projects'
+              ? 'bg-blue-50 text-blue-600'
+              : 'hover:bg-gray-50 text-gray-700'
+          }`}
+        >
+          <FaProjectDiagram className="text-xl" />
+          <span className="font-medium">Dự án con</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('members')}
+          className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+            activeTab === 'members'
+              ? 'bg-blue-50 text-blue-600'
+              : 'hover:bg-gray-50 text-gray-700'
+          }`}
+        >
+          <FaUsers className="text-xl" />
+          <span className="font-medium">Thành viên</span>
+        </button>
       </nav>
     </div>
   );

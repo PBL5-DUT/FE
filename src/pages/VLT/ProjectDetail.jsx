@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiConfig } from "../../config/apiConfig";
 import Donation from "../../components/VLT/Donation";
-
-const formatDate = (dateString) => {
-  const options = { day: "2-digit", month: "2-digit", year: "numeric" };
-  return new Date(dateString).toLocaleDateString("vi-VN", options);
-};
+import { FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaHeart, FaClock, FaDonate, FaComments } from "react-icons/fa";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -19,6 +17,10 @@ const ProjectDetail = () => {
   const [error, setError] = useState(null);
   const [status, setStatus] = useState(null);
   const [isWaiting, setIsWaiting] = useState(false);
+
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), "dd MMMM, yyyy", { locale: vi });
+  };
 
   // Fetch project detail
   const fetchProjectDetail = async () => {
@@ -103,100 +105,166 @@ const ProjectDetail = () => {
   }, [id]);
 
   if (loading) {
-    return <div className="text-center mt-10">Đang tải thông tin dự án...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mx-auto"></div>
+          <p className="mt-4 text-purple-500 font-medium text-lg animate-pulse">
+            Đang tải thông tin dự án...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center mt-10 text-red-500">{error}</div>;
-  }
-
-  if (!project) {
-    return <div className="text-center mt-10 text-red-500">Dự án không tồn tại.</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+          <div className="text-red-500 text-5xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Đã có lỗi xảy ra</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={fetchProjectDetail}
+            className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      {/* Nội dung chính */}
-      <div className="max-w-6xl mx-auto p-4 flex gap-8 h-screen">
-        {/* Left Column */}
-        <div className="flex-1 overflow-y-auto">
-          <h1 className="text-4xl font-bold mb-4">{project.name}</h1>
-          <img
-            src={project.avatarFilepath}
-            alt={project.name}
-            className="w-full h-96 object-cover rounded-lg mb-4"
-          />
-          <p className="text-gray-700 mb-4">{project.description}</p>
-          <p className="text-gray-700"><strong>Địa điểm:</strong> {project.location}</p>
-          <p className="text-gray-700">
-            <strong>Thời gian:</strong> {formatDate(project.startTime)} → {formatDate(project.endTime)}
-          </p>
-          <p className="text-gray-700"><strong>Số lượng tham gia tối đa:</strong> {project.maxParticipants}</p>
-          <p className="text-gray-700"><strong>Số lượng hiện tại:</strong> {project.participantsCount}</p>
-          <p className="text-gray-700"><strong>Lượt thích:</strong> {project.likesCount}</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <div className="relative h-[40vh] bg-black">
+        <img
+          src={project.avatarFilepath}
+          alt={project.name}
+          className="w-full h-full object-cover opacity-70"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+          <div className="max-w-6xl mx-auto">
+            <h1 className="text-5xl font-bold mb-4">{project.name}</h1>
+            <div className="flex items-center space-x-6 text-gray-200">
+              <div className="flex items-center">
+                <FaMapMarkerAlt className="mr-2" />
+                {project.location}
+              </div>
+              <div className="flex items-center">
+                <FaCalendarAlt className="mr-2" />
+                {formatDate(project.startTime)}
+              </div>
+              <div className="flex items-center">
+                <FaHeart className="mr-2" />
+                {project.likesCount} lượt thích
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          {/* Buttons */}
-          <div className="flex justify-start w-full gap-4 mt-8">
-            {status === "pending" ? (
-              <button
-                className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md"
-                disabled
-              >
-                Waiting for approving
-              </button>
-            ) : status === "approved" ? (
-              <button
-                className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
-                onClick={handleGoToForum}
-              >
-                Go to Forum
-              </button>
-            ) : (
-              <button
-                className={`py-3 px-6 text-lg font-semibold rounded-lg shadow-md ${
-                  isWaiting
-                    ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                    : "bg-purple-200 text-purple-700 hover:bg-purple-300"
-                }`}
-                onClick={isWaiting ? null : handleRegister}
-                disabled={isWaiting}
-              >
-                {isWaiting ? "Waiting for approving" : "❤️ Register"}
-              </button>
-            )}
-            <button
-              className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900"
-              onClick={() => setShowDonate(!showDonate)}
-            >
-              » Donate
-            </button>
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="flex gap-8">
+          {/* Left Column - Project Details */}
+          <div className="flex-1">
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+              <h2 className="text-2xl font-bold mb-4">Thông tin dự án</h2>
+              <p className="text-gray-700 mb-6 leading-relaxed">{project.description}</p>
+              
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <div className="flex items-center text-purple-700 mb-2">
+                    <FaClock className="mr-2" />
+                    <span className="font-semibold">Thời gian</span>
+                  </div>
+                  <p className="text-gray-700">
+                    {formatDate(project.startTime)} → {formatDate(project.endTime)}
+                  </p>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <div className="flex items-center text-purple-700 mb-2">
+                    <FaUsers className="mr-2" />
+                    <span className="font-semibold">Số lượng tham gia</span>
+                  </div>
+                  <p className="text-gray-700">
+                    {project.participantsCount}/{project.maxParticipants} người
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                {status === "pending" ? (
+                  <button className="flex-1 py-3 px-6 bg-gray-100 text-gray-500 rounded-lg font-medium cursor-not-allowed">
+                    <FaClock className="inline mr-2" />
+                    Đang chờ duyệt
+                  </button>
+                ) : status === "approved" ? (
+                  <button
+                    onClick={handleGoToForum}
+                    className="flex-1 py-3 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+                  >
+                    <FaComments className="inline mr-2" />
+                    Tham gia diễn đàn
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleRegister}
+                    disabled={isWaiting}
+                    className="flex-1 py-3 px-6 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:bg-gray-300"
+                  >
+                    <FaUsers className="inline mr-2" />
+                    Đăng ký tham gia
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowDonate(!showDonate)}
+                  className="flex-1 py-3 px-6 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  <FaDonate className="inline mr-2" />
+                  Ủng hộ dự án
+                </button>
+              </div>
+
+              {/* Donation Form */}
+              {showDonate && (
+                <div className="mt-6 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
+                  <h3 className="text-xl font-semibold text-purple-800 mb-4">Ủng hộ dự án</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Số tiền ủng hộ (VNĐ)
+                      </label>
+                      <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Nhập số tiền..."
+                      />
+                    </div>
+                    <button
+                      onClick={processDonation}
+                      className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-medium hover:from-purple-700 hover:to-purple-800 transition-all"
+                    >
+                      Xác nhận ủng hộ
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Donation Form */}
-          {showDonate && (
-            <div className="mt-4 p-4 border border-purple-300 rounded-lg bg-purple-100 text-purple-900">
-              <p className="mb-2">Nhập số tiền muốn ủng hộ (VND):</p>
-              <input
-                type="number"
-                className="p-2 border rounded w-full mb-3"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="VD: 500000"
-              />
-              <button
-                className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-800"
-                onClick={processDonation}
-              >
-                Xác nhận ủng hộ
-              </button>
-            </div>
-          )}
+          {/* Right Column - Donation History */}
+          <div className="w-80">
+              <Donation projectId={id} />
+           
+          </div>
         </div>
-
-        {/* Right Column */}
-        <aside className="w-[300px] bg-white p-4 shadow-md border-l border-gray-200 h-full overflow-y-auto flex-shrink-0">
-          <Donation projectId={id} />
-        </aside>
       </div>
     </div>
   );

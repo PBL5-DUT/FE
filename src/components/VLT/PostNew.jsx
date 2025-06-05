@@ -1,30 +1,44 @@
 import React, { useState } from "react";
 import { FaImage, FaPaperPlane, FaTrash } from "react-icons/fa";
-import { uploadFileToAzure } from "../../util/azureBlobService"; 
+import { uploadFileToAzure } from "../../util/azureBlobService";
 import { apiConfig } from "../../config/apiConfig";
 
 const PostNew = ({ forumId, userId, onPost }) => {
   const [content, setContent] = useState("");
   const [images, setImages] = useState([]);
   const [error, setError] = useState("");
+  const [isPosting, setIsPosting] = useState(false);
+  const [success, setSuccess] = useState(""); // Thêm state cho thông báo thành công
 
   const handlePost = async () => {
+    if (isPosting) return;
     if (!content.trim()) {
       setError("Nội dung không được để trống!");
       return;
     }
 
+    setIsPosting(true);
+    setError("");
+    setSuccess(""); // Reset thông báo thành công
+
     try {
-      // Upload từng ảnh lên Azure Blob Storage
       const uploadedImages = await Promise.all(
         images.map(async (image, index) => {
-          const blobName = `post-${Date.now()}-${index}-${image.file.name}`;
-          const url = await uploadFileToAzure("post", blobName, image.file);
-          return { url }; // Trả về URL của ảnh đã upload
+          try {
+            const blobName = `post-${Date.now()}-${index}-${image.file.name || "image"}`;
+            const imageUrl = await uploadFileToAzure("post", blobName, image.file);
+            return {
+              imageFilepath: imageUrl,
+              description: "",
+              order: index,
+            };
+          } catch (e) {
+            console.error("Image upload failed:", e);
+            throw new Error("Tải ảnh thất bại!");
+          }
         })
       );
 
-      // Chuẩn bị dữ liệu gửi đến backend
       const postData = {
         forumId,
         userId,
@@ -32,25 +46,27 @@ const PostNew = ({ forumId, userId, onPost }) => {
         postImages: uploadedImages,
       };
 
-      // Gửi dữ liệu đến backend
-      console.log("forumId:", forumId);
-      console.log("userId:", userId);
-      
-      const response = await apiConfig.post('/posts', postData);
-        
+      console.log("postImages gửi lên backend:", postData.postImages);
 
-      if (response.ok) {
-        const newPost = await response.json();
-        onPost(newPost); // Gọi callback để cập nhật danh sách bài viết
+      const response = await apiConfig.post("/posts", postData);
+
+      if (response?.status === 200 || response?.status === 201) {
+        if (typeof onPost === "function") {
+          onPost(response.data);
+        }
         setContent("");
         setImages([]);
         setError("");
+        setSuccess("Đăng bài thành công!");
+        setTimeout(() => setSuccess(""), 5000); 
       } else {
         setError("Đã xảy ra lỗi khi đăng bài!");
       }
     } catch (err) {
       console.error("Error posting:", err);
-      setError("Không thể kết nối đến server!");
+      setError("Không thể kết nối đến server hoặc upload ảnh thất bại!");
+    } finally {
+      setIsPosting(false);
     }
   };
 
@@ -58,9 +74,16 @@ const PostNew = ({ forumId, userId, onPost }) => {
     const files = Array.from(e.target.files);
     const newImages = files.map((file) => ({
       file,
-      url: URL.createObjectURL(file), // Tạo URL xem trước
+      url: URL.createObjectURL(file),
     }));
-    setImages((prev) => [...prev, ...newImages]);
+
+    setImages((prev) => {
+      const existingKeys = new Set(prev.map((img) => img.file.name + img.file.size));
+      const uniqueNewImages = newImages.filter(
+        (img) => !existingKeys.has(img.file.name + img.file.size)
+      );
+      return [...prev, ...uniqueNewImages];
+    });
   };
 
   const handleRemoveImage = (index) => {
@@ -76,12 +99,13 @@ const PostNew = ({ forumId, userId, onPost }) => {
         value={content}
         onChange={(e) => {
           setContent(e.target.value);
-          setError(""); // Xóa lỗi khi người dùng nhập
+          setError("");
+          setSuccess("");
         }}
       ></textarea>
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
 
-      {/* Hiển thị ảnh đã chọn */}
       {images.length > 0 && (
         <div className="mt-4 grid grid-cols-3 gap-4">
           {images.map((image, index) => (
@@ -103,7 +127,6 @@ const PostNew = ({ forumId, userId, onPost }) => {
       )}
 
       <div className="flex justify-between items-center mt-4">
-        {/* Nút thêm ảnh */}
         <label className="flex items-center bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition cursor-pointer">
           <FaImage className="mr-2 text-gray-600" />
           Thêm ảnh
@@ -116,13 +139,17 @@ const PostNew = ({ forumId, userId, onPost }) => {
           />
         </label>
 
-        {/* Nút đăng bài */}
         <button
           onClick={handlePost}
-          className="flex items-center bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition"
+          disabled={isPosting}
+          className={`flex items-center px-6 py-2 rounded-lg transition ${
+            isPosting
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 text-white hover:bg-blue-600"
+          }`}
         >
           <FaPaperPlane className="mr-2" />
-          Đăng bài
+          {isPosting ? "Đang đăng..." : "Đăng bài"}
         </button>
       </div>
     </div>

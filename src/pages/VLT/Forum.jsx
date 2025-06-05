@@ -1,20 +1,20 @@
+import React, { useState, useContext } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import LeftBar from "../../components/VLT/LeftBar";
 import ChatButton from "../../components/VLT/ChatButton";
 import PostNew from "../../components/VLT/PostNew";
 import PostList from "../../components/VLT/PostList";
+import ProjectChild from "../../components/VLT/ProjectChild";
+import MemberList from "../../components/VLT/MemberList";
 import Donation from "../../components/VLT/Donation";
 import { AuthContext } from "../../util/AuthContext";
-import { useContext } from "react";
-
-
-
 
 const Forum = () => {
-  const { currentUser, setCurrentUser } = useContext(AuthContext);  
+  const { currentUser } = useContext(AuthContext);  
   const { forumId } = useParams();
   const location = useLocation();
   const { projectId, userId } = location.state || {};
+  const [activeTab, setActiveTab] = useState('home');
 
   if (!projectId) {
     return (
@@ -24,33 +24,45 @@ const Forum = () => {
     );
   }
 
+  const renderMainContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return (
+          <>
+            <PostNew forumId={forumId} userId={currentUser?.userId} />
+            <div className="mt-6">
+              <PostList forumId={forumId} />
+            </div>
+          </>
+        );
+      case 'projects':
+        return <ProjectChild projectId={projectId} />;
+      case 'members':
+        return <MemberList projectId={projectId} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col overflow-hidden">     
-      {/* Layout 3 cột */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar trái */}
-        <aside className="w-[220px] bg-white border-r border-gray-200 shadow-md h-full overflow-y-auto flex-shrink-0">
-          <LeftBar />
+        {/* Left Sidebar */}
+        <aside className="w-[200px] bg-white border-r border-gray-200 shadow-md h-full overflow-y-auto flex-shrink-0">
+          <LeftBar activeTab={activeTab} setActiveTab={setActiveTab} />
           <ChatButton />
         </aside>
 
-        {/* Nội dung chính */}
-        <main className="flex-1 h-full overflow-y-auto p-6 bg-gray-50">
-          <div className="max-w-4xl mx-auto">
-             {/* Đăng bài mới */}
-            <div className="mb-6">
-              <PostNew forumId={forumId} userId={currentUser.userId} />
-            </div>
-
-            {/* Danh sách bài viết */}
-            <div>
-              <PostList forumId={forumId} />
-            </div>
+        {/* Main Content */}
+        <main className="flex-1 h-full overflow-y-auto p-6 bg-gray-100">
+          <div className="max-w-3xl mx-auto">
+            {renderMainContent()}
           </div>
         </main>
 
-        {/* Sidebar phải */}
-        <aside className="w-[300px] bg-white p-4 shadow-md border-l border-gray-200 h-full overflow-y-auto flex-shrink-0">
+        {/* Right Sidebar */}
+        <aside className="w-[290px] bg-white p-4 shadow-md border-l border-white h-full overflow-y-auto flex-shrink-0">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Lịch sử ủng hộ</h2>
           <Donation projectId={projectId} />
         </aside>
       </div>
