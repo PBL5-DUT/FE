@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import LeftBar from "../../components/VLT/LeftBar";
 import ChatButton from "../../components/VLT/ChatButton";
+import AIChatBox from "../../components/VLT/AIChatBox";
 import PostNew from "../../components/VLT/PostNew";
 import PostList from "../../components/VLT/PostList";
 import ProjectChild from "../../components/VLT/ProjectChild";
@@ -54,7 +55,6 @@ const Forum = () => {
             setActiveTab={setActiveTab}
             projectName={projectName}
           />
-          <ChatButton />
         </aside>
 
         {/* Main Content */}
@@ -69,6 +69,11 @@ const Forum = () => {
           <h2 className="text-xl font-bold text-gray-800 mb-4">Lịch sử ủng hộ</h2>
           <TabContainer projectId={projectId} />
         </aside>
+
+        <>
+  <ChatButton />
+  <AIChatBox />
+</>
       </div>
     </div>
   );
