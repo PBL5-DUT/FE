@@ -13,7 +13,7 @@ const Forum = () => {
   const { currentUser } = useContext(AuthContext);  
   const { forumId } = useParams();
   const location = useLocation();
-  const { projectId, userId } = location.state || {};
+  const { projectId, projectName } = location.state || {};
   const [activeTab, setActiveTab] = useState('home');
 
   if (!projectId) {
@@ -49,7 +49,11 @@ const Forum = () => {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar */}
         <aside className="w-[200px] bg-white border-r border-gray-200 shadow-md h-full overflow-y-auto flex-shrink-0">
-          <LeftBar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <LeftBar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            projectName={projectName}
+          />
           <ChatButton />
         </aside>
 

@@ -1,7 +1,7 @@
 import React from "react";
 import ForumCard from "./ForumCard";
 
-const ForumList = ({ forums, projectId }) => {
+const ForumList = ({ forums, projectId,projectName }) => {
   console.log("Forums in ForumList:", forums); // Log để kiểm tra dữ liệu được truyền vào
 
   if (!Array.isArray(forums) || forums.length === 0) {
@@ -12,7 +12,7 @@ const ForumList = ({ forums, projectId }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {forums.map((forum) => (
-        <ForumCard key={forum.forumId} forum={forum} projectId={projectId} />
+        <ForumCard key={forum.forumId} forum={forum} projectId={projectId} projectName={projectName}/>
       ))}
     </div>
   );

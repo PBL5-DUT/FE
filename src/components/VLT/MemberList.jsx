@@ -42,7 +42,7 @@ const MemberList = ({ projectId }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-gray-100 rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
         Thành viên ({members.length})
       </h2>

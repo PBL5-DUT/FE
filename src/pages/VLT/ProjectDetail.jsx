@@ -62,7 +62,12 @@ const ProjectDetail = () => {
 
   // Handle navigation to forum
   const handleGoToForum = () => {
-    navigate(`/forumoverview/${id}`);
+    navigate(`/forumoverview/${id}`, {
+      state: {
+        projectId: id,
+        projectName: project.name,
+      }
+    });
   };
 
   // Handle donation processing

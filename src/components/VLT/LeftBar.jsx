@@ -1,10 +1,15 @@
 import React from 'react';
 import { FaHome, FaProjectDiagram, FaUsers } from 'react-icons/fa';
 
-const LeftBar = ({ activeTab, setActiveTab }) => {
+const LeftBar = ({ activeTab, setActiveTab, projectName }) => {
   return (
     <div className="p-4 fixed">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Forum Menu</h2>
+      <h2
+        className="text-l font-bold text-blue-700 mb-6 truncate max-w-[180px] overflow-hidden whitespace-nowrap"
+        title={projectName}
+      >
+        {projectName}
+      </h2>
       <nav className="space-y-2">
         <button
           onClick={() => setActiveTab('home')}

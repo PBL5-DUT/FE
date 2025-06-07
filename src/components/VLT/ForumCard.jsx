@@ -1,11 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const ForumCard = ({ forum, projectId }) => {
+const ForumCard = ({ forum, projectId, projectName}) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`/forum/${forum.forumId}`, { state: { projectId } }); // Truyền projectId qua state
+    navigate(`/forum/${forum.forumId}`, { state: { projectId: projectId, projectName:projectName } }); // Truyền projectId qua state
   };
 
   return (

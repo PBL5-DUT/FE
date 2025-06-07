@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import ForumList from "../../components/VLT/ForumList";
 import { apiConfig } from "../../config/apiConfig";
 
 const ForumOverview = () => {
-  const { projectId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { projectId, projectName } = location.state || {};
   const [forums, setForums] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,7 +16,7 @@ const ForumOverview = () => {
       setLoading(true);
       const response = await apiConfig.get(`/forums/project/${projectId}`);
       console.log("API Response:", response.data);
-      setForums(response.data); 
+      setForums(response.data);
       setError(null);
     } catch (err) {
       console.error("Error fetching forums:", err);
@@ -27,6 +29,8 @@ const ForumOverview = () => {
   useEffect(() => {
     fetchForums();
   }, [projectId]);
+
+  
 
   if (loading) {
     return (
@@ -59,7 +63,9 @@ const ForumOverview = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-6">
           Danh sách diễn đàn
         </h1>
-        <ForumList forums={forums} projectId={projectId} />
+        <ForumList forums={forums} projectId={projectId} projectName={projectName}/>
+
+        {projectName}
       </div>
     </div>
   );
