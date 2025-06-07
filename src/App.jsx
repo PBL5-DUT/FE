@@ -17,7 +17,8 @@ import ProjectDetail from "./pages/VLT/ProjectDetail";
 import Information from "./pages/VLT/Information";
 import AboutUs from "./pages/VLT/AboutUs";
 import JoinedProject from "./pages/VLT/JoinedProject";
-// import Forum from "./pages/VLT/Forum";
+import ForumOverview from "./pages/VLT/ForumOverview";
+import Forum from "./pages/VLT/Forum";
 
 import PmDetail from './pages/PM/PmDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
@@ -39,9 +40,18 @@ function App() {
       path: "/",
       element: (
         <ProtectedRoute>
-          <div>
-            <Header />
-            <Outlet />
+          <div className="h-screen flex flex-col">
+            {/* Header cố định */}
+            <div className="bg-white shadow-md z-50 h-[64px] flex-shrink-0 fixed w-full">
+              <Header />
+            </div>
+
+            {/* Nội dung bên dưới Header */}
+            <div className="h-screen flex flex-col pt-[64px]">
+              <div className="flex-1 overflow-y-auto">
+                <Outlet />
+              </div>
+            </div>
           </div>
         </ProtectedRoute>
       ),
@@ -69,7 +79,7 @@ function App() {
         {
           path: "/project-manager",
           element: <PmManager />,
-        },       
+        },
         {
           path: "/information",
           element: <Information />,
@@ -82,17 +92,18 @@ function App() {
           path: "/joined",
           element: <JoinedProject />,
         },
-
         {
           path: "/project/:id/statistics",
-          element: <DonationChart />
+          element: <DonationChart />,
         },
-
-        // {
-        //   path: "/forum",
-        //   element: <Forum />,
-        // },
-
+        {
+          path: "/forumoverview/:projectId",
+          element: <ForumOverview />,
+        },
+        {
+          path: "/forum/:forumId",
+          element: <Forum />,
+        },
       ],
     },
     {
@@ -103,7 +114,6 @@ function App() {
       path: "/register",
       element: <Register />,
     },
-    
   ]);
 
   return (
