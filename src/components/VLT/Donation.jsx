@@ -1,86 +1,72 @@
 import React, { useEffect, useState } from "react";
 import { apiConfig } from "../../config/apiConfig";
 
-const Donation = ({ projectId }) => {
+const Donation = ({ projectId, isFixed = true }) => {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("Money");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12; // Hiển thị 10 người dùng mỗi trang
-
-  // Fetch donations
-  const fetchDonations = async () => {
-    try {
-      setLoading(true);
-      const response = await apiConfig.get(`/donations/project/${projectId}`);
-      setDonations(response.data);
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching donations:", err);
-      setError("Không thể tải danh sách ủng hộ.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const itemsPerPage = 12;
 
   useEffect(() => {
+    const fetchDonations = async () => {
+      try {
+        setLoading(true);
+        const response = await apiConfig.get(`/donations/project/${projectId}`);
+        setDonations(response.data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching donations:", err);
+        setError("Không thể tải danh sách ủng hộ.");
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchDonations();
   }, [projectId]);
 
-  // Phân loại donations
   const moneyDonations = donations.filter((donation) => donation.type === "money") || [];
   const goodsDonations = donations.filter((donation) => donation.type === "goods") || [];
-
-  // Tính tổng tiền đóng góp
   const totalMoney = moneyDonations.reduce((sum, d) => sum + d.amount, 0);
 
-  // Hàm xử lý phân trang
   const paginatedDonations = (donations) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return donations.slice(startIndex, endIndex);
+    return donations.slice(startIndex, startIndex + itemsPerPage);
   };
 
   const totalPages = Math.ceil(
     (activeTab === "Money" ? moneyDonations : goodsDonations).length / itemsPerPage
   );
 
-  if (loading) {
-    return <div className="text-xs text-gray-500">Đang tải danh sách ủng hộ...</div>;
-  }
-
-  if (error) {
-    return <div className="text-xs text-red-500">{error}</div>;
-  }
+  const currentDonations =
+    activeTab === "Money" ? paginatedDonations(moneyDonations) : paginatedDonations(goodsDonations);
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-lg fixed right-0 top-[64px] w-[300px] h-[calc(100vh-64px)] overflow-hidden">
-      <h2 className="text-sm font-bold mb-3 text-red-500">Donations</h2>
+    <div className={`bg-white p-4 ${isFixed ? "fixed right-0 top-[64px] w-[300px] h-[calc(100vh-64px)]" : "h-full"} overflow-hidden`}>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-4">
-        <button
-          className={`px-3 py-1 rounded-lg text-xs font-medium ${
-            activeTab === "Money" ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"
-          }`}
-          onClick={() => setActiveTab("Money")}
+      {/* Dropdown Tab */}
+      <div className="mb-4">
+        <select
+          value={activeTab}
+          onChange={(e) => {
+            setActiveTab(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-100px px-2 py-1 rounded-lg border border-gray-300 text-xs"
         >
-          Money
-        </button>
-        <button
-          className={`px-3 py-1 rounded-lg text-xs font-medium ${
-            activeTab === "Goods" ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"
-          }`}
-          onClick={() => setActiveTab("Goods")}
-        >
-          Goods
-        </button>
+          <option value="Money">Money</option>
+          <option value="Goods">Goods</option>
+        </select>
       </div>
 
-      {/* Content section */}
-      <div className="h-[calc(100%-160px)] overflow-hidden">
-        <div className="w-full h-full">
+      {/* Content section - Remove scroll */}
+      {loading ? (
+        <div className="text-xs text-gray-500">Đang tải danh sách ủng hộ...</div>
+      ) : error ? (
+        <div className="text-xs text-red-500">{error}</div>
+      ) : (
+        <div className="h-[calc(100%-160px)]">
           <table className="w-full border-collapse border border-gray-300 text-xs">
             <thead>
               <tr className="bg-gray-100 text-gray-700">
@@ -92,27 +78,27 @@ const Donation = ({ projectId }) => {
               </tr>
             </thead>
             <tbody>
-              {(activeTab === "Money" ? moneyDonations : goodsDonations).length > 0 ? (
-                paginatedDonations(activeTab === "Money" ? moneyDonations : goodsDonations).map(
-                  (donation, index) => (
-                    <tr
-                      key={index}
-                      className={`${
-                        index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                      } hover:bg-gray-100 transition`}
-                    >
-                      <td className="border border-gray-300 px-1 py-1">
-                        {index + 1 + (currentPage - 1) * itemsPerPage}
-                      </td>
-                      <td className="border border-gray-300 px-1 py-1">{donation.user.username}</td>
-                      <td className="border border-gray-300 px-1 py-1 text-right">
-                        {activeTab === "Money"
-                          ? `${donation.amount.toLocaleString()}`
-                          : donation.amount}
-                      </td>
-                    </tr>
-                  )
-                )
+              {currentDonations.length > 0 ? (
+                currentDonations.map((donation, index) => (
+                  <tr
+                    key={index}
+                    className={`${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    } hover:bg-gray-100 transition`}
+                  >
+                    <td className="border border-gray-300 px-1 py-1">
+                      {index + 1 + (currentPage - 1) * itemsPerPage}
+                    </td>
+                    <td className="border border-gray-300 px-1 py-1">
+                      {donation.user.username}
+                    </td>
+                    <td className="border border-gray-300 px-1 py-1 text-right">
+                      {activeTab === "Money"
+                        ? donation.amount.toLocaleString()
+                        : donation.amount}
+                    </td>
+                  </tr>
+                ))
               ) : (
                 <tr>
                   <td colSpan="3" className="text-center py-2 text-gray-500">
@@ -123,36 +109,40 @@ const Donation = ({ projectId }) => {
             </tbody>
           </table>
         </div>
-      </div>
+      )}
 
-      {/* Total Money - luôn hiển thị ở dưới */}
-      {activeTab === "Money" && (
-        <div className="mt-4 text-right">
-          <p className="text-xs font-medium text-gray-700">
-            Total:{" "}
-            <span className="font-bold text-red-500">{totalMoney.toLocaleString()} VND</span>
-          </p>
+      {/* Total Money */}
+      {activeTab === "Money" && !loading && !error && (
+        <div className="absolute bottom-16 right-4 left-4">
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="text-xs font-medium text-gray-700 text-right">
+              Total:{" "}
+              <span className="font-bold text-red-500">{totalMoney.toLocaleString()} VND</span>
+            </p>
+          </div>
         </div>
       )}
 
-      {/* Pagination - luôn hiển thị ở dưới */}
-      {(activeTab === "Money" ? moneyDonations : goodsDonations).length > itemsPerPage && (
-        <div className="mt-4 flex justify-between items-center text-xs">
-          <button
-            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-            className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300"
-          >
-            Previous
-          </button>
-          <span className="text-gray-500">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
-            className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300"
-          >
-            Next
-          </button>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="absolute bottom-4 right-4 left-4">
+          <div className="flex justify-between items-center text-xs">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300"
+            >
+              Previous
+            </button>
+            <span className="text-gray-500">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>

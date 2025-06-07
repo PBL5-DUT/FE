@@ -6,7 +6,7 @@ import PostNew from "../../components/VLT/PostNew";
 import PostList from "../../components/VLT/PostList";
 import ProjectChild from "../../components/VLT/ProjectChild";
 import MemberList from "../../components/VLT/MemberList";
-import Donation from "../../components/VLT/Donation";
+import TabContainer from "../../components/VLT/TabContainer";
 import { AuthContext } from "../../util/AuthContext";
 
 const Forum = () => {
@@ -67,7 +67,7 @@ const Forum = () => {
         {/* Right Sidebar */}
         <aside className="w-[290px] bg-white p-4 shadow-md border-l border-white h-full overflow-y-auto flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Lịch sử ủng hộ</h2>
-          <Donation projectId={projectId} />
+          <TabContainer projectId={projectId} />
         </aside>
       </div>
     </div>

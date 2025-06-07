@@ -24,29 +24,42 @@ const Post = ({ post, onPostUpdate }) => {
     }).format(date);
   };
 
-  const handleLikeClick = () => {
-    setLiked((prevLiked) => {
-      // Cập nhật likeCount dựa trên prevLiked (trạng thái trước khi bấm)
-      setLikeCount((prevCount) => prevLiked ? prevCount - 1 : prevCount + 1);
-      latestLikedRef.current = !prevLiked;
-      return !prevLiked;
-    });
+  const handleLikeClick = async (e) => {
+    e.preventDefault(); // Prevent event bubbling
+    if (likeLoading) return;
 
-    if (debounceRef.current) clearTimeout(debounceRef.current);
+    setLikeLoading(true);
+    const willLike = !liked;
 
-    debounceRef.current = setTimeout(async () => {
-      setLikeLoading(true);
-      try {
-        await apiConfig.post(`/post/${post.postId}/like`, {
-          like: latestLikedRef.current
-        });
-      } catch (error) {
-        setLiked(post.isLiked);
-        setLikeCount(post.likeCount);
-      } finally {
-        setLikeLoading(false);
+    try {
+      // Update UI immediately for better UX
+      setLiked(willLike);
+      setLikeCount(prev => willLike ? prev + 1 : prev - 1);
+      
+      // Clear existing timeout
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
       }
-    }, 600);
+
+      // Debounced API call
+      debounceRef.current = setTimeout(async () => {
+        const response = await apiConfig.post(`/posts/${post.postId}/like`, {
+          like: willLike
+        });
+
+        if (!response.data) {
+          throw new Error('Failed to update like status');
+        }
+      }, 300);
+
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      // Rollback UI changes if API fails
+      setLiked(!willLike);
+      setLikeCount(prev => willLike ? prev - 1 : prev + 1);
+    } finally {
+      setLikeLoading(false);
+    }
   };
 
   // Update the comment button click handler

@@ -51,7 +51,7 @@ const MemberList = ({ projectId }) => {
       <div className="flex flex-col space-y-4">
         {members.map((member) => (
           <MemberCard
-            key={member.userId}
+            userId={member.userId}
             name={member.fullName}
             username={member.username}
             avatar={member.avatarFilepath}
