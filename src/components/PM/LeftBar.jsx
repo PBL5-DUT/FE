@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaHome, FaProjectDiagram, FaUsers, FaUserPlus } from 'react-icons/fa';
+import { FaHome, FaProjectDiagram, FaUsers, FaUserPlus, FaFileAlt } from 'react-icons/fa';
 
 const LeftBar = ({ activeTab, setActiveTab, projectName }) => {
   return (
@@ -57,6 +57,18 @@ const LeftBar = ({ activeTab, setActiveTab, projectName }) => {
           <FaUserPlus className="text-xl" />
           <span className="font-medium">Yêu cầu tham gia</span>
         
+        </button>
+
+        <button
+          onClick={() => setActiveTab('postings')}
+          className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+            activeTab === 'postings'
+              ? 'bg-blue-50 text-blue-600'
+              : 'hover:bg-gray-50 text-gray-700'
+          }`}
+        >
+          <FaFileAlt className="text-xl" />
+          <span className="font-medium">Duyệt bài viết</span>
         </button>
       </nav>
     </div>

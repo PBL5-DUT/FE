@@ -8,7 +8,7 @@ const PostNew = ({ forumId, userId, onPost }) => {
   const [images, setImages] = useState([]);
   const [error, setError] = useState("");
   const [isPosting, setIsPosting] = useState(false);
-  const [success, setSuccess] = useState(""); // Thêm state cho thông báo thành công
+  const [success, setSuccess] = useState(""); 
 
   const handlePost = async () => {
     if (isPosting) return;
@@ -19,7 +19,7 @@ const PostNew = ({ forumId, userId, onPost }) => {
 
     setIsPosting(true);
     setError("");
-    setSuccess(""); // Reset thông báo thành công
+    setSuccess(""); 
 
     try {
       const uploadedImages = await Promise.all(

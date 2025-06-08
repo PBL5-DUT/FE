@@ -73,10 +73,10 @@ const Donation = ({ projectId, isFixed = true }) => {
               </select>
             </div>
 
-            <table className="w-full text-xs">
+            <table className="w-full text-xm">
               <thead className="sticky top-0 bg-white border-b">
                 <tr className="text-gray-600">
-                  <th className="text-left py-2 w-8">STT</th>
+                  <th className="text-left py-2 w-10">STT</th>
                   <th className="text-left py-2">Người ủng hộ</th>
                   <th className="text-right py-2">
                     {activeTab === "Money" ? "Số tiền" : "Mô tả/SL"}

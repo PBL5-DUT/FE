@@ -8,8 +8,9 @@ import PostList from "../../components/PM/PostList";
 import ProjectChild from "../../components/PM/ProjectChild";
 import MemberList from "../../components/PM/MemberList";
 import TabContainer from "../../components/PM/TabContainer";
-import UserRequest from "../../components/PM/UserRequest";
+import UserRequest from "../../components/PM/UserRequest.jsx";
 import { AuthContext } from "../../util/AuthContext";
+import PostRequest from "../../components/PM/PostRequest.jsx";
 
 const Forum = () => {
   const { currentUser } = useContext(AuthContext);  
@@ -43,6 +44,8 @@ const Forum = () => {
         return <MemberList projectId={projectId} />;
       case 'requests':
         return <UserRequest projectId={projectId} />;
+      case 'postings':
+        return <PostRequest forumId={forumId} />;
       default:
         return null;
     }
