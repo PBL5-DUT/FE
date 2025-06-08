@@ -1,117 +1,151 @@
 import { useParams } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { apiConfig } from "../../config/apiConfig";
 
-const Donation = ({ donations }) => {
+const Donation = ({ projectId, isFixed = true }) => {
+  const [donations, setDonations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("Money");
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const { id } = useParams();
 
-  const moneyDonations = (donations || []).filter(d => d.type === "money");
-  const goodsDonations = (donations || []).filter(d => d.type === "goods");
-
-  const totalMoney = moneyDonations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
-
-  const getCurrentDonations = () => {
-    const currentData = activeTab === "Money" ? moneyDonations : goodsDonations;
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return currentData.slice(startIndex, endIndex);
-  };
-
-  const totalPages =
-    activeTab === "Money"
-      ? Math.ceil(moneyDonations.length / itemsPerPage)
-      : Math.ceil(goodsDonations.length / itemsPerPage);
+  const itemsPerPage = 12;
 
   useEffect(() => {
-    setCurrentPage(1); 
-  }, [activeTab]);
+    const fetchDonations = async () => {
+      try {
+        setLoading(true);
+        const response = await apiConfig.get(`/donations/project/${projectId}`);
+        setDonations(response.data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching donations:", err);
+        setError("Không thể tải danh sách ủng hộ.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDonations();
+  }, [projectId]);
+
+  const moneyDonations = donations.filter((donation) => donation.type === "money") || [];
+  const goodsDonations = donations.filter((donation) => donation.type === "goods") || [];
+  const totalMoney = moneyDonations.reduce((sum, d) => sum + d.amount, 0);
+
+  const paginatedDonations = (donations) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return donations.slice(startIndex, startIndex + itemsPerPage);
+  };
+
+  const totalPages = Math.ceil(
+    (activeTab === "Money" ? moneyDonations : goodsDonations).length / itemsPerPage
+  );
+
+  const currentDonations =
+    activeTab === "Money" ? paginatedDonations(moneyDonations) : paginatedDonations(goodsDonations);
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-lg fixed right-0 top-[64px] w-[300px] h-[calc(100vh-64px)] overflow-hidden">
-      <h2 className="text-2xl font-bold mb-4 text-red-500">DONATIONS</h2>
+    <div className={`bg-white p-4 ${isFixed ? "fixed right-0 top-[64px] w-[300px] h-[calc(100vh-64px)]" : "h-full"} overflow-hidden`}>
 
       {/* Dropdown Tab */}
-      <div className="mb-4 flex items-center gap-2">
-        <label htmlFor="tab-select" className="font-semibold">Chọn loại:</label>
+      <div className="mb-4">
         <select
-          id="tab-select"
           value={activeTab}
-          onChange={(e) => setActiveTab(e.target.value)}
-          className="px-4 py-2 rounded border border-gray-300"
+          onChange={(e) => {
+            setActiveTab(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-100px px-2 py-1 rounded-lg border border-gray-300 text-xs"
         >
           <option value="Money">Money</option>
           <option value="Goods">Goods</option>
         </select>
       </div>
 
-      {/* Content Table */}
-      <table className="w-full table-auto mb-4">
-  <thead>
-    <tr className="text-left border-b border-gray-300">
-      <th>STT</th>
-      <th>Username</th>
-      <th className="text-right">{activeTab === "Money" ? "VND" : "Description"}</th>
-    </tr>
-  </thead>
-  <tbody>
-    {getCurrentDonations().length > 0 ? (
-      getCurrentDonations().map((donation, index) => (
-        <tr key={index} className="border-b border-gray-200">
-          <td className="py-3">
-            {index + 1 + (currentPage - 1) * itemsPerPage}
-          </td>
-          <td className="py-3">
-            {donation.txnRef === "anonymous" ? "Anonymous User" : donation.user?.username || "Ẩn danh"}
-          </td>
-          <td className="py-3 text-right">
-            {activeTab === "Money"
-              ? `${Number(donation.amount).toLocaleString()} VND`
-              : donation.goodDescription || "N/A"}
-          </td>
-        </tr>
-      ))
-    ) : (
-      <tr>
-        <td colSpan="3" className="text-center py-4 text-gray-500">Chưa có đóng góp nào</td>
-      </tr>
-    )}
-  </tbody>
-  {activeTab === "Money" && (
-    <tfoot>
-      <tr>
-        <td colSpan={2} className="text-left font-semibold py-3">Total:</td>
-        <td className="text-right font-semibold py-3">
-          {totalMoney.toLocaleString()} VND
-        </td>
-      </tr>
-    </tfoot>
-  )}
-</table>
-      
+      {/* Content section - Remove scroll */}
+      {loading ? (
+        <div className="text-xs text-gray-500">Đang tải danh sách ủng hộ...</div>
+      ) : error ? (
+        <div className="text-xs text-red-500">{error}</div>
+      ) : (
+        <div className="h-[calc(100%-160px)]">
+          <table className="w-full border-collapse border border-gray-300 text-xs">
+            <thead>
+              <tr className="bg-gray-100 text-gray-700">
+                <th className="border border-gray-300 px-1 py-1 text-left">STT</th>
+                <th className="border border-gray-300 px-1 py-1 text-left">Username</th>
+                <th className="border border-gray-300 px-1 py-1 text-right">
+                  {activeTab === "Money" ? "VND" : "Quantity"}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentDonations.length > 0 ? (
+                currentDonations.map((donation, index) => (
+                  <tr
+                    key={index}
+                    className={`${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    } hover:bg-gray-100 transition`}
+                  >
+                    <td className="border border-gray-300 px-1 py-1">
+                      {index + 1 + (currentPage - 1) * itemsPerPage}
+                    </td>
+                    <td className="border border-gray-300 px-1 py-1">
+                      {donation.user.username}
+                    </td>
+                    <td className="border border-gray-300 px-1 py-1 text-right">
+                      {activeTab === "Money"
+                        ? donation.amount.toLocaleString()
+                        : donation.amount}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-center py-2 text-gray-500">
+                    No donations yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Total Money */}
+      {activeTab === "Money" && !loading && !error && (
+        <div className="absolute bottom-16 right-4 left-4">
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="text-xs font-medium text-gray-700 text-right">
+              Total:{" "}
+              <span className="font-bold text-red-500">{totalMoney.toLocaleString()} VND</span>
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Pagination */}
-      {(activeTab === "Money"
-        ? moneyDonations.length > itemsPerPage
-        : goodsDonations.length > itemsPerPage) && (
-        <div className="flex justify-between items-center mb-4">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
-          >
-            Previous
-          </button>
-          <span className="text-gray-600">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
-          >
-            Next
-          </button>
+      {totalPages > 1 && (
+        <div className="absolute bottom-4 right-4 left-4">
+          <div className="flex justify-between items-center text-xs">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300"
+            >
+              Previous
+            </button>
+            <span className="text-gray-500">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>
