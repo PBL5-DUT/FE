@@ -8,25 +8,35 @@ const ProjectChild = ({ projectId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchChildProjects = async () => {
-      try {
-        setLoading(true);
-        const response = await apiConfig.get(`/projects/child-projects/${projectId}`);
+    useEffect(() => {
+  const fetchChildProjects = async () => {
+    try {
+      setLoading(true);
+      const response = await apiConfig.get(`/projects/child-projects/${projectId}`);
+
+      // Nếu là mảng rỗng hoặc không có dữ liệu, vẫn là hợp lệ
+      if (Array.isArray(response.data)) {
         setChildProjects(response.data);
         setError(null);
-      } catch (err) {
-        console.error('Error fetching child projects:', err);
-        setError('Không thể tải danh sách dự án con. Vui lòng thử lại sau.');
-      } finally {
-        setLoading(false);
+      } else {
+        // Nếu response không phải mảng, coi là lỗi dữ liệu
+        throw new Error('Invalid response format');
       }
-    };
+    } catch (err) {
+      console.error('Error fetching child projects:', err);
 
-    if (projectId) {
-      fetchChildProjects();
+      // Chỉ setError nếu là lỗi thật sự, không phải "không có dự án con"
+      setError('Không thể tải danh sách dự án con. Vui lòng thử lại sau.');
+      setChildProjects([]); // reset để không hiện dữ liệu cũ nếu có
+    } finally {
+      setLoading(false);
     }
-  }, [projectId]);
+  };
+
+  if (projectId) {
+    fetchChildProjects();
+  }
+}, [projectId]);
 
   if (loading) {
     return (

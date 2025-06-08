@@ -8,7 +8,7 @@ import PostList from "../../components/PM/PostList";
 import ProjectChild from "../../components/PM/ProjectChild";
 import MemberList from "../../components/PM/MemberList";
 import TabContainer from "../../components/PM/TabContainer";
-import UserRequest from "../../components/PM/UserRequest.jsx";
+import UserRequest from "../../components/PM/userRequest.jsx";
 import { AuthContext } from "../../util/AuthContext";
 import PostRequest from "../../components/PM/PostRequest.jsx";
 
