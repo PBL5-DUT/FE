@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiConfig } from "../../config/apiConfig";
-import { FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaHeart, FaClock, FaDonate, FaComments } from "react-icons/fa";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
 import Donation from "../../components/VLT/Donation";
 import Expense from "../../components/VLT/Expense";
 
@@ -27,10 +24,6 @@ const ProjectDetail = () => {
 
   const [expenses, setExpenses] = useState([]);
   const [donations, setDonations] = useState([]);
-
-  const formatDate = (dateString) => {
-    return format(new Date(dateString), "dd MMMM, yyyy", { locale: vi });
-  };
 
   const formatDate = (dateString) => {
     return format(new Date(dateString), "dd MMMM, yyyy", { locale: vi });
@@ -290,7 +283,6 @@ const ProjectDetail = () => {
           
         </div>
       </div>
-    </div>
   );
 };
 
