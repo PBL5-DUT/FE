@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import AddExpense from "./AddExpense";
 
-const Expense = ({ expenses }) => {
+const Expense = ({ expenses = [] }) => {
   const { id } = useParams();
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,12 +14,15 @@ const Expense = ({ expenses }) => {
     const endIndex = startIndex + itemsPerPage;
     return expenses.slice(startIndex, endIndex);
   };
+
   const totalMoney = expenses.reduce(
-    (sum, expense) => sum + (typeof expense.amount === "number" ? expense.amount : 0),
+    (sum, expense) =>
+      sum + (Number.isFinite(expense.amount) ? expense.amount : 0),
     0
   );
+
   return (
-    <div>
+    <div className="bg-white p-4 rounded-lg shadow-lg fixed right-0 top-[64px] w-[300px] h-[calc(100vh-64px)] overflow-hidden">
       <table className="w-full table-auto">
         <thead>
           <tr>
@@ -37,14 +39,17 @@ const Expense = ({ expenses }) => {
                 <td className="border-b border-red-500 py-3">
                   {index + 1 + (currentPage - 1) * itemsPerPage}
                 </td>
-                <td className="border-b border-red-500 py-3">{expense.purpose}</td>
+                <td className="border-b border-red-500 py-3">
+                  {expense.purpose}
+                </td>
                 <td className="border-b border-red-500 py-3 text-right">
                   {expense.receiver?.username || "Ẩn danh"}
                 </td>
                 <td className="border-b border-red-500 py-3 text-right">
-                  {expense.amount.toLocaleString()}
+                  {Number.isFinite(expense.amount)
+                    ? expense.amount.toLocaleString()
+                    : "0"}
                 </td>
-                
               </tr>
             ))
           ) : (
@@ -57,11 +62,12 @@ const Expense = ({ expenses }) => {
         </tbody>
         <tfoot>
           <tr>
-            <td colSpan={3} className="text-left font-semibold py-3">Total:</td>
-        <td className="text-right font-semibold py-3">
-          {totalMoney.toLocaleString()} VND
-        </td>
-            <td></td>
+            <td colSpan={3} className="text-left font-semibold py-3">
+              Total:
+            </td>
+            <td className="text-right font-semibold py-3">
+              {totalMoney.toLocaleString()} VND
+            </td>
           </tr>
         </tfoot>
       </table>
@@ -85,25 +91,6 @@ const Expense = ({ expenses }) => {
             Next
           </button>
         </div>
-      )}
-
-      <button
-        className="mt-4 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition"
-        onClick={() => setShowForm(true)}
-      >
-        +
-      </button>
-
-      {showForm && (
-        <AddExpense
-          isOpen={showForm}
-          onRequestClose={() => setShowForm(false)}
-          onSuccess={() => {
-            setShowForm(false);
-            window.location.reload();
-          }}
-          projectId={id}
-        />
       )}
     </div>
   );

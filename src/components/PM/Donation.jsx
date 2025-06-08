@@ -50,46 +50,48 @@ const Donation = ({ donations }) => {
 
       {/* Content Table */}
       <table className="w-full table-auto mb-4">
-        <thead>
-          <tr className="text-left border-b border-gray-300">
-            <th>STT</th>
-            <th>Username</th>
-            <th className="text-right">{activeTab === "Money" ? "VND" : "Description"}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {getCurrentDonations().length > 0 ? (
-            getCurrentDonations().map((donation, index) => (
-              <tr key={index} className="border-b border-gray-200">
-                <td className="py-3">
-                  {index + 1 + (currentPage - 1) * itemsPerPage}
-                </td>
-                <td className="py-3">
-                  {donation.txnRef === "anonymous" ? "Anonymous User" : donation.user?.username || "Ẩn danh"}
-                </td>
-                <td className="py-3 text-right">
-                  {activeTab === "Money"
-                    ? `${Number(donation.amount).toLocaleString()} VND`
-                    : donation.goodDescription || "N/A"}
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="3" className="text-center py-4 text-gray-500">Chưa có đóng góp nào</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-
-      {/* Tổng tiền chỉ ở tab Money */}
-      {activeTab === "Money" && (
-        <div className="mb-4">
-          <p className="text-lg font-semibold">
-            Total: {totalMoney.toLocaleString()} VND
-          </p>
-        </div>
-      )}
+  <thead>
+    <tr className="text-left border-b border-gray-300">
+      <th>STT</th>
+      <th>Username</th>
+      <th className="text-right">{activeTab === "Money" ? "VND" : "Description"}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {getCurrentDonations().length > 0 ? (
+      getCurrentDonations().map((donation, index) => (
+        <tr key={index} className="border-b border-red-500">
+          <td className="py-3">
+            {index + 1 + (currentPage - 1) * itemsPerPage}
+          </td>
+          <td className="py-3">
+            {donation.txnRef === "anonymous" ? "Anonymous User" : donation.user?.username || "Ẩn danh"}
+          </td>
+          <td className="py-3 text-right">
+            {activeTab === "Money"
+              ? `${Number(donation.amount).toLocaleString()} VND`
+              : donation.goodDescription || "N/A"}
+          </td>
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan="3" className="text-center py-4 text-gray-500">Chưa có đóng góp nào</td>
+      </tr>
+    )}
+  </tbody>
+  {activeTab === "Money" && (
+    <tfoot>
+      <tr>
+        <td colSpan={2} className="text-left font-semibold py-3">Total:</td>
+        <td className="text-right font-semibold py-3">
+          {totalMoney.toLocaleString()} VND
+        </td>
+      </tr>
+    </tfoot>
+  )}
+</table>
+      
 
       {/* Pagination */}
       {(activeTab === "Money"
@@ -129,7 +131,7 @@ const Donation = ({ donations }) => {
           onRequestClose={() => setShowForm(false)}
           onSuccess={() => {
             setShowForm(false);
-            window.location.reload(); // Optional: refresh or better with state update
+            window.location.reload(); 
           }}
           projectId={id}
         />

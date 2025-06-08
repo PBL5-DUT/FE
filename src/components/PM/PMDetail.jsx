@@ -16,6 +16,7 @@ const PMDetail = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
   const [activeTab, setActiveTab] = useState("Donation"); 
   const [expenses, setExpenses] = useState([]);
+  const [donations, setDonations] = useState([]);
 
 
   useEffect(() => {
@@ -66,7 +67,7 @@ const PMDetail = () => {
     }
   }
   
-  const [donations, setDonations] = useState([]);
+  
 
   useEffect(() => {
   const fetchDonations = async () => {

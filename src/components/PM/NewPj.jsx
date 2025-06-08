@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
+import { apiConfig } from '../../config/apiConfig';
 import { AuthContext } from "../../util/AuthContext"; 
 import { uploadFileToAzure } from "../../util/azureBlobService";
 
@@ -15,18 +15,75 @@ const NewPj = ({ onClose }) => {
   const [avatar, setAvatar] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [avatarUploading, setAvatarUploading] = useState(false); 
+  const [avatarUploading, setAvatarUploading] = useState(false);
+
+  // Lấy ngày hiện tại (định dạng YYYY-MM-DD)
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
+  // Xử lý thay đổi ngày bắt đầu
+  const handleStartDateChange = (e) => {
+    const newStartDate = e.target.value;
+    const currentDate = getCurrentDate();
+    
+    // Kiểm tra ngày bắt đầu không được nhỏ hơn ngày hiện tại
+    if (newStartDate < currentDate) {
+      setError('Ngày bắt đầu không được nhỏ hơn ngày hiện tại.');
+      return; // Không cập nhật state nếu ngày không hợp lệ
+    }
+    
+    setStartDate(newStartDate);
+    
+    // Nếu ngày kết thúc đã được chọn và nhỏ hơn ngày bắt đầu mới
+    if (endDate && newStartDate > endDate) {
+      setEndDate(''); // Reset ngày kết thúc
+      setError('Ngày kết thúc đã được reset vì nhỏ hơn ngày bắt đầu mới.');
+    } else {
+      setError(''); // Xóa lỗi nếu có
+    }
+  };
+
+  // Xử lý thay đổi ngày kết thúc
+  const handleEndDateChange = (e) => {
+    const newEndDate = e.target.value;
+    
+    // Kiểm tra ngày kết thúc không được nhỏ hơn ngày bắt đầu
+    if (startDate && newEndDate < startDate) {
+      setError('Ngày kết thúc không được nhỏ hơn ngày bắt đầu.');
+      return; // Không cập nhật state nếu ngày không hợp lệ
+    }
+    
+    setEndDate(newEndDate);
+    setError(''); // Xóa lỗi nếu ngày hợp lệ
+  };
   
   const handleSubmit = async (status) => {
     if (!title || !description || !location || !startDate || !endDate) {
       setError('Vui lòng nhập đầy đủ thông tin.');
       return;
     }
+
+    const currentDate = getCurrentDate();
+    
+    // Kiểm tra ngày bắt đầu không được nhỏ hơn ngày hiện tại
+    if (startDate < currentDate) {
+      setError('Ngày bắt đầu không được nhỏ hơn ngày hiện tại.');
+      return;
+    }
+
+    // Kiểm tra lại ngày một lần nữa khi submit
+    if (startDate > endDate) {
+      setError('Ngày kết thúc không được nhỏ hơn ngày bắt đầu.');
+      return;
+    }
+
     const bankPattern = /^\d+\s*-\s*[^-]+-\s*[^-]+$/;
     if (!bankPattern.test(bank.trim())) {
-    setError('Trường Ngân hàng phải đúng định dạng: "<SốTàiKhoản> - <TênTàiKhoản> - <TênNgânHàng>"');
-    return;
-  }
+      setError('Trường Ngân hàng phải đúng định dạng: "<SốTàiKhoản> - <TênTàiKhoản> - <TênNgânHàng>"');
+      return;
+    }
 
     if (!currentUser || !currentUser.userId) {
       setError('Bạn cần đăng nhập để tạo dự án.');
@@ -40,7 +97,7 @@ const NewPj = ({ onClose }) => {
       const currentTime = new Date().toISOString();
       const token = localStorage.getItem('token');
 
-      const response = await axios.post(
+      const response = await apiConfig.post(
         'http://localhost:8080/api/projects',
         {
           name: title,
@@ -137,7 +194,8 @@ const NewPj = ({ onClose }) => {
           type="date"
           className="w-full p-2 border rounded mb-3"
           value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
+          onChange={handleStartDateChange}
+          min={getCurrentDate()} // Thiết lập ngày tối thiểu là ngày hiện tại
         />
 
         <label className="block font-semibold">Ngày kết thúc</label>
@@ -145,8 +203,10 @@ const NewPj = ({ onClose }) => {
           type="date"
           className="w-full p-2 border rounded mb-3"
           value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
+          onChange={handleEndDateChange}
+          min={startDate} // Thiết lập ngày tối thiểu là ngày bắt đầu
         />
+        
         <label className="block font-semibold">Ngân hàng</label>
         <span className="block text-gray-400 text-sm mb-1">
           Nhập đúng định dạng sau: &lt;Số Tài Khoản&gt; - &lt;Tên thụ hưởng&gt; - &lt;Tên ngân hàng&gt;

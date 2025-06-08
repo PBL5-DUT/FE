@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiConfig } from "../../config/apiConfig";
+import { FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaHeart, FaClock, FaDonate, FaComments } from "react-icons/fa";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 import Donation from "../../components/VLT/Donation";
-
-const formatDate = (dateString) => {
-  const options = { day: "2-digit", month: "2-digit", year: "numeric" };
-  return new Date(dateString).toLocaleDateString("vi-VN", options);
-};
+import Expense from "../../components/VLT/Expense";
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -19,9 +18,15 @@ const ProjectDetail = () => {
   const [error, setError] = useState(null);
   const [status, setStatus] = useState(null);
   const [isWaiting, setIsWaiting] = useState(false);
+  const [activeTab, setActiveTab] = useState("Donation"); 
+
+  const [expenses, setExpenses] = useState([]);
   const [donations, setDonations] = useState([]);
 
-  // Fetch project detail
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), "dd MMMM, yyyy", { locale: vi });
+  };
+
   const fetchProjectDetail = async () => {
     try {
       setLoading(true);
@@ -35,17 +40,25 @@ const ProjectDetail = () => {
     }
   };
 
-  // Fetch donations
-  const fetchDonations = async () => {
-    try {
-      const response = await apiConfig.get(`/donations/project/${id}`);
-      setDonations(response.data);
-    } catch (error) {
-      console.error("Lỗi khi tải donations:", error);
-    }
-  };
+  const fetchExpenses = async () => {
+  try {
+    const response = await apiConfig.get(`/expenses/project/${id}`);
+    setExpenses(response.data); 
+  } catch (error) {
+    console.error("Lỗi khi tải expenses:", error);
+  }
+};
 
-  // Check project join status
+const fetchDonations = async () => {
+  try {
+    const response = await apiConfig.get(`/donations/project/${id}`);
+    setDonations(response.data); 
+  } catch (error) {
+    console.error("Lỗi khi tải donations:", error);
+  }
+};
+
+
   const checkJoinedStatus = async () => {
     try {
       const response = await apiConfig.get(`/requests/${id}/check-join`);
@@ -55,7 +68,6 @@ const ProjectDetail = () => {
     }
   };
 
-  // Handle project join request
   const handleRegister = async () => {
     try {
       setIsWaiting(true);
@@ -69,12 +81,15 @@ const ProjectDetail = () => {
     }
   };
 
-  // Handle navigation to forum
   const handleGoToForum = () => {
-    navigate(`/forum/${id}`);
+    navigate(`/forumoverview/${id}`, {
+      state: {
+        projectId: id,
+        projectName: project.name,
+      }
+    });
   };
 
-  // Handle donation processing
   const processDonation = async () => {
     if (!amount || isNaN(amount)) {
       alert("Vui lòng nhập số tiền hợp lệ");
@@ -98,93 +113,99 @@ const ProjectDetail = () => {
       if (response.status === 200) {
         window.location.href = response.data.paymentUrl;
       } else {
-        console.error("Lỗi từ server:", response.data);
         alert("Không thể kết nối đến hệ thống thanh toán.");
       }
     } catch (error) {
-      console.error("Lỗi khi tạo thanh toán:", error);
       alert("Không thể kết nối đến hệ thống thanh toán.");
     }
   };
 
-  // Initial fetch
   useEffect(() => {
     fetchProjectDetail();
+    fetchExpenses();
     fetchDonations();
     checkJoinedStatus();
   }, [id]);
 
   if (loading) {
-    return <div className="text-center mt-10">Đang tải thông tin dự án...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Đang tải...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center mt-10 text-red-500">{error}</div>;
-  }
-
-  if (!project) {
-    return <div className="text-center mt-10 text-red-500">Dự án không tồn tại.</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>{error}</p>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <div className="max-w-7xl mx-auto p-4 flex flex-col gap-10 text-left">
-        <div className="flex gap-8">
-          {/* Left Column */}
-          <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-4">{project.name}</h1>
-            <img
-              src={project.avatarFilepath}
-              alt={project.name}
-              className="w-full h-96 object-cover rounded-lg mb-4"
-            />
-            <p className="text-gray-700 mb-4">{project.description}</p>
-            <p className="text-gray-700"><strong>Địa điểm:</strong> {project.location}</p>
-            <p className="text-gray-700">
-              <strong>Thời gian:</strong> {formatDate(project.startTime)} → {formatDate(project.endTime)}
-            </p>
-            <p className="text-gray-700"><strong>Số lượng tham gia tối đa:</strong> {project.maxParticipants}</p>
-            <p className="text-gray-700"><strong>Số lượng hiện tại:</strong> {project.participantsCount}</p>
-            <p className="text-gray-700"><strong>Lượt thích:</strong> {project.likesCount}</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <div className="relative h-[40vh] bg-black">
+        <img
+          src={project.avatarFilepath}
+          alt={project.name}
+          className="w-full h-full object-cover opacity-70"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+          <div className="max-w-6xl mx-auto">
+            <h1 className="text-5xl font-bold mb-4">{project.name}</h1>
+            <div className="flex items-center space-x-6 text-gray-200">
+              <div className="flex items-center"><FaMapMarkerAlt className="mr-2" />{project.location}</div>
+              <div className="flex items-center"><FaCalendarAlt className="mr-2" />{formatDate(project.startTime)}</div>
+              <div className="flex items-center"><FaHeart className="mr-2" />{project.likesCount} lượt thích</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Buttons */}
-<div className="flex justify-start w-full gap-4 mt-8">
-  {project.status === "locked" ||  project.status === "lockedpending" ? (
-  <div className="py-3 px-6 text-lg font-semibold text-red-600 bg-red-100 rounded-lg shadow-md">
-    {project.status === "locked" ? "This project is locked" : "This project is pending lock approval"}
-  </div>
-  ) : (
-    <>
-      {status === "pending" ? (
-        <button className="py-3 px-6 text-lg font-semibold bg-gray-400 text-gray-700 cursor-not-allowed rounded-lg shadow-md" disabled>
-          Waiting for approving
-        </button>
-      ) : status === "approved" ? (
-        <button className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700" onClick={handleGoToForum}>
-          Go to Forum
-        </button>
-      ) : (
-        <button
-          className={`py-3 px-6 text-lg font-semibold rounded-lg shadow-md ${
-            isWaiting
-              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-              : "bg-purple-200 text-purple-700 hover:bg-purple-300"
-          }`}
-          onClick={isWaiting ? null : handleRegister}
-          disabled={isWaiting}
-        >
-          {isWaiting ? "Waiting for approving" : "❤️ Register"}
-        </button>
-      )}
-      <button
-        className="py-3 px-6 text-lg font-semibold bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-900"
-        onClick={() => setShowDonate(!showDonate)}
-      >
-        » Donate
-      </button>
-    </>
-  )}
-</div>
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 py-8 flex gap-8">
+        {/* Left Section */}
+        <div className="flex-1">
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h2 className="text-2xl font-bold mb-4">Thông tin dự án</h2>
+            <p className="text-gray-700 mb-6">{project.description}</p>
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <div className="flex items-center text-purple-700 mb-2">
+                  <FaClock className="mr-2" /><span className="font-semibold">Thời gian</span>
+                </div>
+                <p>{formatDate(project.startTime)} → {formatDate(project.endTime)}</p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <div className="flex items-center text-purple-700 mb-2">
+                  <FaUsers className="mr-2" /><span className="font-semibold">Số lượng tham gia</span>
+                </div>
+                <p>{project.participantsCount}/{project.maxParticipants} người</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              {status === "pending" ? (
+                <button disabled className="flex-1 py-3 bg-gray-300 text-gray-600 rounded-lg cursor-not-allowed">
+                  <FaClock className="inline mr-2" />Đang chờ duyệt
+                </button>
+              ) : status === "approved" ? (
+                <button onClick={handleGoToForum} className="flex-1 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                  <FaComments className="inline mr-2" />Tham gia diễn đàn
+                </button>
+              ) : (
+                <button onClick={handleRegister} className="flex-1 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700" disabled={isWaiting}>
+                  <FaUsers className="inline mr-2" />Đăng ký tham gia
+                </button>
+              )}
+              <button onClick={() => setShowDonate(!showDonate)} className="flex-1 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                <FaDonate className="inline mr-2" />Ủng hộ dự án
+              </button>
+            </div>
 
             {showDonate && (
   <div className="mt-6 p-6 border border-purple-200 rounded-2xl bg-purple-50 text-purple-900 shadow-md space-y-4">
@@ -221,8 +242,33 @@ const ProjectDetail = () => {
 )}
 
           </div>
+        </div>
 
-          <Donation donations={donations} />
+        {/* Right Section - Tabs */}
+        <div className="w-[28rem] bg-white p-6 rounded-lg shadow-md">
+          <div className="flex gap-2 mb-4">
+            <button
+              className={`px-4 py-2 rounded-full font-semibold ${
+                activeTab === "Donation" ? "bg-red-500 text-white" : "bg-gray-200 text-black"
+              }`}
+              onClick={() => setActiveTab("Donation")}
+            >
+              Donation
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full font-semibold ${
+                activeTab === "Expense" ? "bg-blue-500 text-white" : "bg-gray-200 text-black"
+              }`}
+              onClick={() => setActiveTab("Expense")}
+            >
+              Expense
+            </button>
+          </div>
+          {activeTab === "Donation" ? (
+            <Donation donations={donations} />
+          ) : (
+            <Expense expenses={expenses} />
+          )}
         </div>
       </div>
     </div>
@@ -230,3 +276,4 @@ const ProjectDetail = () => {
 };
 
 export default ProjectDetail;
+
