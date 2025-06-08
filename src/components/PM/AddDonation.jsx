@@ -1,14 +1,18 @@
 import React, { useState } from "react";
+import { useContext } from "react";
 import Modal from "react-modal";
 import { apiConfig } from "../../config/apiConfig";
+import { AuthContext } from "../../util/AuthContext";
 
 Modal.setAppElement("#root");
 
 const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
+  const { currentUser } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     userId: "",
     amount: "",
     type: "money",
+    goodDescription: "",
     anonymous: false,
   });
 
@@ -25,11 +29,14 @@ const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
 
     const payload = {
       amount: parseInt(formData.amount, 10),
-      projectId: parseInt(projectId),
+      projectId: parseInt(projectId, 10),
       txnRef: formData.anonymous ? "anonymous" : "",
       type: formData.type,
       status: "success",
-      user: formData.anonymous ? null : { userId: parseInt(formData.userId, 10) },
+      goodDescription: formData.goodDescription || "",
+      user: formData.anonymous
+        ? { userId: currentUser.userId }
+        : { userId: parseInt(formData.userId, 10) },
     };
 
     try {
@@ -51,6 +58,29 @@ const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
     >
       <h2 className="text-xl font-bold mb-4">Add Donation</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block font-semibold mb-2">Donation Type</label>
+          <select
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          >
+            <option value="money">Money</option>
+            <option value="goods">Goods</option>
+          </select>
+        </div>
+        {formData.type ==="money" && (
+          <input
+          type="number"
+          name="amount"
+          placeholder="Amount"
+          className="w-full p-2 border rounded"
+          value={formData.amount}
+          onChange={handleChange}
+          required
+          />
+        )}
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -71,37 +101,16 @@ const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
             required
           />
         )}
+        
         <input
-          type="number"
-          name="amount"
-          placeholder="Amount (VND)"
+          type="text"
+          name="goodDescription"
+          placeholder="Description"
           className="w-full p-2 border rounded"
-          value={formData.amount}
+          value={formData.goodDescription}
           onChange={handleChange}
-          required
         />
-        <div>
-          <label className="mr-4">
-            <input
-              type="radio"
-              name="type"
-              value="money"
-              checked={formData.type === "money"}
-              onChange={handleChange}
-            />
-            Money
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="type"
-              value="goods"
-              checked={formData.type === "goods"}
-              onChange={handleChange}
-            />
-            Goods
-          </label>
-        </div>
+        
         <div className="flex justify-end gap-2">
           <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
             Gửi

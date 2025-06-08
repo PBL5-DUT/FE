@@ -133,6 +133,7 @@ const Expense = ({ projectId, isFixed = true }) => {
           }}
           projectId={projectId}
         />
+
       )}
     </div>
   );

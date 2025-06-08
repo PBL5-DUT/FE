@@ -1,17 +1,23 @@
 import { useState } from "react";
 import { apiConfig } from "../../config/apiConfig";
 
-const Lock = ({ projectId, onClose, onLocked }) => {
+const Lock = ({ project, onClose, onLocked }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [reason, setReason] = useState(""); 
+  const [customReason, setCustomReason] = useState(""); 
 
   const handleLock = async () => {
-    setLoading(true);
+    const projectId = project.projectId; 
     setError("");
     try {
-      await apiConfig.post(`http://localhost:8080/api/projects/${projectId}/lock`);
-      onLocked?.(); 
-      onClose(); 
+      const currentTime = new Date().toISOString();
+      await apiConfig.put(`http://localhost:8080/api/projects/${projectId}/lock`, {
+        status: "lockedpending",
+        updatedAt: currentTime,
+      });
+      onLocked?.();
+      onClose();
     } catch (err) {
       setError("Có lỗi khi khoá dự án.");
       console.error(err);
@@ -21,10 +27,34 @@ const Lock = ({ projectId, onClose, onLocked }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-30">
-      <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
-        <h2 className="text-xl font-bold mb-4">Khoá dự án</h2>
-        <p>Bạn có muốn khoá dự án này không? Sau khi khoá, không thể chỉnh sửa nữa.</p>
+    <div className="fixed inset-0 bg-white bg-opacity-40 flex items-center justify-center z-30">
+      <div className="bg-white rounded-lg p-6 w-160 shadow-lg">
+        <h1 className="text-xl font-bold mb-4">Khoá dự án</h1>
+        <label className="block font-semibold mb-2">Lý do khoá dự án:</label>
+        <select
+          name="type"
+          className="w-full p-2 border rounded"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        >
+          <option value="1">Không đủ kinh phí</option>
+          <option value="2">Không đủ thành viên</option>
+          <option value="3">Không được chấp thuận địa điểm</option>
+          <option value="4">Cần thảo luận lại kế hoạch</option>
+          <option value="5">Lý do khác</option>
+        </select>
+        {reason === "5" && (
+          <div className="mt-4">
+            <label className="block font-semibold mb-2">Nhập lý do khác:</label>
+            <textarea
+              className="w-full p-2 border rounded"
+              placeholder="Nhập lý do của bạn..."
+              value={customReason}
+              onChange={(e) => setCustomReason(e.target.value)}
+              rows="3"
+            ></textarea>
+          </div>
+        )}
         {error && <p className="text-red-500 mt-2">{error}</p>}
         <div className="mt-6 flex justify-end gap-3">
           <button

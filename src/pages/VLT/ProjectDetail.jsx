@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiConfig } from "../../config/apiConfig";
+import { FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaHeart, FaClock, FaDonate, FaComments } from "react-icons/fa";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 import Donation from "../../components/VLT/Donation";
 import Expense from "../../components/VLT/Expense";
+
 import TabContainer from '../../components/VLT/TabContainer';
 import { FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaHeart, FaClock, FaDonate, FaComments } from "react-icons/fa";
 import { format } from "date-fns";
@@ -19,12 +23,19 @@ const ProjectDetail = () => {
   const [error, setError] = useState(null);
   const [status, setStatus] = useState(null);
   const [isWaiting, setIsWaiting] = useState(false);
+  const [activeTab, setActiveTab] = useState("Donation"); 
+
+  const [expenses, setExpenses] = useState([]);
+  const [donations, setDonations] = useState([]);
 
   const formatDate = (dateString) => {
     return format(new Date(dateString), "dd MMMM, yyyy", { locale: vi });
   };
 
-  // Fetch project detail
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), "dd MMMM, yyyy", { locale: vi });
+  };
+
   const fetchProjectDetail = async () => {
     try {
       setLoading(true);
@@ -38,7 +49,6 @@ const ProjectDetail = () => {
     }
   };
 
-  // Check project join status
   const checkJoinedStatus = async () => {
     try {
       const response = await apiConfig.get(`/requests/${id}/check-join`);
@@ -48,7 +58,6 @@ const ProjectDetail = () => {
     }
   };
 
-  // Handle project join request
   const handleRegister = async () => {
     try {
       setIsWaiting(true);
@@ -62,7 +71,6 @@ const ProjectDetail = () => {
     }
   };
 
-  // Handle navigation to forum
   const handleGoToForum = () => {
     navigate(`/forumoverview/${id}`, {
       state: {
@@ -72,7 +80,6 @@ const ProjectDetail = () => {
     });
   };
 
-  // Handle donation processing
   const processDonation = async () => {
     if (!amount || isNaN(amount)) {
       alert("Vui lòng nhập số tiền hợp lệ");
@@ -96,23 +103,22 @@ const ProjectDetail = () => {
       if (response.status === 200) {
         window.location.href = response.data.paymentUrl;
       } else {
-        console.error("Lỗi từ server:", response.data);
         alert("Không thể kết nối đến hệ thống thanh toán.");
       }
     } catch (error) {
-      console.error("Lỗi khi tạo thanh toán:", error);
       alert("Không thể kết nối đến hệ thống thanh toán.");
     }
   };
 
-  // Initial fetch
   useEffect(() => {
     fetchProjectDetail();
+
     checkJoinedStatus();
   }, [id]);
 
   if (loading) {
     return (
+
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mx-auto"></div>
@@ -126,6 +132,7 @@ const ProjectDetail = () => {
 
   if (error) {
     return (
+
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
           <div className="text-red-500 text-5xl mb-4">⚠️</div>
@@ -156,6 +163,7 @@ const ProjectDetail = () => {
           <div className="max-w-6xl mx-auto">
             <h1 className="text-5xl font-bold mb-4">{project.name}</h1>
             <div className="flex items-center space-x-6 text-gray-200">
+
               <div className="flex items-center">
                 <FaMapMarkerAlt className="mr-2" />
                 {project.location}
@@ -168,12 +176,13 @@ const ProjectDetail = () => {
                 <FaHeart className="mr-2" />
                 {project.likesCount} lượt thích
               </div>
+
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
+
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Left Column - Project Details */}
@@ -236,35 +245,43 @@ const ProjectDetail = () => {
                   Ủng hộ dự án
                 </button>
               </div>
+   
+            {showDonate && (
+            <div className="mt-6 p-6 border border-purple-200 rounded-2xl bg-purple-50 text-purple-900 shadow-md space-y-4">
+            <div>
+            <h3 className="text-lg font-semibold mb-2">Cách 1: Ủng hộ gián tiếp qua chủ dự án</h3>
+            <div className="bg-white p-4 rounded-lg border text-sm">
+            <p className="font-medium text-gray-700">Thông tin chuyển khoản:</p>
+            <p className="mt-1 text-gray-900">{project.bank}</p>
+            </div>
+            </div>
 
-              {/* Donation Form */}
-              {showDonate && (
-                <div className="mt-6 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
-                  <h3 className="text-xl font-semibold text-purple-800 mb-4">Ủng hộ dự án</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Số tiền ủng hộ (VNĐ)
-                      </label>
-                      <input
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="Nhập số tiền..."
-                      />
-                    </div>
-                    <button
-                      onClick={processDonation}
-                      className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-medium hover:from-purple-700 hover:to-purple-800 transition-all"
-                    >
-                      Xác nhận ủng hộ
-                    </button>
-                  </div>
-                </div>
-              )}
+            <div className="border-t border-purple-300 my-4"></div>
+
+            <div>
+            <h3 className="text-lg font-semibold mb-2">Cách 2: Ủng hộ trực tiếp qua VNPay</h3>
+             <label className="block text-sm font-medium text-gray-700 mb-1">
+             Nhập số tiền muốn ủng hộ (VND):
+            </label>
+          <input
+           type="number"
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent bg-white"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="VD: 500000"
+          />
+          <button
+          className="mt-4 w-full py-2 px-4 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-all"
+          onClick={processDonation}
+        >
+        Xác nhận ủng hộ
+      </button>
+    </div>
+  </div>
+)}
             </div>
           </div>
+        </div>
 
           {/* Right Column - Donation/Expense History */}
           <div className="w-80">
@@ -278,3 +295,4 @@ const ProjectDetail = () => {
 };
 
 export default ProjectDetail;
+
