@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { apiConfig } from "../../config/apiConfig";
 
@@ -7,7 +6,6 @@ const Donation = ({ projectId, isFixed = true }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("Money");
-  const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const itemsPerPage = 12;
@@ -17,6 +15,7 @@ const Donation = ({ projectId, isFixed = true }) => {
       try {
         setLoading(true);
         const response = await apiConfig.get(`/donations/project/${projectId}`);
+        console.log("Fetched donations:", response.data);
         setDonations(response.data);
         setError(null);
       } catch (err) {
@@ -29,13 +28,13 @@ const Donation = ({ projectId, isFixed = true }) => {
     fetchDonations();
   }, [projectId]);
 
-  const moneyDonations = donations.filter((donation) => donation.type === "money") || [];
-  const goodsDonations = donations.filter((donation) => donation.type === "goods") || [];
-  const totalMoney = moneyDonations.reduce((sum, d) => sum + d.amount, 0);
+  const moneyDonations = donations.filter((d) => d.type === "money");
+  const goodsDonations = donations.filter((d) => d.type === "goods");
+  const totalMoney = moneyDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
 
-  const paginatedDonations = (donations) => {
+  const paginatedDonations = (list) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return donations.slice(startIndex, startIndex + itemsPerPage);
+    return list.slice(startIndex, startIndex + itemsPerPage);
   };
 
   const totalPages = Math.ceil(
@@ -43,11 +42,16 @@ const Donation = ({ projectId, isFixed = true }) => {
   );
 
   const currentDonations =
-    activeTab === "Money" ? paginatedDonations(moneyDonations) : paginatedDonations(goodsDonations);
+    activeTab === "Money"
+      ? paginatedDonations(moneyDonations)
+      : paginatedDonations(goodsDonations);
 
   return (
-    <div className={`bg-white p-4 ${isFixed ? "fixed right-0 top-[64px] w-[300px] h-[calc(100vh-64px)]" : "h-full"} overflow-hidden`}>
-
+    <div
+      className={`bg-white p-4 ${
+        isFixed ? "fixed right-0 top-[64px] w-[300px] h-[calc(100vh-64px)]" : "h-full"
+      } overflow-hidden`}
+    >
       {/* Dropdown Tab */}
       <div className="mb-4">
         <select
@@ -63,13 +67,13 @@ const Donation = ({ projectId, isFixed = true }) => {
         </select>
       </div>
 
-      {/* Content section - Remove scroll */}
+      {/* Content */}
       {loading ? (
         <div className="text-xs text-gray-500">Đang tải danh sách ủng hộ...</div>
       ) : error ? (
         <div className="text-xs text-red-500">{error}</div>
       ) : (
-        <div className="h-[calc(100%-160px)]">
+        <div className="h-[calc(100%-160px)] overflow-y-auto">
           <table className="w-full border-collapse border border-gray-300 text-xs">
             <thead>
               <tr className="bg-gray-100 text-gray-700">
@@ -84,7 +88,7 @@ const Donation = ({ projectId, isFixed = true }) => {
               {currentDonations.length > 0 ? (
                 currentDonations.map((donation, index) => (
                   <tr
-                    key={index}
+                    key={donation.id || `${donation.userName}-${index}`}
                     className={`${
                       index % 2 === 0 ? "bg-white" : "bg-gray-50"
                     } hover:bg-gray-100 transition`}
@@ -93,12 +97,12 @@ const Donation = ({ projectId, isFixed = true }) => {
                       {index + 1 + (currentPage - 1) * itemsPerPage}
                     </td>
                     <td className="border border-gray-300 px-1 py-1">
-                      {donation.user.username}
+                      {donation.userName || "Unknown"}
                     </td>
                     <td className="border border-gray-300 px-1 py-1 text-right">
                       {activeTab === "Money"
-                        ? donation.amount.toLocaleString()
-                        : donation.amount}
+                        ? (donation.amount || 0).toLocaleString()
+                        : donation.amount || 0}
                     </td>
                   </tr>
                 ))
@@ -120,7 +124,9 @@ const Donation = ({ projectId, isFixed = true }) => {
           <div className="bg-gray-50 p-3 rounded-lg">
             <p className="text-xs font-medium text-gray-700 text-right">
               Total:{" "}
-              <span className="font-bold text-red-500">{totalMoney.toLocaleString()} VND</span>
+              <span className="font-bold text-red-500">
+                {totalMoney.toLocaleString()} VND
+              </span>
             </p>
           </div>
         </div>
@@ -140,7 +146,9 @@ const Donation = ({ projectId, isFixed = true }) => {
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300"
             >
               Next
