@@ -178,8 +178,8 @@ const ProjectDetail = () => {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex gap-8">
-          {/* Left Column - Project Details */}
-          <div className="flex-1">
+          {/* Left Column - Project Details - Reduced width */}
+          <div className="w-[800px]"> {/* Changed from flex-1 to fixed width */}
             <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
               <h2 className="text-2xl font-bold mb-4">Thông tin dự án</h2>
               <p className="text-gray-700 mb-6 leading-relaxed">{project.description}</p>
@@ -276,8 +276,8 @@ const ProjectDetail = () => {
           </div>
         </div>
 
-          {/* Right Column - Donation/Expense History */}
-          <div className="w-80">
+          {/* Right Column - Fixed position */}
+          <div className="fixed right-0 top-[64px] w-[300px] h-[calc(100vh-64px)] bg-white shadow-lg overflow-hidden">
             <TabContainer projectId={id} />
           </div>
           

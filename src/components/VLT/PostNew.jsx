@@ -8,62 +8,45 @@ const PostNew = ({ forumId, userId, onPost }) => {
   const [images, setImages] = useState([]);
   const [error, setError] = useState("");
   const [isPosting, setIsPosting] = useState(false);
-  const [success, setSuccess] = useState(""); // Thêm state cho thông báo thành công
+  const [success, setSuccess] = useState("");
 
   const handlePost = async () => {
-    if (isPosting) return;
-    if (!content.trim()) {
+    if (isPosting || !content.trim()) {
       setError("Nội dung không được để trống!");
       return;
     }
 
     setIsPosting(true);
     setError("");
-    setSuccess(""); // Reset thông báo thành công
+    setSuccess("");
 
     try {
       const uploadedImages = await Promise.all(
         images.map(async (image, index) => {
-          try {
-            const blobName = `post-${Date.now()}-${index}-${image.file.name || "image"}`;
-            const imageUrl = await uploadFileToAzure("post", blobName, image.file);
-            return {
-              imageFilepath: imageUrl,
-              description: "",
-              order: index,
-            };
-          } catch (e) {
-            console.error("Image upload failed:", e);
-            throw new Error("Tải ảnh thất bại!");
-          }
+          const blobName = `post-${Date.now()}-${index}-${image.file.name || "image"}`;
+          const imageUrl = await uploadFileToAzure("post", blobName, image.file);
+          return {
+            imageFilepath: imageUrl,
+            description: "",
+            order: index,
+          };
         })
       );
 
-      const postData = {
-        forumId,
-        userId,
-        content,
-        postImages: uploadedImages,
-      };
-
-      console.log("postImages gửi lên backend:", postData.postImages);
-
+      const postData = { forumId, userId, content, postImages: uploadedImages };
       const response = await apiConfig.post("/posts", postData);
 
       if (response?.status === 200 || response?.status === 201) {
-        if (typeof onPost === "function") {
-          onPost(response.data);
-        }
+        onPost?.(response.data);
         setContent("");
         setImages([]);
-        setError("");
         setSuccess("Đăng bài thành công!");
-        setTimeout(() => setSuccess(""), 5000); 
+        setTimeout(() => setSuccess(""), 3000);
       } else {
         setError("Đã xảy ra lỗi khi đăng bài!");
       }
     } catch (err) {
-      console.error("Error posting:", err);
+      console.error(err);
       setError("Không thể kết nối đến server hoặc upload ảnh thất bại!");
     } finally {
       setIsPosting(false);
@@ -78,11 +61,9 @@ const PostNew = ({ forumId, userId, onPost }) => {
     }));
 
     setImages((prev) => {
-      const existingKeys = new Set(prev.map((img) => img.file.name + img.file.size));
-      const uniqueNewImages = newImages.filter(
-        (img) => !existingKeys.has(img.file.name + img.file.size)
-      );
-      return [...prev, ...uniqueNewImages];
+      const existing = new Set(prev.map((img) => img.file.name + img.file.size));
+      const unique = newImages.filter((img) => !existing.has(img.file.name + img.file.size));
+      return [...prev, ...unique];
     });
   };
 
@@ -91,11 +72,11 @@ const PostNew = ({ forumId, userId, onPost }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 md:p-6 space-y-4">
       <textarea
-        className="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full resize-none border border-gray-300 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-500"
         rows="3"
-        placeholder="Viết bài đăng hoặc câu hỏi của bạn tại đây..."
+        placeholder="Bạn đang nghĩ gì thế?"
         value={content}
         onChange={(e) => {
           setContent(e.target.value);
@@ -103,21 +84,22 @@ const PostNew = ({ forumId, userId, onPost }) => {
           setSuccess("");
         }}
       ></textarea>
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-      {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {success && <p className="text-green-600 text-sm">{success}</p>}
 
       {images.length > 0 && (
-        <div className="mt-4 grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
           {images.map((image, index) => (
-            <div key={index} className="relative">
+            <div key={index} className="relative group">
               <img
                 src={image.url}
-                alt={`Preview ${index}`}
-                className="w-full h-32 object-cover rounded-lg"
+                alt={`preview-${index}`}
+                className="w-full h-28 object-cover rounded-lg"
               />
               <button
                 onClick={() => handleRemoveImage(index)}
-                className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-700"
+                className="absolute top-1 right-1 bg-black bg-opacity-60 text-white p-1 rounded-full text-xs opacity-0 group-hover:opacity-100 transition"
               >
                 <FaTrash />
               </button>
@@ -126,10 +108,10 @@ const PostNew = ({ forumId, userId, onPost }) => {
         </div>
       )}
 
-      <div className="flex justify-between items-center mt-4">
-        <label className="flex items-center bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition cursor-pointer">
-          <FaImage className="mr-2 text-gray-600" />
-          Thêm ảnh
+      <div className="flex justify-between items-center border-t pt-4">
+        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-blue-500">
+          <FaImage />
+          <span className="hidden sm:inline">Thêm ảnh</span>
           <input
             type="file"
             accept="image/*"
@@ -142,13 +124,13 @@ const PostNew = ({ forumId, userId, onPost }) => {
         <button
           onClick={handlePost}
           disabled={isPosting}
-          className={`flex items-center px-6 py-2 rounded-lg transition ${
-            isPosting
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500 text-white hover:bg-blue-600"
-          }`}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition 
+            ${isPosting
+              ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+              : "bg-blue-500 text-white hover:bg-blue-600"}
+          `}
         >
-          <FaPaperPlane className="mr-2" />
+          <FaPaperPlane />
           {isPosting ? "Đang đăng..." : "Đăng bài"}
         </button>
       </div>

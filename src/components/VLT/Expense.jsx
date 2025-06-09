@@ -53,7 +53,8 @@ const Expense = ({ projectId, isFixed = true }) => {
               <thead>
                 <tr className="bg-gray-100 text-gray-700">
                   <th className="border border-gray-300 px-1 py-1 text-left">STT</th>
-                  <th className="border border-gray-300 px-1 py-1 text-left">Username</th>
+                  {/* <th className="border border-gray-300 px-1 py-1 text-left">Username</th> */}
+                  <th className="border border-gray-300 px-1 py-1 text-right">Purpose</th>
                   <th className="border border-gray-300 px-1 py-1 text-right">VND</th>
                 </tr>
               </thead>
@@ -69,8 +70,11 @@ const Expense = ({ projectId, isFixed = true }) => {
                       <td className="border border-gray-300 px-1 py-1">
                         {index + 1 + (currentPage - 1) * itemsPerPage}
                       </td>
-                      <td className="border border-gray-300 px-1 py-1">
-                        {expense.receiver?.username || "Ẩn danh"}
+                      {/* <td className="border border-gray-300 px-1 py-1">
+                        {expense.receiver?.userName || "Ẩn danh"}
+                      </td> */}
+                      <td className="border border-gray-300 px-1 py-1 text-right">
+                        {expense.purpose || "Không có mục đích"}
                       </td>
                       <td className="border border-gray-300 px-1 py-1 text-right">
                         {expense.amount.toLocaleString()}
@@ -121,20 +125,7 @@ const Expense = ({ projectId, isFixed = true }) => {
           )}
         </>
       )}
-
-      {/* Add Expense Modal */}
-      {showForm && (
-        <AddExpense
-          isOpen={showForm}
-          onRequestClose={() => setShowForm(false)}
-          onSuccess={() => {
-            setShowForm(false);
-            window.location.reload();
-          }}
-          projectId={projectId}
-        />
-
-      )}
+      
     </div>
   );
 };
