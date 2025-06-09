@@ -1,99 +1,151 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { apiConfig } from "../../config/apiConfig";
 import AddExpense from "./AddExpense";
+import { useParams } from "react-router-dom";
 
-const Expense = ({ expenses }) => {
-  const { id } = useParams();
-  const [showForm, setShowForm] = useState(false);
+const Expense = ({ projectId, isFixed = true }) => {
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [showForm, setShowForm] = useState(false);
+  const itemsPerPage = 8; // Giảm số item để phù hợp với layout
+
+  // Fetch expenses
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        setLoading(true);
+        const response = await apiConfig.get(`/expenses/project/${projectId}`);
+        setExpenses(response.data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching expenses:", err);
+        setError("Không thể tải danh sách chi tiêu.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchExpenses();
+  }, [projectId]);
+
+  // Calculate total money
+  const totalMoney = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+  // Pagination
+  const paginatedExpenses = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return expenses.slice(startIndex, startIndex + itemsPerPage);
+  };
 
   const totalPages = Math.ceil(expenses.length / itemsPerPage);
 
-  const paginatedExpenses = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return expenses.slice(startIndex, endIndex);
-  };
-  const totalMoney = expenses.reduce(
-    (sum, expense) => sum + (typeof expense.amount === "number" ? expense.amount : 0),
-    0
-  );
   return (
-    <div>
-      <table className="w-full table-auto">
-        <thead>
-          <tr>
-            <th className="text-left">STT</th>
-            <th className="text-left">Purpose</th>
-            <th className="text-right">Receiver</th>
-            <th className="text-right">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {expenses.length > 0 ? (
-            paginatedExpenses().map((expense, index) => (
-              <tr key={index}>
-                <td className="border-b border-red-500 py-3">
-                  {index + 1 + (currentPage - 1) * itemsPerPage}
-                </td>
-                <td className="border-b border-red-500 py-3">{expense.purpose}</td>
-                <td className="border-b border-red-500 py-3 text-right">
-                  {expense.receiver?.username || "Ẩn danh"}
-                </td>
-                <td className="border-b border-red-500 py-3 text-right">
-                  {expense.amount.toLocaleString()}
-                </td>
-                
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" className="text-center py-3">
-                Chưa có khoản chi nào
-              </td>
-            </tr>
-          )}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colSpan={3} className="text-left font-semibold py-3">Total:</td>
-        <td className="text-right font-semibold py-3">
-          {totalMoney.toLocaleString()} VND
-        </td>
-            <td></td>
-          </tr>
-        </tfoot>
-      </table>
-
-      {/* Pagination Controls */}
-      {expenses.length > itemsPerPage && (
-        <div className="mt-4 flex justify-between items-center">
-          <button
-            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-            className="px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-400"
-          >
-            Previous
-          </button>
-          <span className="text-gray-600">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
-            className="px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-400"
-          >
-            Next
-          </button>
+    <div className="h-full flex flex-col relative">
+      {loading ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-sm text-gray-500">Đang tải...</div>
         </div>
+      ) : error ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-sm text-red-500">{error}</div>
+        </div>
+      ) : (
+        <>
+          {/* Table Container - Scrollable */}
+          <div className="flex-1 overflow-auto p-4">
+            <table className="w-full text-xs">
+              <thead className="sticky top-0 bg-white border-b">
+                <tr className="text-gray-600">
+                  <th className="text-left py-2 w-8">STT</th>
+                  <th className="text-left py-2">Mục đích</th>
+                  <th className="text-left py-2">Người nhận</th>
+                  <th className="text-right py-2">Số tiền</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedExpenses().length > 0 ? (
+                  paginatedExpenses().map((expense, index) => (
+                    <tr
+                      key={expense.expenseId}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="py-2 text-gray-500">
+                        {index + 1 + (currentPage - 1) * itemsPerPage}
+                      </td>
+                      <td className="py-2">
+                        <div className="truncate max-w-[100px]" title={expense.purpose}>
+                          {expense.purpose}
+                        </div>
+                      </td>
+                      <td className="py-2 text-gray-600">
+                        <div className="truncate max-w-[300px] ml-4" title={expense.receiver?.username || "Ẩn danh"}>
+                          {expense.receiver?.username || "Ẩn danh"}
+                        </div>
+                      </td>
+                      <td className="py-2 text-right font-medium">
+                        {expense.amount.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="text-center py-8 text-gray-500">
+                      Chưa có khoản chi nào
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Bottom Section - Fixed */}
+          <div className="border-t bg-white p-4 space-y-3">
+            {/* Total Money */}
+            <div className="bg-gray-50 p-3 rounded-md">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-700">Tổng chi:</span>
+                <span className="text-sm font-bold text-red-500">
+                  {totalMoney.toLocaleString()} VND
+                </span>
+              </div>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                >
+                  Trước
+                </button>
+                <span className="text-xs text-gray-500">
+                  {currentPage}/{totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                >
+                  Sau
+                </button>
+              </div>
+            )}
+
+            {/* Add Button */}
+            <button
+              className="w-full py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition"
+              onClick={() => setShowForm(true)}
+            >
+              + 
+            </button>
+          </div>
+        </>
       )}
 
-      <button
-        className="mt-4 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition"
-        onClick={() => setShowForm(true)}
-      >
-        +
-      </button>
-
+      {/* Add Expense Modal */}
       {showForm && (
         <AddExpense
           isOpen={showForm}
@@ -102,7 +154,7 @@ const Expense = ({ expenses }) => {
             setShowForm(false);
             window.location.reload();
           }}
-          projectId={id}
+          projectId={projectId}
         />
       )}
     </div>

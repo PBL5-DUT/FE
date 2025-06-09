@@ -234,7 +234,7 @@ const PMUpdate = ({ project, onClose, onUpdated }) => {
           <button className={`px-4 py-2 rounded ${
             loading ? "bg-gray-400" : "bg-orange-400 text-white"
         }`}
-        onClick={() => handleSubmit(project?.status === "draft" ? "pending" : "approved")}
+        onClick={() => handleSubmit(project?.status === "draft" ? "pending" : project?.status)}
         disabled={loading}
         >
         {loading ? "Updating..." : "Update"}

@@ -23,7 +23,11 @@ import Forum from "./pages/VLT/Forum";
 import PmDetail from './pages/PM/PmDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
 import DonationChart from "./components/PM/DonationChart";
+
 import ChatPage from "./pages/VLT/ChatPage";
+import PMForumOverview from "./pages/PM/ForumOverview";
+import PMForum from "./pages/PM/Forum";
+
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -109,10 +113,15 @@ function App() {
           path: "/forum/:forumId",
           element: <Forum />,
         },
-        // {
-        //   path:"/chatpage",
-        //   element:<ChatPage/>,
-        // },
+
+          path: "/PMforumoverview/:projectId",
+          element: <PMForumOverview />,
+        },
+        {
+          path: "/PMforum/:forumId",
+          element: <PMForum />,
+        },
+
       ],
     },
     {
