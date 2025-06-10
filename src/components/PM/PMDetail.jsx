@@ -152,6 +152,16 @@ const PMDetail = () => {
           <div className="flex justify-start w-full gap-4 mt-8">
             - Địa điểm: {project.location}
           </div>
+          <div className="flex justify-start w-full gap-4 mt-8">
+            - Ngân hàng: {project.bank}
+          </div>
+          <div className="flex justify-start w-full gap-4 mt-8">
+            - Số người tham gia tối đa: {project.maxParticipants}
+          </div>
+          <div className="flex justify-start w-full gap-4 mt-8">
+            - Số người tham gia hiện tại: {project.participantsCount}
+          </div>
+          
           <div className="flex justify-start w-full mt-8">
             <button
               className="py-3 px-6 text-lg font-semibold bg-blue-500 text-white rounded-full flex items-center gap-2 shadow-md hover:bg-blue-600"

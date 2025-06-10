@@ -131,7 +131,7 @@ const Donation = ({ projectId, isFixed = true }) => {
                       </td>
                       <td className="py-2">
                         <div className="truncate max-w-[80px]" title={donation.userName || "Ẩn danh"}>
-                          {donation.txnRef === "anonymous" ? "Anonymous User" : donation.userName || "Ẩn danh"}
+                          {donation.txnRef === "anonymous" ? "Ẩn danh" : donation.userName || "Ẩn danh"}
                         </div>
                       </td>
                       <td className="py-2 text-right font-medium">
