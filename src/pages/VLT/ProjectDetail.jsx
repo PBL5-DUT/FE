@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiConfig } from "../../config/apiConfig";
-import Donation from "../../components/VLT/Donation";
-import Expense from "../../components/VLT/Expense";
 
 import TabContainer from '../../components/VLT/TabContainer';
 import { FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaHeart, FaClock, FaDonate, FaComments } from "react-icons/fa";
@@ -22,8 +20,6 @@ const ProjectDetail = () => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [activeTab, setActiveTab] = useState("Donation"); 
 
-  const [expenses, setExpenses] = useState([]);
-  const [donations, setDonations] = useState([]);
 
   const formatDate = (dateString) => {
     return format(new Date(dateString), "dd MMMM, yyyy", { locale: vi });
@@ -33,6 +29,7 @@ const ProjectDetail = () => {
     try {
       setLoading(true);
       const response = await apiConfig.get(`/projects/${id}`);
+      console.log("API Response:", response.data);
       setProject(response.data);
     } catch (err) {
       console.error("Error fetching project detail:", err);
@@ -45,6 +42,7 @@ const ProjectDetail = () => {
   const checkJoinedStatus = async () => {
     try {
       const response = await apiConfig.get(`/requests/${id}/check-join`);
+      console.log("Joined status response:", response.data);
       setStatus(response.data.status);
     } catch (error) {
       console.error("Error checking joined status:", error);
@@ -205,9 +203,16 @@ const ProjectDetail = () => {
                 </div>
               </div>
 
+              
               {/* Action Buttons */}
               <div className="flex gap-4">
-                {status === "pending" ? (
+                {status === "locked" ? (
+                  <button className="flex-1 py-3 px-6 bg-red-100 text-red-500 rounded-lg font-medium cursor-not-allowed">
+                    <FaLock className="inline mr-2" />
+                    Dự án đã bị khóa
+                  </button>
+                ) :
+                status === "pending" ? (
                   <button className="flex-1 py-3 px-6 bg-gray-100 text-gray-500 rounded-lg font-medium cursor-not-allowed">
                     <FaClock className="inline mr-2" />
                     Đang chờ duyệt
@@ -220,7 +225,7 @@ const ProjectDetail = () => {
                     <FaComments className="inline mr-2" />
                     Tham gia diễn đàn
                   </button>
-                ) : (
+                ) :  (
                   <button
                     onClick={handleRegister}
                     disabled={isWaiting}

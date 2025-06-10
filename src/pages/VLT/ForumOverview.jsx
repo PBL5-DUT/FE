@@ -18,6 +18,19 @@ const ForumOverview = () => {
       console.log("API Response:", response.data);
       setForums(response.data);
       setError(null);
+      
+      // Tự động điều hướng đến forum đầu tiên nếu có dữ liệu
+      if (response.data && response.data.length > 0) {
+        const firstForumId = response.data[0].id || response.data[0].forumId;
+        // Điều hướng đến trang forum với forum đầu tiên
+        navigate(`/forum/${firstForumId}`, {
+          state: { 
+            projectId, 
+            projectName,
+            forumData: response.data[0] 
+          }
+        });
+      }
     } catch (err) {
       console.error("Error fetching forums:", err);
       setError("Không thể tải danh sách diễn đàn. Vui lòng thử lại.");
@@ -27,10 +40,10 @@ const ForumOverview = () => {
   };
 
   useEffect(() => {
-    fetchForums();
+    if (projectId) {
+      fetchForums();
+    }
   }, [projectId]);
-
-  
 
   if (loading) {
     return (
@@ -53,6 +66,22 @@ const ForumOverview = () => {
         >
           Thử lại
         </button>
+      </div>
+    );
+  }
+
+  // Nếu không có forum nào
+  if (forums.length === 0) {
+    return (
+      <div className="bg-gray-50 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+            Danh sách diễn đàn
+          </h1>
+          <div className="text-center mt-10 text-gray-500">
+            <p>Không có diễn đàn nào trong dự án này.</p>
+          </div>
+        </div>
       </div>
     );
   }
