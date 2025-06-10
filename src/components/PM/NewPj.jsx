@@ -79,11 +79,7 @@ const NewPj = ({ onClose }) => {
       return;
     }
 
-    const bankPattern = /^\d+\s*-\s*[^-]+-\s*[^-]+$/;
-    if (!bankPattern.test(bank.trim())) {
-      setError('Trường Ngân hàng phải đúng định dạng: "<SốTàiKhoản> - <TênTàiKhoản> - <TênNgânHàng>"');
-      return;
-    }
+  
 
     if (!currentUser || !currentUser.userId) {
       setError('Bạn cần đăng nhập để tạo dự án.');

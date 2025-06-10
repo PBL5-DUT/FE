@@ -163,7 +163,7 @@ const PMDetail = () => {
             })
           }
             >
-              Go to forum
+              Đi đến forum
               <span className="text-xl">→</span>
             </button>
           </div>

@@ -7,24 +7,30 @@ import { AuthContext } from "../../util/AuthContext";
 const PjManager = () => {
   const { currentUser } = useContext(AuthContext);
   const [projects, setProjects] = useState([]);
-  const [activeTab, setActiveTab] = useState("Active");
+  const [activeTab, setActiveTab] = useState("Đang hoạt động");
   const [showNewPj, setShowNewPj] = useState(false);
   const [menuOpen, setMenuOpen] = useState(null);
   const navigate = useNavigate();
 
   const tabMap = {
-    Active: "approved",
-    Pending: "pending",
-    Finished: "finished",
-    Locked: "locked",
-    Draft: "draft",
-    Rejected: "rejected"
+    "Đang hoạt động": "approved",
+    "Chờ duyệt": "pending",
+    "Đã kết thúc": "finished",
+    "Đã khóa": "locked",
+    "Nháp": "draft",
+    "Từ chối": "rejected"
   };
 
-  const reverseTabMap = Object.entries(tabMap).reduce((acc, [label, value]) => {
-    acc[value] = label;
-    return acc;
-  }, {});
+  const reverseTabMap = {
+    "approved": "Đang hoạt động",
+    "pending": "Chờ duyệt",
+    "finished": "Đã kết thúc",
+    "locked": "Đã khóa",
+    "draft": "Nháp",
+    "rejected": "Từ chối",
+    "lockedpending": "Chờ duyệt"  // Thêm trạng thái này để hiển thị đúng
+  };
+
   const pmId = currentUser.userId;
   const loadProjects = async () => {
     try {
@@ -65,7 +71,7 @@ const PjManager = () => {
   ) : (
     projects
       .filter((project) => {
-        if (activeTab === "Pending") {
+        if (activeTab === "Chờ duyệt") {
           return project.pmId === currentUser.userId && 
                  (project.status === "pending" || project.status === "lockedpending");
         }
@@ -98,7 +104,7 @@ const PjManager = () => {
             className="fixed bottom-6 right-6 bg-blue-500 text-white px-4 py-2 rounded-full flex items-center shadow-lg"
             onClick={() => setShowNewPj(true)} 
           >
-            <span className="text-xl mr-2">➕</span> Add Project
+            <span className="text-xl mr-2">➕</span> Thêm dự án mới
           </button>
         </>
       )}

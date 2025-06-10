@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { apiConfig } from "../../config/apiConfig";
 
@@ -6,42 +7,44 @@ const Donation = ({ projectId, isFixed = true }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("Money");
+  const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 12;
+  const itemsPerPage = 12; 
 
   useEffect(() => {
     const fetchDonations = async () => {
       try {
         setLoading(true);
         const response = await apiConfig.get(`/donations/project/${projectId}`);
-        console.log("Fetched donations:", response.data);
-
         
-        // Fix: Ensure donations is always an array
-        const donationsData = response.data;
-        if (Array.isArray(donationsData)) {
-          setDonations(donationsData);
-        } else if (donationsData && Array.isArray(donationsData.donations)) {
-          // If the response is wrapped in an object with a donations property
-          setDonations(donationsData.donations);
-        } else if (donationsData && Array.isArray(donationsData.data)) {
-          // If the response is wrapped in an object with a data property
-          setDonations(donationsData.data);
+        // Debug log to see the actual response structure
+        console.log("API Response:", response.data);
+        console.log("Response type:", typeof response.data);
+        console.log("Is array:", Array.isArray(response.data));
+        
+        // Safe handling of different response structures
+        let donationsData = [];
+        
+        if (Array.isArray(response.data)) {
+          donationsData = response.data;
+        } else if (response.data && Array.isArray(response.data.donations)) {
+          donationsData = response.data.donations;
+        } else if (response.data && Array.isArray(response.data.data)) {
+          donationsData = response.data.data;
+        } else if (response.data && Array.isArray(response.data.results)) {
+          donationsData = response.data.results;
         } else {
-          // If response is not an array, set empty array
-          console.warn("API response is not an array:", donationsData);
-          setDonations([]);
+          console.warn("Unexpected API response structure:", response.data);
+          donationsData = [];
         }
         
-
+        setDonations(donationsData);
         setError(null);
       } catch (err) {
         console.error("Error fetching donations:", err);
         setError("Không thể tải danh sách ủng hộ.");
-
-        setDonations([]);
-
+        setDonations([]); // Ensure donations is always an array
       } finally {
         setLoading(false);
       }
@@ -53,142 +56,143 @@ const Donation = ({ projectId, isFixed = true }) => {
   }, [projectId]);
 
 
-  // Safe filtering with fallback to empty array
   const moneyDonations = Array.isArray(donations) 
-    ? donations.filter((d) => d.type === "money") 
+    ? donations.filter((donation) => donation.type === "money") 
     : [];
+    
   const goodsDonations = Array.isArray(donations) 
-    ? donations.filter((d) => d.type === "goods") 
+    ? donations.filter((donation) => donation.type === "goods") 
     : [];
+    
 
   const totalMoney = moneyDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
 
-  const paginatedDonations = (list) => {
-    if (!Array.isArray(list)) return [];
+  const paginatedDonations = () => {
+    const currentData = activeTab === "Money" ? moneyDonations : goodsDonations;
+    if (!Array.isArray(currentData)) return [];
+    
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return list.slice(startIndex, startIndex + itemsPerPage);
+    return currentData.slice(startIndex, startIndex + itemsPerPage);
   };
 
   const totalPages = Math.ceil(
     (activeTab === "Money" ? moneyDonations : goodsDonations).length / itemsPerPage
   );
 
-  const currentDonations =
-    activeTab === "Money"
-      ? paginatedDonations(moneyDonations)
-      : paginatedDonations(goodsDonations);
-
   return (
-    <div className="w-full">
-      {/* Dropdown Tab */}
-      <div className="mb-4">
-        <select
-          value={activeTab}
-          onChange={(e) => {
-            setActiveTab(e.target.value);
-            setCurrentPage(1);
-          }}
-          className="w-100px px-2 py-1 rounded-lg border border-gray-300 text-xs"
-        >
-          <option value="Money">Money</option>
-          <option value="Goods">Goods</option>
-        </select>
-      </div>
-
-      {/* Content */}
+    <div className="h-full flex flex-col relative">
       {loading ? (
-        <div className="text-center py-4">
-          Đang tải danh sách ủng hộ...
+        <div className="flex items-center justify-center h-full">
+          <div className="text-sm text-gray-500">Đang tải...</div>
         </div>
       ) : error ? (
-        <div className="text-center py-4 text-red-500">
-          {error}
+        <div className="flex items-center justify-center h-full">
+          <div className="text-sm text-red-500">{error}</div>
         </div>
       ) : (
-        <div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-4 py-2">STT</th>
-                  <th className="border border-gray-300 px-4 py-2">Username</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    {activeTab === "Money" ? "VND" : "Quantity"}
+        <>
+          {/* Table Container - Scrollable */}
+          <div className="flex-1 overflow-auto p-4">
+            {/* Dropdown Tab */}
+            <div className="mb-4">
+              <select
+                value={activeTab}
+                onChange={(e) => {
+                  setActiveTab(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="px-3 py-1 text-xs rounded border border-gray-300"
+              >
+                <option value="Money">Tiền mặt</option>
+                <option value="Goods">Hàng hóa</option>
+              </select>
+            </div>
+
+            <table className="w-full text-xs">
+              <thead className="sticky top-0 bg-white border-b">
+                <tr className="text-gray-600">
+                  <th className="text-left py-2 w-10">STT</th>
+                  <th className="text-left py-2">Người ủng hộ</th>
+                  <th className="text-right py-2">
+                    {activeTab === "Money" ? "Số tiền" : "Mô tả/SL"}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {currentDonations.length > 0 ? (
-                  currentDonations.map((donation, index) => (
-                    <tr key={donation.id || index} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-4 py-2 text-center">
+                {paginatedDonations().length > 0 ? (
+                  paginatedDonations().map((donation, index) => (
+                    <tr
+                      key={donation.id || index}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="py-2 text-gray-500">
                         {index + 1 + (currentPage - 1) * itemsPerPage}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        {donation.userName || "Unknown"}
+                      <td className="py-2">
+                        <div className="truncate max-w-[80px]" title={donation.userName || "Ẩn danh"}>
+                          {donation.txnRef === "anonymous" ? "Anonymous User" : donation.userName || "Ẩn danh"}
+                        </div>
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-right">
+                      <td className="py-2 text-right font-medium">
                         {activeTab === "Money"
-                          ? (donation.amount || 0).toLocaleString()
-                          : donation.amount || 0}
+                          ? donation.amount?.toLocaleString() || "0"
+                          : donation.goodDescription || donation.amount || "N/A"}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="border border-gray-300 px-4 py-8 text-center text-gray-500">
-                      No donations yet
+                    <td colSpan="3" className="text-center py-8 text-gray-500">
+                      Chưa có ủng hộ nào
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
-        </div>
-      )}
 
-      {/* Total Money */}
-      {activeTab === "Money" && !loading && !error && (
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-          <div className="text-center">
-            <div className="text-lg font-semibold">
-              <span className="text-gray-700">
-                Total:{" "}
-                <span className="text-blue-600">
-                  {totalMoney.toLocaleString()} VND
+          {/* Bottom Section - Fixed */}
+          <div className="border-t bg-white p-4 space-y-3">
+            {/* Total Money - Only show for Money tab */}
+            {activeTab === "Money" && (
+              <div className="bg-gray-50 p-3 rounded-md">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-700">Tổng ủng hộ:</span>
+                  <span className="text-sm font-bold text-red-500">
+                    {totalMoney.toLocaleString()} VND
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Trước
+                </button>
+                <span className="text-xs text-gray-500">
+                  {currentPage}/{totalPages}
                 </span>
-              </span>
-            </div>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Sau
+                </button>
+              </div>
+            )}
+
           </div>
-        </div>
+        </>
       )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-4">
-          <div className="flex justify-center items-center gap-4">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-            <span className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, {useContext} from "react";
 import { Link, useNavigate } from "react-router-dom";
+import userAvatar from "../../assets/avatar-icon.avif";
 import { AuthContext } from "../../util/AuthContext";
 
 
@@ -34,19 +35,19 @@ const Menu = ({ isOpen, setMenuOpen }) => {
         to="/profile"
         className="flex items-center gap-2 p-2 hover:bg-gray-200 rounded"
       >
-        Profile
+        Hồ sơ
       </Link>
       <Link
         to="/project-manager"
         className="flex items-center gap-2 p-2 hover:bg-gray-200 rounded"
       >
-        Project Manager
+        Quản lý dự án
       </Link>
       <button
         onClick={handleLogout}
         className="flex items-center gap-2 p-2 w-full text-left hover:bg-gray-200 rounded"
       >
-        Logout
+        Đăng xuất
       </button>
     </div>
   );

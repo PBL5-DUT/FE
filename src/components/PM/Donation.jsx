@@ -11,7 +11,7 @@ const Donation = ({ projectId, isFixed = true }) => {
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 8; // Giảm số item để phù hợp với layout
+  const itemsPerPage = 10; // Giảm số item để phù hợp với layout
 
   useEffect(() => {
     const fetchDonations = async () => {
