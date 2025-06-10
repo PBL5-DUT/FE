@@ -11,6 +11,7 @@ const PostNew = ({ forumId, userId, onPost }) => {
   const [success, setSuccess] = useState("");
 
   const handlePost = async () => {
+    console.log("forum" , forumId);
     if (isPosting || !content.trim()) {
       setError("Nội dung không được để trống!");
       return;
@@ -35,7 +36,7 @@ const PostNew = ({ forumId, userId, onPost }) => {
 
       const postData = { forumId, userId, content, postImages: uploadedImages };
       const response = await apiConfig.post("/posts", postData);
-
+      console.log("Post response:", postData);;
       if (response?.status === 200 || response?.status === 201) {
         onPost?.(response.data);
         setContent("");
@@ -43,6 +44,8 @@ const PostNew = ({ forumId, userId, onPost }) => {
         setSuccess("Đăng bài thành công!");
         setTimeout(() => setSuccess(""), 3000);
       } else {
+              console.log("Post response:", postData);;
+
         setError("Đã xảy ra lỗi khi đăng bài!");
       }
     } catch (err) {

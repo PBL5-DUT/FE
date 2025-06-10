@@ -63,7 +63,7 @@ const ProjectDetail = () => {
   };
 
   const handleGoToForum = () => {
-    navigate(`/forum/${id}`, {
+    navigate(`/forumoverview/${id}`, {
       state: {
         projectId: id,
         projectName: project.name,

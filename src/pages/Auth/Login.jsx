@@ -52,12 +52,12 @@ const Login = () => {
         
         {/* Nút Đăng nhập với quyền Admin - Đặt ở đây để định vị tuyệt đối */}
         <a
-          href="https://your-admin-dashboard-url.com/admin/login" // <-- THAY ĐỔI URL CỦA BẠN TẠI ĐÂY
+          href="https://7e51-14-191-113-10.ngrok-free.app" // <-- THAY ĐỔI URL CỦA BẠN TẠI ĐÂY
           target="_blank"
           rel="noopener noreferrer"
           className="absolute top-4 right-4 bg-purple-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-purple-700 transition whitespace-nowrap" // <--- CLASSES MỚI
         >
-          Đăng nhập Admin
+          A
         </a>
 
         {/* Logo */}
