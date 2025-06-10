@@ -10,19 +10,21 @@ const ReportRequest = ({ projectId }) => {
 
   useEffect(() => {
     fetchPendingReports();
-  }, [forumId, activeTab]);
+  }, [projectId, activeTab]);
 
   const fetchPendingReports = async () => {
     try {
       setLoading(true);
       if(activeTab === 'post') {
-      const response = await apiConfig.get(`/reports/postpending/${projectId}`);
+        const response = await apiConfig.get(`/reports/postpending/${projectId}`);
+        setReports(response.data);
+        console.log('Fetched post reports:', response.data);
       }
       else if(activeTab === 'comment') {
-      const response = await apiConfig.get(`/reports/commentpending/${projectId}`);
+        const response = await apiConfig.get(`/reports/commentpending/${projectId}`);
+        setReports(response.data);
+        console.log('Fetched comment reports:', response.data);
       }
-      setReports(response.data);
-
     } catch (err) {
       console.error('Error fetching pending reports:', err);
       setError('Không thể tải danh sách báo cáo chờ duyệt');
@@ -53,22 +55,6 @@ const ReportRequest = ({ projectId }) => {
     }
   };
 
-  const handleDismiss = async (reportId) => {
-    try {
-      setProcessingIds(prev => new Set(prev).add(reportId));
-      await apiConfig.put(`/reports/dismiss/${reportId}`);
-      setReports(prev => prev.filter(report => report.reportId !== reportId));
-    } catch (err) {
-      console.error('Error dismissing report:', err);
-      setError('Không thể bỏ qua báo cáo');
-    } finally {
-      setProcessingIds(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(reportId);
-        return newSet;
-      });
-    }
-  };
 
   if (loading) {
     return (
@@ -107,7 +93,7 @@ const ReportRequest = ({ projectId }) => {
               : 'text-gray-500 hover:text-gray-700'
           }`}
         >
-          Báo cáo Bài viết ({reports.filter(r => r.reportType === 'post').length})
+          Báo cáo Bài viết ({reports.length})
         </button>
         <button
           onClick={() => setActiveTab('comment')}
@@ -117,7 +103,7 @@ const ReportRequest = ({ projectId }) => {
               : 'text-gray-500 hover:text-gray-700'
           }`}
         >
-          Báo cáo Bình luận ({reports.filter(r => r.reportType === 'comment').length})
+          Báo cáo Bình luận ({reports.length})
         </button>
       </div>
 
@@ -135,17 +121,36 @@ const ReportRequest = ({ projectId }) => {
             <div key={report.reportId} className="border rounded-lg p-4">
               {/* Report Header */}
               <div className="flex justify-between items-start mb-3">
-                <div>
-                  <p className="font-medium">
-                    Người báo cáo: {report.user?.username || 'Ẩn danh'}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {formatDate(report.createdAt)}
-                  </p>
+                <div className="flex items-center space-x-3">
+                  {/* User Avatar */}
+                  {report.userAvatar && (
+                    <img 
+                      src={report.userAvatar} 
+                      alt="Avatar" 
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  )}
+                  <div>
+                    <p className="font-medium">
+                      Người báo cáo: {report.userName || 'Ẩn danh'}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {formatDate(report.createdAt)}
+                    </p>
+                  </div>
                 </div>
-                <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                  {activeTab === 'post' ? 'Bài viết' : 'Bình luận'}
-                </span>
+                <div className="flex flex-col items-end space-y-1">
+                  <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                    {activeTab === 'post' ? 'Bài viết' : 'Bình luận'}
+                  </span>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    report.status === 'approved' 
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {report.status === 'approved' ? 'Chờ duyệt' : 'Chờ duyệt'}
+                  </span>
+                </div>
               </div>
 
               {/* Report Reason */}
@@ -155,19 +160,36 @@ const ReportRequest = ({ projectId }) => {
               </div>
 
               {/* Reported Content Preview */}
-              {report.reportedContent && (
-                <div className="bg-gray-50 rounded p-3 mb-3">
-                  <p className="text-sm font-medium text-gray-600 mb-1">Nội dung bị báo cáo:</p>
-                  <p className="text-gray-800 line-clamp-3">
-                    {report.reportedContent.content || report.reportedContent.text}
-                  </p>
-                  {report.reportType === 'post' && report.reportedContent.postImages?.length > 0 && (
-                    <p className="text-sm text-gray-500 mt-2">
-                      Có {report.reportedContent.postImages.length} hình ảnh
+              <div className="bg-gray-50 rounded p-3 mb-3">
+                <p className="text-sm font-medium text-gray-600 mb-1">Nội dung bị báo cáo:</p>
+                <p className="text-gray-800 line-clamp-3">
+                  {report.content}
+                </p>
+                
+                {/* Display post images if available */}
+                {report.postImages && report.postImages.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500 mb-2">
+                      Có {report.postImages.length} hình ảnh:
                     </p>
-                  )}
+                    <div className="flex flex-wrap gap-2">
+                      {report.postImages.map((image, index) => (
+                        <img 
+                          key={index}
+                          src={image.imageFilepath || image.url} 
+                          alt={`Hình ${index + 1}`}
+                          className="w-16 h-16 object-cover rounded border"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Additional post info */}
+                <div className="mt-2 text-sm text-gray-500">
+                  <p>Post ID: {report.postId}</p>
                 </div>
-              )}
+              </div>
 
               {/* Action Buttons */}
               <div className="flex justify-end space-x-2">

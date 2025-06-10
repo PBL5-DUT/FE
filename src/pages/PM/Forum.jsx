@@ -17,7 +17,9 @@ const Forum = () => {
   const location = useLocation();
   const { projectId, projectName } = location.state || {};
   const [activeTab, setActiveTab] = useState('home');
-
+  
+  console.log("Forum ID:", forumId);
+  console.log("Project ID:", projectId);
   if (!projectId) {
     return (
       <div className="text-center mt-10 text-red-500">
