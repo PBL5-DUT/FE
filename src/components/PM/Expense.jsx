@@ -17,28 +17,81 @@ const Expense = ({ projectId, isFixed = true }) => {
       try {
         setLoading(true);
         const response = await apiConfig.get(`/expenses/project/${projectId}`);
-        setExpenses(response.data);
+        
+        // Debug log to see the actual response structure
+        console.log("Expenses API Response:", response.data);
+        console.log("Response type:", typeof response.data);
+        console.log("Is array:", Array.isArray(response.data));
+        
+        // Safe handling of different response structures
+        let expensesData = [];
+        
+        if (Array.isArray(response.data)) {
+          expensesData = response.data;
+        } else if (response.data && Array.isArray(response.data.expenses)) {
+          expensesData = response.data.expenses;
+        } else if (response.data && Array.isArray(response.data.data)) {
+          expensesData = response.data.data;
+        } else if (response.data && Array.isArray(response.data.results)) {
+          expensesData = response.data.results;
+        } else {
+          console.warn("Unexpected expenses API response structure:", response.data);
+          expensesData = [];
+        }
+        
+        setExpenses(expensesData);
         setError(null);
       } catch (err) {
         console.error("Error fetching expenses:", err);
         setError("Không thể tải danh sách chi tiêu.");
+        setExpenses([]); // Ensure expenses is always an array
       } finally {
         setLoading(false);
       }
     };
-    fetchExpenses();
+    
+    if (projectId) {
+      fetchExpenses();
+    }
   }, [projectId]);
 
-  // Calculate total money
-  const totalMoney = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  // Calculate total money - safe calculation
+  const totalMoney = Array.isArray(expenses) 
+    ? expenses.reduce((sum, expense) => sum + (expense.amount || 0), 0)
+    : 0;
 
-  // Pagination
+  // Pagination - safe slicing
   const paginatedExpenses = () => {
+    if (!Array.isArray(expenses)) return [];
+    
     const startIndex = (currentPage - 1) * itemsPerPage;
     return expenses.slice(startIndex, startIndex + itemsPerPage);
   };
 
-  const totalPages = Math.ceil(expenses.length / itemsPerPage);
+  const totalPages = Math.ceil((Array.isArray(expenses) ? expenses.length : 0) / itemsPerPage);
+
+  const refetchExpenses = async () => {
+    try {
+      const response = await apiConfig.get(`/expenses/project/${projectId}`);
+      let expensesData = [];
+      
+      if (Array.isArray(response.data)) {
+        expensesData = response.data;
+      } else if (response.data && Array.isArray(response.data.expenses)) {
+        expensesData = response.data.expenses;
+      } else if (response.data && Array.isArray(response.data.data)) {
+        expensesData = response.data.data;
+      } else if (response.data && Array.isArray(response.data.results)) {
+        expensesData = response.data.results;
+      } else {
+        expensesData = [];
+      }
+      console.log("Refetched expenses:", expensesData);
+      setExpenses(expensesData);
+    } catch (err) {
+      console.error("Error refetching expenses:", err);
+    }
+  };
 
   return (
     <div className="h-full flex flex-col relative">
@@ -67,24 +120,24 @@ const Expense = ({ projectId, isFixed = true }) => {
                 {paginatedExpenses().length > 0 ? (
                   paginatedExpenses().map((expense, index) => (
                     <tr
-                      key={expense.expenseId}
+                      key={expense.expenseId || expense.id || index}
                       className="border-b border-gray-100 hover:bg-gray-50"
                     >
                       <td className="py-2 text-gray-500">
                         {index + 1 + (currentPage - 1) * itemsPerPage}
                       </td>
                       <td className="py-2">
-                        <div className="truncate max-w-[100px]" title={expense.purpose}>
-                          {expense.purpose}
+                        <div className="truncate max-w-[100px]" title={expense.purpose || "N/A"}>
+                          {expense.purpose || "N/A"}
                         </div>
                       </td>
                       <td className="py-2 text-gray-600">
-                        <div className="truncate max-w-[300px] ml-4" title={expense.receiver?.username || "Ẩn danh"}>
-                          {expense.receiver?.username || "Ẩn danh"}
+                        <div className="truncate max-w-[300px] ml-4" title={expense.receiverName}>
+                          {expense.receiverName }
                         </div>
                       </td>
                       <td className="py-2 text-right font-medium">
-                        {expense.amount.toLocaleString()}
+                        {(expense.amount || 0).toLocaleString()}
                       </td>
                     </tr>
                   ))
@@ -117,7 +170,7 @@ const Expense = ({ projectId, isFixed = true }) => {
                 <button
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                  className="px-3 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Trước
                 </button>
@@ -127,7 +180,7 @@ const Expense = ({ projectId, isFixed = true }) => {
                 <button
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                  className="px-3 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Sau
                 </button>
@@ -136,10 +189,11 @@ const Expense = ({ projectId, isFixed = true }) => {
 
             {/* Add Button */}
             <button
-              className="w-full py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition"
+              className="w-full py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition disabled:opacity-50"
               onClick={() => setShowForm(true)}
+              disabled={loading}
             >
-              + 
+              + Thêm chi tiêu
             </button>
           </div>
         </>
@@ -152,7 +206,8 @@ const Expense = ({ projectId, isFixed = true }) => {
           onRequestClose={() => setShowForm(false)}
           onSuccess={() => {
             setShowForm(false);
-            window.location.reload();
+            // Instead of window.location.reload(), refetch the data
+            refetchExpenses();
           }}
           projectId={projectId}
         />
