@@ -9,8 +9,18 @@ const MessageWindow = ({ projectId }) => {
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
   const messagesEndRef = useRef(null);
-  const stompClientRef = useRef(null); // ✅ Dùng ref thay vì state
+  const stompClientRef = useRef(null);
   const { currentUser } = useContext(AuthContext);
+
+  // Hàm scroll xuống dưới cùng
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      const container = messagesEndRef.current.parentElement;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+  };
 
   // Lấy lịch sử tin nhắn
   useEffect(() => {
@@ -18,6 +28,8 @@ const MessageWindow = ({ projectId }) => {
       try {
         const response = await apiConfig.get(`/chats/${projectId}`);
         setMessages(response.data);
+        // Scroll xuống sau khi load tin nhắn
+        setTimeout(scrollToBottom, 100);
       } catch (err) {
         console.error("❌ Lỗi tải tin nhắn:", err);
       }
@@ -25,9 +37,14 @@ const MessageWindow = ({ projectId }) => {
     fetchMessages();
   }, [projectId]);
 
-  // Tự động scroll xuống tin nhắn mới
+  // Tự động scroll xuống tin nhắn mới với delay
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Sử dụng setTimeout để đảm bảo DOM đã được render
+    const timer = setTimeout(() => {
+      scrollToBottom();
+    }, 50);
+
+    return () => clearTimeout(timer);
   }, [messages]);
 
   // Kết nối WebSocket khi projectId thay đổi
@@ -41,8 +58,14 @@ const MessageWindow = ({ projectId }) => {
 
         client.subscribe(`/topic/chat/project/${projectId}`, (message) => {
           const body = JSON.parse(message.body);
-          console.log("📥 Nhận tin nhắn:", body);
-          setMessages((prev) => [...prev, body]);
+          console.log("Received message:", body);
+          
+          setMessages((prev) => {
+            console.log("Previous messages:", prev);
+            const updated = [...prev, body];
+            console.log("Updated messages:", updated);
+            return updated;
+          });
         });
       },
       onStompError: (frame) => {
@@ -51,7 +74,7 @@ const MessageWindow = ({ projectId }) => {
     });
 
     client.activate();
-    stompClientRef.current = client; // ✅ Gán vào ref
+    stompClientRef.current = client;
 
     // Cleanup khi component unmount hoặc projectId đổi
     return () => {
@@ -77,6 +100,8 @@ const MessageWindow = ({ projectId }) => {
     });
 
     setNewMsg("");
+    // Scroll xuống ngay sau khi gửi tin nhắn
+    setTimeout(scrollToBottom, 100);
   };
 
   return (
@@ -87,9 +112,16 @@ const MessageWindow = ({ projectId }) => {
       </div>
 
       {/* Message list */}
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-2">
+      <div 
+        className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-2"
+        id="messages-container"
+      >
         <ChatList messages={messages} projectId={projectId} />
-        <div ref={messagesEndRef} />
+        {/* Div để scroll xuống */}
+        <div 
+          ref={messagesEndRef} 
+          style={{ height: '1px' }}
+        />
       </div>
 
       {/* Input */}

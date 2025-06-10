@@ -30,9 +30,18 @@ const Donation = ({ projectId, isFixed = true }) => {
     fetchDonations();
   }, [projectId]);
 
-  const moneyDonations = donations.filter((donation) => donation.type === "money") || [];
-  const goodsDonations = donations.filter((donation) => donation.type === "goods") || [];
-  const totalMoney = moneyDonations.reduce((sum, d) => sum + d.amount, 0);
+  // const moneyDonations = donations.filter((donation) => donation.type === "money") || [];
+  // const goodsDonations = donations.filter((donation) => donation.type === "goods") || [];
+  // const totalMoney = moneyDonations.reduce((sum, d) => sum + d.amount, 0);
+  const moneyDonations = Array.isArray(donations)
+    ? donations.filter((d) => d.type === "money")
+    : [];
+
+  const goodsDonations = Array.isArray(donations)
+    ? donations.filter((d) => d.type === "goods")
+    : [];
+
+  const totalMoney = moneyDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
 
   const paginatedDonations = () => {
     const currentData = activeTab === "Money" ? moneyDonations : goodsDonations;

@@ -34,9 +34,9 @@ const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
       type: formData.type,
       status: "success",
       goodDescription: formData.goodDescription || "",
-      user: formData.anonymous
-        ? { userId: currentUser.userId }
-        : { userId: parseInt(formData.userId, 10) },
+      userId: formData.anonymous
+        ?  currentUser.userId 
+        : parseInt(formData.userId, 10) ,
     };
 
     try {
