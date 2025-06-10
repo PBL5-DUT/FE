@@ -27,7 +27,6 @@ const Menu = ({ isOpen, setMenuOpen }) => {
           alt="User Avatar"
           className="h-14 w-14 rounded-full mb-2"
         />
-        <span className="text-gray-800 font-semibold">UserName</span>
       </div>
       <hr className="my-2" />
       <Link
