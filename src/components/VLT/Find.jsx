@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-const Find = ({ onSortChange, defaultSort }) => {
+const Find = ({ onSortChange, onSearch, defaultSort }) => {
   const [selectedSort, setSelectedSort] = useState(defaultSort || "Newest");
-  const [search, setSearch] = useState(""); // State để lưu giá trị tìm kiếm
+  const [search, setSearch] = useState(""); 
 
   const sortOptions = [
     { label: "Newest", value: "Newest" },
@@ -19,6 +19,7 @@ const Find = ({ onSortChange, defaultSort }) => {
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
+    onSearch(e.target.value); 
     console.log("Search value:", e.target.value);
   };
 

@@ -11,6 +11,7 @@ import TabContainer from "../../components/PM/TabContainer";
 import UserRequest from "../../components/PM/userRequest.jsx";
 import { AuthContext } from "../../util/AuthContext";
 import PostRequest from "../../components/PM/PostRequest.jsx";
+import ReportRequest from "../../components/PM/ReportRequest.jsx";
 
 const Forum = () => {
   const { currentUser } = useContext(AuthContext);  
@@ -46,6 +47,8 @@ const Forum = () => {
         return <UserRequest projectId={projectId} />;
       case 'postings':
         return <PostRequest forumId={forumId} />;
+      case 'reports':
+        return <ReportRequest />; 
       default:
         return null;
     }

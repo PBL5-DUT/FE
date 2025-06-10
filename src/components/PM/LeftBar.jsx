@@ -70,6 +70,17 @@ const LeftBar = ({ activeTab, setActiveTab, projectName }) => {
           <FaFileAlt className="text-xl" />
           <span className="font-medium">Duyệt bài viết</span>
         </button>
+        <button
+          onClick={() => setActiveTab('reports')}
+          className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+            activeTab === 'reports'
+              ? 'bg-blue-50 text-blue-600'
+              : 'hover:bg-gray-50 text-gray-700'
+          }`}
+        >
+          <FaFileAlt className="text-xl" />
+          <span className="font-medium">Xử lý báo cáo</span>
+        </button>
       </nav>
     </div>
   );
