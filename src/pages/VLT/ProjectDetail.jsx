@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { apiConfig } from "../../config/apiConfig";
 
 import TabContainer from '../../components/VLT/TabContainer';
-import { FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaHeart, FaClock, FaDonate, FaComments, FaLock } from "react-icons/fa";
+import { FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaHeart, FaClock, FaDonate, FaComments } from "react-icons/fa";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 
@@ -19,6 +19,7 @@ const ProjectDetail = () => {
   const [status, setStatus] = useState(null);
   const [isWaiting, setIsWaiting] = useState(false);
   const [activeTab, setActiveTab] = useState("Donation"); 
+
 
   const formatDate = (dateString) => {
     return format(new Date(dateString), "dd MMMM, yyyy", { locale: vi });
@@ -102,22 +103,13 @@ const ProjectDetail = () => {
 
   useEffect(() => {
     fetchProjectDetail();
+
     checkJoinedStatus();
   }, [id]);
 
-  // Hàm để xác định trạng thái button dựa trên project status và user status
-  const getActionButtonStatus = () => {
-    // Kiểm tra trạng thái dự án trước
-    if (project?.status === "locked") {
-      return "locked";
-    }
-    
-    // Nếu dự án không bị khóa, kiểm tra trạng thái tham gia của user
-    return status;
-  };
-
   if (loading) {
     return (
+
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mx-auto"></div>
@@ -131,6 +123,7 @@ const ProjectDetail = () => {
 
   if (error) {
     return (
+
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
           <div className="text-red-500 text-5xl mb-4">⚠️</div>
@@ -147,8 +140,6 @@ const ProjectDetail = () => {
     );
   }
 
-  const actionButtonStatus = getActionButtonStatus();
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -163,6 +154,7 @@ const ProjectDetail = () => {
           <div className="max-w-6xl mx-auto">
             <h1 className="text-5xl font-bold mb-4">{project.name}</h1>
             <div className="flex items-center space-x-6 text-gray-200">
+
               <div className="flex items-center">
                 <FaMapMarkerAlt className="mr-2" />
                 {project.location}
@@ -175,15 +167,17 @@ const ProjectDetail = () => {
                 <FaHeart className="mr-2" />
                 {project.likesCount} lượt thích
               </div>
+
             </div>
           </div>
         </div>
       </div>
 
+
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex gap-8">
-          {/* Left Column - Project Details */}
-          <div className="w-[800px]">
+          {/* Left Column - Project Details - Reduced width */}
+          <div className="w-[800px]"> {/* Changed from flex-1 to fixed width */}
             <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
               <h2 className="text-2xl font-bold mb-4">Thông tin dự án</h2>
               <p className="text-gray-700 mb-6 leading-relaxed">{project.description}</p>
@@ -209,19 +203,21 @@ const ProjectDetail = () => {
                 </div>
               </div>
 
+              
               {/* Action Buttons */}
               <div className="flex gap-4">
-                {actionButtonStatus === "locked" ? (
+                {status === "locked" ? (
                   <button className="flex-1 py-3 px-6 bg-red-100 text-red-500 rounded-lg font-medium cursor-not-allowed">
                     <FaLock className="inline mr-2" />
                     Dự án đã bị khóa
                   </button>
-                ) : actionButtonStatus === "pending" ? (
+                ) :
+                status === "pending" ? (
                   <button className="flex-1 py-3 px-6 bg-gray-100 text-gray-500 rounded-lg font-medium cursor-not-allowed">
                     <FaClock className="inline mr-2" />
                     Đang chờ duyệt
                   </button>
-                ) : actionButtonStatus === "approved" ? (
+                ) : status === "approved" ? (
                   <button
                     onClick={handleGoToForum}
                     className="flex-1 py-3 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
@@ -229,7 +225,7 @@ const ProjectDetail = () => {
                     <FaComments className="inline mr-2" />
                     Tham gia diễn đàn
                   </button>
-                ) : (
+                ) :  (
                   <button
                     onClick={handleRegister}
                     disabled={isWaiting}
@@ -239,63 +235,61 @@ const ProjectDetail = () => {
                     Đăng ký tham gia
                   </button>
                 )}
-                
-                {/* Donation button - chỉ ẩn khi dự án bị khóa */}
-                {actionButtonStatus !== "locked" && (
-                  <button
-                    onClick={() => setShowDonate(!showDonate)}
-                    className="flex-1 py-3 px-6 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
-                  >
-                    <FaDonate className="inline mr-2" />
-                    Ủng hộ dự án
-                  </button>
-                )}
+                <button
+                  onClick={() => setShowDonate(!showDonate)}
+                  className="flex-1 py-3 px-6 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  <FaDonate className="inline mr-2" />
+                  Ủng hộ dự án
+                </button>
               </div>
+   
+            {showDonate && (
+            <div className="mt-6 p-6 border border-purple-200 rounded-2xl bg-purple-50 text-purple-900 shadow-md space-y-4">
+            <div>
+            <h3 className="text-lg font-semibold mb-2">Cách 1: Ủng hộ gián tiếp qua chủ dự án</h3>
+            <div className="bg-white p-4 rounded-lg border text-sm">
+            <p className="font-medium text-gray-700">Thông tin chuyển khoản:</p>
+            <p className="mt-1 text-gray-900">{project.bank}</p>
+            </div>
+            </div>
 
-              {showDonate && actionButtonStatus !== "locked" && (
-                <div className="mt-6 p-6 border border-purple-200 rounded-2xl bg-purple-50 text-purple-900 shadow-md space-y-4">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Cách 1: Ủng hộ gián tiếp qua chủ dự án</h3>
-                    <div className="bg-white p-4 rounded-lg border text-sm">
-                      <p className="font-medium text-gray-700">Thông tin chuyển khoản:</p>
-                      <p className="mt-1 text-gray-900">{project.bank || "Chưa có thông tin ngân hàng"}</p>
-                    </div>
-                  </div>
+            <div className="border-t border-purple-300 my-4"></div>
 
-                  <div className="border-t border-purple-300 my-4"></div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Cách 2: Ủng hộ trực tiếp qua VNPay</h3>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nhập số tiền muốn ủng hộ (VND):
-                    </label>
-                    <input
-                      type="number"
-                      className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent bg-white"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      placeholder="VD: 500000"
-                    />
-                    <button
-                      className="mt-4 w-full py-2 px-4 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-all"
-                      onClick={processDonation}
-                    >
-                      Xác nhận ủng hộ
-                    </button>
-                  </div>
-                </div>
-              )}
+            <div>
+            <h3 className="text-lg font-semibold mb-2">Cách 2: Ủng hộ trực tiếp qua VNPay</h3>
+             <label className="block text-sm font-medium text-gray-700 mb-1">
+             Nhập số tiền muốn ủng hộ (VND):
+            </label>
+          <input
+           type="number"
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent bg-white"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="VD: 500000"
+          />
+          <button
+          className="mt-4 w-full py-2 px-4 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-all"
+          onClick={processDonation}
+        >
+        Xác nhận ủng hộ
+      </button>
+    </div>
+  </div>
+)}
             </div>
           </div>
+        </div>
 
           {/* Right Column - Fixed position */}
           <div className="fixed right-0 top-[64px] w-[300px] h-[calc(100vh-64px)] bg-white shadow-lg overflow-hidden">
             <TabContainer projectId={id} />
           </div>
+          
         </div>
       </div>
-    </div>
   );
 };
 
 export default ProjectDetail;
+
