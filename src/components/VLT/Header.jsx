@@ -27,7 +27,7 @@ const Header = () => {
               : "text-gray-500 hover:text-blue-500 font-medium text-xl"
           }
         >
-          Home
+          Trang chủ
         </NavLink>
         <NavLink
           to="/joined"
@@ -37,7 +37,7 @@ const Header = () => {
               : "text-gray-500 hover:text-blue-500 font-medium text-xl"
           }
         >
-          Joined Project
+          Đã tham gia
         </NavLink>
         <NavLink
           to="/information"
@@ -47,7 +47,7 @@ const Header = () => {
               : "text-gray-500 hover:text-blue-500 font-medium text-xl"
           }
         >
-          Information
+          Thông tin
         </NavLink>
         <NavLink
           to="/aboutus"
@@ -57,7 +57,7 @@ const Header = () => {
               : "text-gray-500 hover:text-blue-500 font-medium text-xl"
           }
         >
-          About us
+          Về chúng tôi
         </NavLink>
       </nav>
 

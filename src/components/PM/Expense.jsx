@@ -9,7 +9,7 @@ const Expense = ({ projectId, isFixed = true }) => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
-  const itemsPerPage = 8; // Giảm số item để phù hợp với layout
+  const itemsPerPage = 10; // Giảm số item để phù hợp với layout
 
   // Fetch expenses
   useEffect(() => {
