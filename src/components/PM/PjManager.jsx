@@ -94,7 +94,7 @@ const PjManager = () => {
             <p className="text-gray-500 text-sm line-clamp-2">{project.description}</p>
             <p className="text-gray-500 text-sm">📅 {new Date(project.startTime).toLocaleDateString()} - {new Date(project.endTime).toLocaleDateString()}</p>
             <p className="text-gray-500 text-sm">🕒 Cập nhật: {new Date(project.updatedAt).toLocaleDateString()}</p>
-            <p className="text-sm text-gray-400">Trạng thái: {reverseTabMap[project.status] || project.status}</p>
+            <p className="text-sm text-gray-400">Trạng thái: { project.status}</p>
           </div>
         </div>
       ))

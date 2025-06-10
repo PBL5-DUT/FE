@@ -151,7 +151,7 @@ const ProjectDetail = () => {
 
   // Function to check if project actions should be disabled
   const isProjectLocked = () => {
-    return project.status === 'locked' || project.status === 'lockedpending';
+    return project.status === 'locked' || project.status === 'lockedpending' || project.status === 'finished';
   };
 
   useEffect(() => {
