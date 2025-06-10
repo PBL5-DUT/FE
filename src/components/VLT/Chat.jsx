@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
 import { apiConfig } from '../../config/apiConfig';
 
-const Chat = ({ message,currentUser,  onUpdate }) => {
+const Chat = ({ message, currentUser, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(message.message);
   const [error, setError] = useState(null);
-
-  
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const handleUpdate = async () => {
     try {
@@ -35,6 +34,7 @@ const Chat = ({ message,currentUser,  onUpdate }) => {
         console.error('Xóa thất bại', err);
       }
     }
+    setShowDropdown(false);
   };
 
   const formatDateTime = (dateString) => {
@@ -57,32 +57,12 @@ const Chat = ({ message,currentUser,  onUpdate }) => {
         className="w-10 h-10 rounded-full object-cover flex-shrink-0"
       />
       <div className="flex-1">
-        <div className="flex items-center justify-between">
-          <div className={`flex items-center gap-2 ${isOwnMessage ? 'flex-row-reverse' : ''}`}>
-            <span className="font-semibold text-sm text-gray-900">{message.userName}</span>
-            <span className="text-xs text-gray-500">{formatDateTime(message.createdAt)}</span>
-          </div>
-          {isOwnMessage && (
-            <div className="relative group">
-              <FaEllipsisV className="text-gray-400 cursor-pointer hover:text-gray-600" />
-              <div className="absolute right-0 mt-1 w-24 bg-white shadow-lg rounded-md hidden group-hover:block z-10">
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Sửa
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                >
-                  Xóa
-                </button>
-              </div>
-            </div>
-          )}
+        <div className={`flex items-center gap-2 mb-1 ${isOwnMessage ? 'flex-row-reverse' : ''}`}>
+          <span className="font-semibold text-sm text-gray-900">{message.userName}</span>
+          <span className="text-xs text-gray-500">{formatDateTime(message.createdAt)}</span>
         </div>
-        <div className="mt-1">
+        
+        <div className="relative">
           {isEditing ? (
             <div className="flex flex-col gap-2">
               <textarea
@@ -107,13 +87,66 @@ const Chat = ({ message,currentUser,  onUpdate }) => {
               </div>
             </div>
           ) : (
-            <p className={`text-sm text-gray-800 p-3 rounded-lg ${isOwnMessage ? 'bg-blue-100' : 'bg-gray-100'}`}>
-              {message.message}
-            </p>
+            <div 
+              className={`relative p-3 rounded-lg group ${isOwnMessage ? 'bg-blue-100' : 'bg-gray-100'}`}
+            >
+              <p className="text-sm text-gray-800 pr-6">
+                {message.message}
+              </p>
+              
+              {/* Nút ba chấm nằm trong tin nhắn */}
+              {isOwnMessage && (
+                <div className="absolute top-2 right-2">
+                  <button
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className="opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-black hover:bg-opacity-10 transition-opacity duration-200"
+                  >
+                    <FaEllipsisV className="text-gray-500 text-xs" />
+                  </button>
+                  
+                  {/* Dropdown menu với vùng hover mở rộng */}
+                  {showDropdown && (
+                    <div 
+                      className="absolute right-0 top-6 w-20 bg-white shadow-lg rounded-md border z-20"
+                      onMouseLeave={() => setShowDropdown(false)}
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsEditing(true);
+                          setShowDropdown(false);
+                        }}
+                        className="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 rounded-t-md"
+                      >
+                        Sửa
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete();
+                        }}
+                        className="block w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-gray-100 rounded-b-md"
+                      >
+                        Xóa
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           )}
         </div>
+        
         {error && <p className="text-xs text-red-500 mt-1 text-right">{error}</p>}
       </div>
+      
+      {/* Overlay để đóng dropdown khi click bên ngoài */}
+      {showDropdown && (
+        <div 
+          className="fixed inset-0 z-10" 
+          onClick={() => setShowDropdown(false)}
+        />
+      )}
     </div>
   );
 };

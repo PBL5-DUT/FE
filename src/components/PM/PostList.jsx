@@ -9,23 +9,36 @@ const PostList = ({ forumId }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
+      if (!forumId) {
+        // If forumId is not available, don't try to fetch posts
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null); // Clear previous errors on new fetch
+
       try {
-        setLoading(true);
         const response = await apiConfig.get(`/posts/${forumId}`);
-        setPosts(response.data.reverse());
-        setError(null);
+        // Ensure response.data is an array before setting state
+        if (Array.isArray(response.data)) {
+          setPosts(response.data.reverse());
+        } else {
+          console.error('API response data is not an array:', response.data);
+          setError('Dữ liệu bài viết không hợp lệ.');
+          setPosts([]); // Set to empty array to prevent issues
+        }
       } catch (err) {
         console.error('Error fetching posts:', err);
         setError('Không thể tải bài viết. Vui lòng thử lại sau.');
+        setPosts([]); // Clear posts on error
       } finally {
         setLoading(false);
       }
     };
 
-    if (forumId) {
-      fetchPosts();
-    }
-  }, [forumId]);
+    fetchPosts(); // Call fetchPosts directly within useEffect
+  }, [forumId]); // Dependency array includes forumId
 
   if (loading) {
     return (
@@ -39,7 +52,7 @@ const PostList = ({ forumId }) => {
     return (
       <div className="text-center py-8 bg-white rounded-lg shadow">
         <p className="text-red-500 mb-4">{error}</p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
         >
@@ -66,13 +79,27 @@ const PostList = ({ forumId }) => {
   return (
     <div className="space-y-6">
       {posts.map((post) => (
-        <Post 
-          key={post.postId} 
+        <Post
+          key={post.postId}
           post={post}
           onPostUpdate={(updatedPost) => {
-            setPosts(currentPosts => 
-              currentPosts.map(p => p.postId === updatedPost.postId ? updatedPost : p)
-            );
+            setPosts(currentPosts => {
+              // Ensure currentPosts is an array before mapping
+              if (!Array.isArray(currentPosts)) {
+                console.warn('currentPosts is not an array in onPostUpdate:', currentPosts);
+                return [updatedPost]; // Or handle as an error, depending on expected behavior
+              }
+              return currentPosts.map(p => p.postId === updatedPost.postId ? updatedPost : p);
+            });
+          }}
+          onPostDelete={(deletedPostId) => {
+            setPosts(currentPosts => {
+              if (!Array.isArray(currentPosts)) {
+                 console.warn('currentPosts is not an array in onPostDelete:', currentPosts);
+                 return [];
+              }
+              return currentPosts.filter(p => p.postId !== deletedPostId);
+            });
           }}
         />
       ))}

@@ -56,7 +56,7 @@ const Donation = ({ projectId, isFixed = true }) => {
     }
   }, [projectId]);
 
-  // Safe filtering with proper fallbacks
+
   const moneyDonations = Array.isArray(donations) 
     ? donations.filter((donation) => donation.type === "money") 
     : [];
@@ -65,6 +65,7 @@ const Donation = ({ projectId, isFixed = true }) => {
     ? donations.filter((donation) => donation.type === "goods") 
     : [];
     
+
   const totalMoney = moneyDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
 
   const paginatedDonations = () => {

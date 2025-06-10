@@ -16,6 +16,7 @@ const Donation = ({ projectId, isFixed = true }) => {
         setLoading(true);
         const response = await apiConfig.get(`/donations/project/${projectId}`);
         console.log("Fetched donations:", response.data);
+
         
         // Fix: Ensure donations is always an array
         const donationsData = response.data;
@@ -33,11 +34,14 @@ const Donation = ({ projectId, isFixed = true }) => {
           setDonations([]);
         }
         
+
         setError(null);
       } catch (err) {
         console.error("Error fetching donations:", err);
         setError("Không thể tải danh sách ủng hộ.");
-        setDonations([]); // Ensure donations is always an array even on error
+
+        setDonations([]);
+
       } finally {
         setLoading(false);
       }
@@ -48,6 +52,7 @@ const Donation = ({ projectId, isFixed = true }) => {
     }
   }, [projectId]);
 
+
   // Safe filtering with fallback to empty array
   const moneyDonations = Array.isArray(donations) 
     ? donations.filter((d) => d.type === "money") 
@@ -55,6 +60,7 @@ const Donation = ({ projectId, isFixed = true }) => {
   const goodsDonations = Array.isArray(donations) 
     ? donations.filter((d) => d.type === "goods") 
     : [];
+
   const totalMoney = moneyDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
 
   const paginatedDonations = (list) => {

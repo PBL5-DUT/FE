@@ -19,6 +19,7 @@ import AboutUs from "./pages/VLT/AboutUs";
 import JoinedProject from "./pages/VLT/JoinedProject";
 import ForumOverview from "./pages/VLT/ForumOverview";
 import Forum from "./pages/VLT/Forum";
+import ChatButton from "./components/VLT/ChatButton";
 
 import PmDetail from './pages/PM/PmDetailPage';
 import PmManager from './pages/PM/PmManagerPage';
@@ -56,6 +57,7 @@ function App() {
               <div className="flex-1 overflow-y-auto">
                 <Outlet />
               </div>
+              <ChatButton />
             </div>
           </div>
         </ProtectedRoute>

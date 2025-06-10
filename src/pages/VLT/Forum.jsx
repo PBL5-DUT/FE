@@ -1,8 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import LeftBar from "../../components/VLT/LeftBar";
-import ChatButton from "../../components/VLT/ChatButton";
-import AIChatBox from "../../components/VLT/AIChatBox";
 import PostNew from "../../components/VLT/PostNew";
 import PostList from "../../components/VLT/PostList";
 import ProjectChild from "../../components/VLT/ProjectChild";
@@ -71,8 +69,7 @@ const Forum = () => {
         </aside>
 
         <>
-  <ChatButton />
-  <AIChatBox />
+  
 </>
       </div>
     </div>
