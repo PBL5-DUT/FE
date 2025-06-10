@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { apiConfig } from '../../config/apiConfig';
 
-const ReportRequest = ({ forumId }) => {
+const ReportRequest = ({ projectId }) => {
   const [activeTab, setActiveTab] = useState('post');
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,8 +15,14 @@ const ReportRequest = ({ forumId }) => {
   const fetchPendingReports = async () => {
     try {
       setLoading(true);
-      const response = await apiConfig.get(`/reports/pending?type=${activeTab}`);
+      if(activeTab === 'post') {
+      const response = await apiConfig.get(`/reports/postpending/${projectId}`);
+      }
+      else if(activeTab === 'comment') {
+      const response = await apiConfig.get(`/reports/commentpending/${projectId}`);
+      }
       setReports(response.data);
+
     } catch (err) {
       console.error('Error fetching pending reports:', err);
       setError('Không thể tải danh sách báo cáo chờ duyệt');
