@@ -33,6 +33,11 @@ export const AuthContextProvider = ({ children }) => {
       throw error;
     }
   };
+  const logoutUser = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setCurrentUser(null); 
+  };
 
   useEffect(() => {
     if (!currentUser) {
@@ -42,7 +47,7 @@ export const AuthContextProvider = ({ children }) => {
   }, [currentUser]);
 
   return (
-    <AuthContext.Provider value={{ currentUser, setCurrentUser, login }}>
+    <AuthContext.Provider value={{ currentUser, setCurrentUser, login,logoutUser }}>
       {children}
     </AuthContext.Provider>
   );
