@@ -46,7 +46,7 @@ const Forum = () => {
       case 'postings':
         return <PostRequest forumId={forumId} />;
       case 'reports':
-        return <ReportRequest />; 
+        return <ReportRequest projectId={projectId}/>; 
       default:
         return null;
     }
