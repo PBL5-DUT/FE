@@ -6,13 +6,12 @@ import { AuthContext } from "../../util/AuthContext";
 
 const Menu = ({ isOpen, setMenuOpen }) => {
   const navigate = useNavigate();
-  const { currentUser } = useContext(AuthContext);  
+   const { currentUser, logoutUser } = useContext(AuthContext);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-    window.location.reload(); // Đảm bảo trạng thái được cập nhật
+    logoutUser(); // Gọi hàm logoutUser để xóa token/user và cập nhật trạng thái
+    navigate("/login"); // Điều hướng đến trang đăng nhập
+    setMenuOpen(false); // Đóng menu sau khi đăng xuất
   };
 
   if (!isOpen) return null;
