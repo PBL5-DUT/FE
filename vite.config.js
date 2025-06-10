@@ -13,7 +13,8 @@ export default defineConfig({
         changeOrigin: true,
         secure: false
       }
-    }
+    },
+     allowedHosts: ['.ngrok-free.app'], 
   },
   optimizeDeps: {
     esbuildOptions: {
