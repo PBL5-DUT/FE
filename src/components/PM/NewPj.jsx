@@ -154,8 +154,8 @@ const NewPj = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-white bg-opacity-50 backdrop-blur-sm flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-1/2 relative max-h-screen overflow-y-auto">
+    <div className="fixed inset-0 bg-white bg-opacity-50 backdrop-blur-sm flex justify-center items-start pt-20">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-1/2 relative max-h-[90vh] overflow-y-auto">
         <button
           className="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-xl"
           onClick={onClose}

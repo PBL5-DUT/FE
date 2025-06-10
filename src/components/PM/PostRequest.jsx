@@ -15,6 +15,7 @@ const PostRequest = ({ forumId }) => {
         setLoading(true);
         const response = await apiConfig.get(`/posts/${forumId}/pending`);
         setPosts(response.data);
+        console.log('Fetched pending posts:', response.data);
       } catch (err) {
         console.error('Error fetching pending posts:', err);
         setError('Không thể tải danh sách bài viết chờ duyệt');

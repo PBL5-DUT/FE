@@ -36,7 +36,9 @@ const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
       goodDescription: formData.goodDescription || "",
       userId: formData.anonymous
         ?  currentUser.userId 
+
         : parseInt(formData.userId, 10) ,
+
     };
 
     try {
@@ -44,6 +46,7 @@ const AddDonation = ({ isOpen, onRequestClose, projectId, onSuccess }) => {
       onSuccess();
       onRequestClose();
     } catch (error) {
+      console.log(payload);
       console.error("Lỗi khi gửi donation:", error);
     }
   };
